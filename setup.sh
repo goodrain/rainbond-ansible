@@ -18,6 +18,7 @@
 IIP=$1
 DEPLOY_TYPE=${2:-onenode}
 INSTALL_TYPE=${3:-online}
+NETWORK_TYPE=${4:-calico}
 
 DOMAIN_API="http://domain.grapps.cn"
 

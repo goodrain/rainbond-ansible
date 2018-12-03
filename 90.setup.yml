@@ -27,7 +27,8 @@
 - hosts: worker
   roles:
     - { role: rainvar, tags: default }
-    - { role: kube-worker, tags: kube-worker}
+    - { role: kube-worker, tags: kube-worker }
+    - { role: etcd-proxy, tags: etcd-proxy }
 
 - hosts: master:worker:lb
   roles:
