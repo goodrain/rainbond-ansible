@@ -1,6 +1,6 @@
 #!/bin/bash
 
-check_key="{{ pillar['secretkey'] }}"
+check_key="{{ secretkey }}"
 
 if [ -f "/grdata/.check" ];then
     cat /grdata/.check | grep "$check_key" > /dev/null
