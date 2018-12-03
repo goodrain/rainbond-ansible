@@ -44,12 +44,12 @@
 - hosts: storage
   roles:
     - { role: rainvar, tags: default }
-    - { role: storage-server, tags: storage-server }
+    - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
 
 - hosts: master:worker:lb
   roles:
     - { role: rainvar, tags: default }
-    - { role: storage-client, tags: storage-client }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
 
 - hosts: lb
   roles:

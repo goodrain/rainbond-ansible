@@ -21,6 +21,7 @@
     - /etc/docker
     - /root/.rbd
     - /grdata/services/ssh
+    - /grdata/services/storage
   tags:
     - master
 
@@ -148,3 +149,29 @@
 - name: System | sysctl -p 
   shell: "sysctl -p /etc/sysctl.d/95-k8s-sysctl.conf"
   ignore_errors: true
+
+- name: System | deploy check ssh
+  shell: "ls /root/.ssh/id_rsa.pub"
+  register: deploy_check_ssh
+  delegate_to: deploy 
+
+- name: System | Copy ssh pub key as builder pub key
+  copy:
+    src: /root/.ssh/id_rsa.pub
+    dest: /grdata/services/ssh/builder_rsa.pub
+    mode: 0600
+  when: deploy_check_ssh.rc == 0
+
+- name: System | Copy ssh key as builder key
+  copy:
+    src: /root/.ssh/id_rsa
+    dest: /grdata/services/ssh/builder_rsa
+    mode: 0600
+  when: deploy_check_ssh.rc == 0
+
+- name: System | Copy ssh config 
+  copy:
+    src: "{{ base_dir }}/hack/files/ssh/config"
+    dest: /grdata/services/ssh/config
+    mode: 0600
+  when: deploy_check_ssh.rc == 0

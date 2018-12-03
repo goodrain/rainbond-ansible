@@ -32,3 +32,15 @@
 
 - name: Update exports
   shell: "exportfs -ra"
+
+
+- name: Health | Copy health storage check
+  template:
+    src: check.sh.j2
+    dest: /tmp/check_storage.sh
+    owner: root
+    group: root
+    mode: 0777
+
+- name: Health | Run health storage check
+  shell: "bash /tmp/check_storage.sh"

@@ -78,3 +78,5 @@ service_cidr: 11.1.0.1/12
 pod_cidr: 10.20.0.0/16
 
 app_domain: 37e53f.grapps.cn
+
+storage_type: nfs

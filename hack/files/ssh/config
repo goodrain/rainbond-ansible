@@ -1,0 +1,4 @@
+Host *
+  IdentityFile ~/.ssh/builder_rsa
+  StrictHostKeyChecking no
+  LogLevel ERROR
