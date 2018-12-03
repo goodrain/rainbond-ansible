@@ -1,3 +1,4 @@
+---
 - name: K8S | pull kubernetes from docker hub
   docker_image:
     name: "rainbond/{{ kubernetes_image }}"

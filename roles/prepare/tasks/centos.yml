@@ -1,13 +1,13 @@
-- name: PKG| remove centos pkg
-  yum: 
-    name: 
-      - firewalld
-      - python-firewall
-      - firewalld-filesystem
-      - container-selinux
-      - dnsmasq
-      - nscd
-    state: absent
+#- name: PKG| remove centos pkg
+#  yum: 
+#    name: 
+#      - firewalld
+#      - python-firewall
+#      - firewalld-filesystem
+#      - container-selinux
+#      - dnsmasq
+#      - nscd
+#    state: absent
 
 - name: PKG| add EPEL repo
   yum: name=epel-release state=latest

@@ -21,3 +21,7 @@ install:
 script:
   # Basic role syntax check
   - make main
+  - make build_ansible
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - docker push rainbond/rainspray:5.0
+

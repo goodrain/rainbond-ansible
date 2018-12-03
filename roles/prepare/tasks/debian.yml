@@ -1,14 +1,14 @@
-- name: PKG | rm ubuntu package
-  apt: 
-    name: 
-      - ufw
-      - lxd
-      - lxd-client
-      - lxcfs
-      - lxc-common
-      - nscd
-      - dnsmasq
-    state: absent
+#- name: PKG | rm ubuntu package
+#  apt: 
+#    name: 
+#      - ufw
+#      - lxd
+#      - lxd-client
+#      - lxcfs
+#      - lxc-common
+#      - nscd
+#      - dnsmasq
+#    state: absent
 
 - name: PKG | install ubuntu package
   apt: 

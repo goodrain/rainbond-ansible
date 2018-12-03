@@ -28,7 +28,10 @@ services:
     - network.target
   requires:
     - network.target
-  type: only_health_check
+  only_health_check: true
+  disable: false
+  is_init_start: true
+  type: notify
   start: none
   restart_policy: always
   restart_sec: 10
@@ -42,7 +45,10 @@ services:
     - network.target
   requires:
     - network.target
-  type: only_health_check
+  only_health_check: true
+  disable: false
+  is_init_start: true
+  type: notify
   start: none
   restart_policy: always
   restart_sec: 10

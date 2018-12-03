@@ -16,7 +16,7 @@
     dest: "{{ env_dir }}/init-flanneld.sh"
     mode: 0755
 
-- name: Rainbond | Copy Init flanneld 
+- name: Rainbond | Run Init flanneld 
   shell: "bash {{ env_dir }}/init-flanneld.sh"
   run_once: true
   delegate_to: "{{ groups['master'][0] }}"
