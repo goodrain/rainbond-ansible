@@ -80,3 +80,4 @@ pod_cidr: 10.20.0.0/16
 app_domain: 37e53f.grapps.cn
 
 storage_type: nfs
+default_dns_local: 114.114.114.114 

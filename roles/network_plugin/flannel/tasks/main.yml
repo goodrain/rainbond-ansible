@@ -6,7 +6,7 @@
 
 - name: Rainbond | Copy flanneld Service
   template:
-    src: mk-docker-opts.sh
+    src: mk-docker-opts.sh.j2
     dest: "{{ env_dir }}/mk-docker-opts.sh"
     mode: 0755
 
@@ -19,7 +19,7 @@
 - name: Rainbond | Copy Init flanneld 
   shell: "bash {{ env_dir }}/init-flanneld.sh"
   run_once: true
-  delegate_to: groups[master][0]
+  delegate_to: "{{ groups['master'][0] }}"
 
 - name: Rainbond | start flanneld
   shell: "systemctl daemon-reload && systemctl enable flanneld && systemctl start flanneld"

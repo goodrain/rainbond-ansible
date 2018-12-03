@@ -30,6 +30,11 @@
     - { role: kube-worker, tags: kube-worker }
     - { role: etcd-proxy, tags: etcd-proxy }
 
+- hosts: master:worker
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: health, tags: health }
+
 - hosts: master:worker:lb
   roles:
   - { role: rainvar, tags: default }

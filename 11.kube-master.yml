@@ -3,6 +3,8 @@
   roles:
     - { role: rainvar, tags: default }
     - { role: kube-master, tags: kube-master }
+    - { role: health, tags: health }
+
 
 #  tasks:
 #  - name: Making master nodes SchedulingDisabled

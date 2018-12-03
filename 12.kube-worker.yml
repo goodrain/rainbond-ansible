@@ -4,3 +4,4 @@
     - { role: rainvar, tags: default }
     - { role: kube-worker, tags: kube-worker }
     - { role: etcd-proxy, tags: etcd-proxy }
+    - { role: health, tags: health }

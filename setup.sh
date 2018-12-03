@@ -49,6 +49,24 @@ init(){
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 }
 
+get_default_dns() {
+    dns=$(cat /etc/resolv.conf | grep "^nameserver" | head -1 | awk '{print $2}')
+    [ -z "$dns" ] && dns="114.114.114.114"
+    echo "default_dns_local: $dns"
+    sed -i -r  "s/(^default_dns_local: ).*/\1$dns/" roles/rainvar/defaults/main.yml
+}
+
+get_default_netwrok_type() {
+    if [ "$NETWORK_TYPE" == "flannel" ];then
+        network="flannel"
+    else
+        network="calico"
+    fi
+    echo "Defalut Network Type: ${network}"
+    sed -i -r  "s/(^CLUSTER_NETWORK: ).*/\1$network/" roles/rainvar/defaults/main.yml
+
+}
+
 get_distribution() {
 	lsb_dist=""
 	# Every system that we officially support has /etc/os-release
@@ -126,6 +144,8 @@ init
 [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $1
 
 onenode(){
+    get_default_dns
+    get_default_netwrok_type
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     ansible-playbook -i inventory/hosts 90.setup.yml
 }

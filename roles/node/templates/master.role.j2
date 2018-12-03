@@ -39,7 +39,7 @@ services:
   start: >-
     docker run --name rbd-repo
     --network host
-    -v /grdata/services/artifactory-manage01:/var/opt/jfrog/artifactory
+    -v /grdata/services/artifactory-{{ inventory_hostname }}:/var/opt/jfrog/artifactory
     -i goodrain.me/{{ repo }}
   stop: docker stop rbd-repo
   restart_policy: always
@@ -207,7 +207,7 @@ services:
   start: >-
     docker run --name rbd-monitor
     --network host
-    -v /opt/rainbond/data/prom:/prometheusdata
+    -v {{ rbd_dir }}/data/prom:/prometheusdata
     -i goodrain.me/{{ monitor }}
     --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ nodeip }}:9999  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
   stop: docker stop rbd-monitor
@@ -266,81 +266,5 @@ services:
     -v {{ rbd_dir }}/logs/rbd-app-ui/:/tmp/
     -i goodrain.me/{{ rbd_app_ui }}
   stop: docker stop rbd-app-ui
-  restart_policy: always
-  restart_sec: 10
-
-- name: docker
-  endpoints:
-  - name: DOCKER_ENDPOINTS
-    protocol: http
-    port: 2376
-  health:
-    name: docker
-    model: http
-    address: 127.0.0.1:2376/version
-    time_interval: 5
-  after:
-    - network.target
-  requires:
-    - network.target
-  type: notify
-  start: none
-  restart_policy: always
-  restart_sec: 10
-- name: storage
-  health:
-    name: storage
-    model: cmd
-    address: {{ rbd_dir }}/health/storage.sh
-    time_interval: 5
-  after:
-    - network.target
-  requires:
-    - network.target
-  type: notify
-  start: none
-  restart_policy: always
-  restart_sec: 10
-- name: local-dns
-  health:
-    name: local-dns
-    model: cmd
-    address: {{ rbd_dir }}/health/local-dns.sh
-    time_interval: 5
-  after:
-    - network.target
-  requires:
-    - network.target
-  type: notify
-  start: none
-  restart_policy: always
-  restart_sec: 10
-- name: rbd-dns
-  endpoints:
-  - name: DNS_ENDPOINTS
-    protocol: udp
-    port: 53
-  health:
-    name: rbd-dns
-    model: cmd
-    address: {{ rbd_dir }}/health/rbd-dns.sh
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm rbd-dns
-  start: >-
-    docker run --name rbd-dns
-    --network host
-    -e VERBOSE=true
-    -v {{ kubecfg_dir }}:/opt/rainbond/etc/kubernetes/kubecfg
-    -i goodrain.me/{{ dns }}
-    --kubecfg-file={{ kubecfg_dir }}/admin.kubeconfig
-    --v=2
-    --healthz-port=8089
-    --dns-bind-address={{ nodeip }}
-    --nameservers=100.100.2.136,1.2.4.8
-    --recoders=goodrain.me={{ MASTER_IP }},*.goodrain.me={{ MASTER_IP }}
-  stop: docker stop rbd-dns
   restart_policy: always
   restart_sec: 10
