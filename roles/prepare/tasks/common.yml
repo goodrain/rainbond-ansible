@@ -74,12 +74,12 @@
 - name: Tools | Copy Rainbond Tools
   copy: src={{ item }} dest={{ bin_dir }} owner=root mode=777
   with_fileglob:
-    - "{{ base_dir }}/files/bin/grtools/*"
+    - "{{ base_dir }}/hack/files/bin/grtools/*"
 
 - name: health check | Copy Rainbond Health Check
   copy: src={{ item }} dest={{ rbd_dir }}/health owner=root mode=777
   with_fileglob:
-    - "{{ base_dir }}/files/health/*"
+    - "{{ base_dir }}/hack/files/health/*"
 
 - name: User | Create Rain User Group
   group:

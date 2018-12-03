@@ -19,6 +19,7 @@
 - name: Check Region SSL
   shell: "ls {{ region_ca_dir }}/ca.pem"
   register: region_ca_is_done
+  ignore_errors: true
 
 
 - name: Rainbond | check_or_create_region-ssl-ca
