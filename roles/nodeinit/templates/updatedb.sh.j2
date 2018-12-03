@@ -1,0 +1,10 @@
+#!/bin/bash
+
+docker exec rbd-db mysql -e "show databases"
+[ "$?" -eq 0 ] && (
+    docker exec rbd-db mysql -e "grant all on *.* to '{{ DBUSER }}'@'%' identified by '{{ DBPASS }}' with grant option; flush privileges";docker exec rbd-db mysql -e "delete from mysql.user where user=''; flush privileges"
+    docker exec rbd-db mysql -e "CREATE DATABASE IF NOT EXISTS region DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+    docker exec rbd-db mysql -e "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+    docker exec rbd-app-ui python /app/ui/manage.py migrate
+
+)

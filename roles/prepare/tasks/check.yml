@@ -1,0 +1,37 @@
+---
+- name: Check | Stop if ansible version is too low
+  assert:
+    that:
+      - ansible_version.full|version_compare('2.3.0', '>=')
+  run_once: yes
+
+- name: Check | Stop if non systemd OS type
+  assert:
+    that: ansible_service_mgr == "systemd"
+  ignore_errors: "true"
+
+- name: Check | Stop if unknown OS
+  assert:
+    that: ansible_distribution in [ 'CentOS','RedHat','Debian','Ubuntu']
+  ignore_errors: "false"
+
+- name: Check | Stop if memory is too small for masters
+  assert:
+    that: ansible_memtotal_mb >= 3500
+  ignore_errors: "false"
+  when: inventory_hostname in groups['master']
+
+- name: Check | Stop if memory is too small for workers
+  assert:
+    that: ansible_memtotal_mb >= 3500
+  ignore_errors: "false"
+  when: inventory_hostname in groups['worker']
+
+# redhat 
+- name: Check | minimum kernel version
+  fail:
+    msg: >
+          docker requires a minimum kernel version of
+          {{ docker_kernel_min_version }} on
+          {{ ansible_distribution }}-{{ ansible_distribution_version }}
+  when: ansible_kernel is version(docker_kernel_min_version, "<")

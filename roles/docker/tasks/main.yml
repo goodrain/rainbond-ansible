@@ -1,0 +1,31 @@
+---
+#- include_tasks: set_facts_dns.yml
+#  when: dns_mode != 'none' and resolvconf_mode == 'docker_dns'
+#  tags:
+#    - facts
+
+- import_tasks: online.yml
+  when: install_type == "online"
+
+- import_tasks: offline.yml
+  when: install_type == "offline"
+
+- name: flush handlers so we can wait for docker to come up
+  meta: flush_handlers
+
+- name: set fact for docker_version
+  command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
+  register: installed_docker_version
+  changed_when: false
+  ignore_errors: "true"
+
+- name: Set docker systemd config
+  import_tasks: systemd.yml
+
+- name: ensure docker service is started and enabled
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - docker

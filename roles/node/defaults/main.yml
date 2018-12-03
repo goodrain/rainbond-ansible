@@ -1,0 +1,14 @@
+---
+nodeip: "{% if k8s_interface is defined %}{{hostvars[inventory_hostname]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[inventory_hostname]['ip']|default(hostvars[inventory_hostname]['ansible_default_ipv4']['address'])}}{% endif %}"
+run_mode: |-
+  {% if inventory_hostname in groups['master'] %}master{% else %}worker{% endif %}
+noderule: |-
+  {% if inventory_hostname in groups['master'] %}
+    {% if inventory_hostname in groups['worker'] %}
+      manage,compute
+    {% else %}
+      manage
+    {% endif %}
+  {% else %}
+      compute
+  {% endif %}

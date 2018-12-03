@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#=============================
+# <none> images cleanup script
+#=============================
+
+cclear
+
+ilist=`docker images --filter "dangling=true" -q`
+
+if [ "$ilist" != "" ];then
+
+docker rmi $ilist
+
+else
+  echo -e "\nThere is no images of <none>"
+fi

@@ -1,0 +1,6 @@
+---
+- name: Set task variables
+  debug:
+    msg: "Check roles/rainvar/defaults/main.yml"
+  tags:
+    - always

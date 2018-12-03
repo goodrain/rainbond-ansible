@@ -1,0 +1,14 @@
+---
+- name: Check Unpack 
+  shell: "ls {{ local_tools }}/bin/etcdctl"
+  register: unpack_is_done
+  ignore_errors: true
+
+- name: Rainbond | Unpack rbd cni tools
+  shell: "docker run --rm -v {{ local_tools }}:/sysdir rainbond/{{ rbd_cni }} tar zxf /pkg.tgz -C /sysdir"
+  when: unpack_is_done.rc != 0
+
+- name: Rainbond | Unpack k8s cni tools
+  shell: "docker run --rm -v {{ local_tools }}:/sysdir rainbond/{{ k8s_cni }} tar zxf /pkg.tgz -C /sysdir"
+  when: unpack_is_done.rc != 0
+

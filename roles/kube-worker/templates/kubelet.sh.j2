@@ -1,0 +1,20 @@
+#!/bin/bash
+
+exec /usr/local/bin/kubelet \
+    --address={{ worker_access_address }} \
+    --port=10250 \
+    --hostname_override=${NODE_UUID} \
+    --kubeconfig={{ kubecfg_dir }}/admin.kubeconfig \
+    --cert-dir={{ ca_dir }} \
+    --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge \
+    --cluster-dns={{ worker_access_address }} \
+    --register-node=false \
+    --max-pods=10000 \
+    --network-plugin=cni \
+    --cni-bin-dir=/opt/rainbond/bin \
+    --cni-conf-dir=/opt/rainbond/etc/cni/ \
+    --cpu-cfs-quota=false \
+    --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
+    --logtostderr=true \
+    --maximum-dead-containers-per-container=0 \
+    --v=2

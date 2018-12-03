@@ -1,0 +1,116 @@
+#!/bin/bash
+
+#ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
+version=$(yq r /srv/pillar/rainbond.sls rbd-version)
+
+func(){
+    local ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
+    systemctl $1 node
+    systemctl daemon-reload
+    for service in ${ALL_SERVICES[@]}
+    do
+        [ -f "/etc/systemd/system/$service.service" ] && (
+            systemctl $1 $service
+            [ "$?" -eq 0 ] && echo "$1 $service successful" || echo "$1 $service failure"
+        ) || (
+            echo "not found.skip $1 $service"
+        )
+    done
+}
+
+core(){
+    local update_img=$1
+    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui rbd-monitor"
+    local time=0
+    for img in ${all[@]}
+    do
+        if [ "$img" == "$update_img" ];then
+            echo "update ${update_img}"
+            docker pull rainbond/${update_img}:${version}
+            docker tag rainbond/${update_img}:${version} goodrain.me/${update_img}:${version}
+            docker push goodrain.me/${update_img}:${version}
+            echo "restart ${update_img}"
+            systemctl restart ${update_img}
+            time=1
+        fi
+    done
+    if [ "$time" != 1 ];then
+        echo "not support ${update_img}"
+        echo "only support ${all}"
+    fi
+}
+
+update_all(){
+    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui rbd-monitor"
+    for update_img in ${all[@]}
+    do
+        echo "update ${update_img}"
+        docker pull rainbond/${update_img}:${version}
+        docker tag rainbond/${update_img}:${version} goodrain.me/${update_img}:${version}
+        docker push goodrain.me/${update_img}:${version}
+        echo "restart ${update_img}"
+        systemctl restart ${update_img}
+    done
+}
+
+reload(){
+    reload_services="kube-apiserver rbd-eventlog rbd-monitor rbd-worker rbd-webcli rbd-mq rbd-chaos rbd-api rbd-entrance"
+    for reload_service in ${reload_services[@]}
+    do
+        echo "systemctl restart $reload_service" >> /tmp/.reload_services
+        systemctl restart $reload_service
+        [ "$?" -eq 0 ] && (
+            echo "restart $reload_service ok" >> /tmp/.reload_services
+        ) || (
+            echo "restart $reload_service failed" >> /tmp/.reload_services
+        )
+    done
+}
+
+reset(){
+    local ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd etcd-proxy storage local-dns kubelet"
+    echo "uninstall salt packages"
+    yum remove -y salt-*
+    rm -rf /etc/salt/
+    rm -rf /srv/
+    echo "rm /opt/rainbond"
+    rm -rf /opt/rainbond/
+    rm -rf /root/.kube/
+    rm -rf /root/.rbd/
+    echo "rm /grdata"
+    df -h | grep grdata >/dev/null
+    [ "$?" -eq 0 ] && (
+        umount /grdata
+        #num=$(cat -n  /etc/fstab | grep grdata | awk '{print $1}')
+        sed -i '/grdata/d' /etc/fstab
+    )
+    echo "disable & remove systemd"
+    for service in ${ALL_SERVICES[@]}
+    do
+        [ -f "/etc/systemd/system/$service.service" ] && (
+            systemctl disable $service
+            [ "$?" -eq 0 ] && rm -rf /etc/systemd/system/$service.service
+        )
+    done
+    iptables -F;iptables -X;iptables -Z
+    echo "clean all."
+}
+
+if [ "$1" == "start" ];then
+    func start
+elif [ "$1" == "stop" ];then
+    func stop
+elif [ "$1" == "reload" ];then
+    reload
+elif [ "$1" == "reset" ];then
+    func stop
+    reset
+elif [ "$1" == "update" ];then
+    if [ "$2" == "all" ];then
+        update_all
+    else
+        core update $2
+    fi
+else
+    echo "grclis <start|stop|update all>"
+fi

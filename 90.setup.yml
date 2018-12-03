@@ -1,0 +1,66 @@
+---
+- hosts: all
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: prepare, tags: prepare }
+
+- hosts: deploy:master:worker:lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: docker, tags: docker }
+
+- hosts: deploy
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: image, tags: image }
+
+- hosts: etcd
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: etcd, tags: etcd }
+
+- hosts: master
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: kube-master, tags: kube-master }
+
+- hosts: worker
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: kube-worker, tags: kube-worker}
+
+- hosts: master:worker:lb
+  roles:
+  - { role: rainvar, tags: default }
+  - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
+  - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
+
+- hosts: master[0]
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: db, tags: db }
+
+- hosts: storage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage-server, tags: storage-server }
+
+- hosts: master:worker:lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage-client, tags: storage-client }
+
+- hosts: lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: lb, tags: lb }
+
+- hosts: master:worker
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: node, tags: node }
+
+- hosts: deploy
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: nodeinit, tags: nodeinit}

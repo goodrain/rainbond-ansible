@@ -1,0 +1,13 @@
+{
+    "name": "calico-k8s-network",
+    "cniVersion": "0.1.0",
+    "type": "calico",
+    "etcd_endpoints": "http://{{ MASTER_IP }}:2379",
+    "log_level": "info",
+    "ipam": {
+        "type": "calico-ipam"
+    },
+    "kubernetes": {
+        "kubeconfig": "{{ rbd_dir }}/admin.kubeconfig"
+    }
+}

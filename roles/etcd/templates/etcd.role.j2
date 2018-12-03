@@ -1,0 +1,20 @@
+version: '2.1'
+services:
+- name: etcd
+  endpoints:
+  - name: ETCD_ENDPOINTS
+    protocol: http
+    port: 2379
+  health:
+    name: etcd
+    model: http
+    address: 127.0.0.1:2379/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm etcd
+  start: {{ rbd_dir }}/scripts/start-etcd.sh
+  stop: docker stop etcd
+  restart_policy: always
+  restart_sec: 10

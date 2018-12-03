@@ -1,0 +1,30 @@
+---
+- name: K8S | pull etcd from goodrain.me
+  shell: "docker pull goodrain.me/{{ etcd_image }}"
+  ignore_errors: "true"
+
+- name: Rainbond | Copy Etcd Role
+  template:
+    src: etcd.role.j2
+    dest: "{{ node_role_dir }}/etcd.yaml"
+
+- name: Rainbond | Copy Etcd Script
+  template:
+    src: start-etcd.sh.j2
+    dest: "{{ script_dir }}/start-etcd.sh"
+    mode: 0777
+
+- name: Rainbond | Copy Etcd Service
+  template:
+    src: etcd.service.j2
+    dest: /etc/systemd/system/etcd.service
+
+- name: Rainbond | Copy etcdctl binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/etcdctl"
+    dest: "{{ bin_dir }}/etcdctl"
+    mode: 0755
+
+- name: Rainbond | start etcd
+  shell: "systemctl daemon-reload && systemctl start etcd"
+

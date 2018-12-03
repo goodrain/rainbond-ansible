@@ -1,0 +1,24 @@
+---
+- name: K8S | pull calico from goodrain.me
+  shell: "docker pull goodrain.me/{{ calico_image }}"
+  ignore_errors: "true"
+
+- name: Rainbond | Copy Calico Service
+  template:
+    src: calico.service.j2
+    dest: /etc/systemd/system/calico.service
+
+- name: Rainbond | Copy Calico Service
+  template:
+    src: calico.conf.j2
+    dest: /opt/rainbond/etc/cni/10-calico.conf
+
+
+- name: Rainbond | Copy calicoctl binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/calicoctl"
+    dest: "{{ bin_dir }}/calicoctl"
+    mode: 0755
+
+- name: Rainbond | start calico
+  shell: "systemctl daemon-reload && systemctl enable calico && systemctl start calico"

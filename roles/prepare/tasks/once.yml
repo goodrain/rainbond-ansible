@@ -1,0 +1,9 @@
+# Generate default domain
+- name: make domain prepare
+
+- name: make_domain
+
+- name: rsync_update_domain
+
+# rsync default ssh key
+- name: key_cp

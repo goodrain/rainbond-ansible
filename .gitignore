@@ -102,3 +102,13 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+TODO
+
+30.addmaster.yml
+31.addnode.yml
+80.harbor.yml
+92.upgrade.yml
+93.backup.yml
+94.restore.yml
+99.clean.yml

@@ -1,0 +1,4 @@
+---
+storage_type: nfs
+nfs_rpcbind_state: started
+nfs_rpcbind_enabled: true

@@ -1,0 +1,14 @@
+# to install clust-addons
+- hosts: storage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage-server, tags: storage-server }
+
+- hosts:
+    - master
+    - worker
+    - lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage-client, tags: storage-client }
+

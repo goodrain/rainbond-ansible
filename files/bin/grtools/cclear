@@ -1,0 +1,7 @@
+#!/bin/bash
+rm_ctns=$(docker ps -a -q --filter 'status=exited')
+if [ -z "$rm_ctns" ];then
+	echo "no exited containers need to delete"
+else
+	docker rm $rm_ctns
+fi

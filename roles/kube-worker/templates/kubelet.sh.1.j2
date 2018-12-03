@@ -1,0 +1,66 @@
+#!/bin/bash
+
+KUBE_LOGTOSTDERR="--logtostderr=true"
+KUBE_LOG_LEVEL="--v=2"
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+KUBE_MASTER="--master=http://127.0.0.1:8080"
+
+KUBELET_ADDRESS="--node-ip={{ worker_access_address }}"
+
+# KUBELET_PORT="--port=10250"
+
+KUBELET_HOSTNAME="--hostname-override=${NODE_UUID}"
+
+# location of the api-server
+# KUBELET_API_SERVER=""
+
+# Add your own!
+KUBELET_ARGS="  --bootstrap-kubeconfig={{ kubecfg_dir }}/bootstrap.kubeconfig \
+                --cert-dir={{ ca_dir }} \
+                --cgroup-driver=cgroupfs \
+                --cluster-dns={{ worker_access_address }} \
+                --cluster-domain=cluster.local. \
+                --fail-swap-on=false \
+                --feature-gates=RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true \
+                --node-labels=node-role.kubernetes.io/k8s-node=true \
+                --image-gc-high-threshold=70 \
+                --image-gc-low-threshold=50 \
+                --kube-reserved=cpu=500m,memory=512Mi,ephemeral-storage=1Gi \
+                --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+                --system-reserved=cpu=1000m,memory=1024Mi,ephemeral-storage=1Gi \
+                --serialize-image-pulls=false \
+                --sync-frequency=30s \
+                --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
+                --resolv-conf=/etc/resolv.conf \
+                --rotate-certificates"
+
+
+   /usr/local/bin/kubelet
+    --address=10.10.10.20
+    --port=10250
+    --hostname_override=ae54bf66-8f4f-4a7a-94e0-b688834e16ed
+    --kubeconfig=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
+    --cert-dir=/opt/rainbond/etc/kubernetes/ssl
+    --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge
+    --cluster-dns=10.10.10.20
+    --register-node=false
+    --max-pods=10000
+    --network-plugin=cni
+    --cni-bin-dir=/opt/rainbond/bin
+    --cni-conf-dir=/opt/rainbond/etc/cni/
+    --cpu-cfs-quota=false
+    --pod-infra-container-image=goodrain.me/pause-amd64:3.0
+    --logtostderr=true
+    --maximum-dead-containers-per-container=0
+    --v=2
+
+
+exec /usr/local/bin/kubelet \
+            $KUBE_LOGTOSTDERR \
+            $KUBE_LOG_LEVEL \
+            $KUBELET_API_SERVER \
+            $KUBELET_ADDRESS \
+            $KUBELET_PORT \
+            $KUBELET_HOSTNAME \
+            $KUBE_ALLOW_PRIV \
+            $KUBELET_ARGS

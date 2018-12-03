@@ -1,0 +1,80 @@
+rainbond_version: 5.0
+kubernetes_version: v1.10.11
+docker_version: 17.06.2.ce
+docker_selinux_version: '17.03'
+docker_log_opts: "--log-opt max-size=50m --log-opt max-file=5"
+docker_kernel_min_version: '3.10'
+docker_daemon_graph: "/var/lib/docker"
+etcd_version: v3.2.25
+calico_version: v3.3.1
+install_type: online
+bin_dir: "/usr/local/bin"
+rbd_dir: "/opt/rainbond"
+base_dir: "/opt/rainbond/rainbond-ansible"
+ca_dir: "{{ rbd_dir }}/etc/kubernetes/ssl"
+local_tools: "{{ rbd_dir }}/etc/tools"
+local_imgaes: "{{ rbd_dir }}/rainbond-ansible/offline/images"
+kubecfg_dir: "{{ rbd_dir }}/etc/kubernetes/kubecfg"
+node_role_dir: "{{ rbd_dir }}/conf"
+env_dir: "{{ rbd_dir }}/envs"
+script_dir: "{{ rbd_dir }}/scripts"
+region_ca_dir: "{{ rbd_dir }}/etc/rbd-api/region.goodrain.me/ssl"
+secretkey: aek0yi7ro5AJaeg5ooRoMie2owu4raeT
+rbd_db_image: rbd-db:{{ rainbond_version }}
+db_user: write
+db_pass: 1833efe4
+
+override_system_hostname: true
+#kube_pods_subnet: 10.233.64.0/18
+#kube_service_addresses: 10.233.0.0/18
+#service_cidr: 10.254.0.0/16
+node_port_range: "20000-40000"
+dns_domain: "cluster.local"
+resolvconf_mode: docker_dns
+dns_mode: coredns
+docker_dns_servers_strict: false
+kube_apiserver_ip: "{{ kube_service_addresses|ipaddr(1)|ipaddr('address') }}"
+kube_dns_server: "{{ kube_service_addresses|ipaddr(10)|ipaddr('address') }}"
+rainbond_domain: "kubeapi.goodrain.me goodrain.me repo.goodrain.me lang.goodrain.me maven.goodrain.me region.goodrain.me"
+
+MASTER_IP: "{{hostvars[groups['master'][0]]['ip']|default(hostvars[groups['master'][0]]['ansible_default_ipv4']['address'])}}"
+
+KUBE_APISERVER: "https://kubeapi.goodrain.me:6443"
+
+# k8s
+etcd_image: etcd:{{ etcd_version }}
+kubernetes_image: hyperkube:{{ kubernetes_version }}
+calico_image: calico-node:{{ calico_version }}
+pause_amd64: pause-amd64:3.0
+kube_apiserver_image: kube-apiserver:{{ kubernetes_version }}
+kube_controller_manager_image: kube-controller-manager:{{ kubernetes_version }}
+kube_scheduler_image: kube-scheduler:{{ kubernetes_version }}
+# Rainbond
+tcm: plugins:tcm
+mesh: plugins:mesh
+hub: rbd-registry:2.6.2
+kubecfg: kubecfg:dev
+cfssl: cfssl:dev
+
+builder: builder:{{ rainbond_version }}
+runner: runner:{{ rainbond_version }}
+adapter: adapter:{{ rainbond_version }}
+repo: rbd-repo:{{ rainbond_version }}
+api: rbd-api:{{ rainbond_version }}
+worker: rbd-worker:{{ rainbond_version }}
+eventlog: rbd-eventlog:{{ rainbond_version }}
+gateway: rbd-gateway:{{ rainbond_version }}
+chaos: rbd-chaos:{{ rainbond_version }}
+mq: rbd-mq:{{ rainbond_version }}
+webcli: rbd-webcli:{{ rainbond_version }}
+rbd_app_ui: rbd-app-ui:{{ rainbond_version }}
+k8s_cni: cni:k8s_{{ rainbond_version }}
+rbd_cni: cni:rbd_{{ rainbond_version }}
+dns: rbd-dns:{{ rainbond_version }}
+monitor: rbd-monitor:{{ rainbond_version }}
+
+CLUSTER_NETWORK: calico
+service_cidr: 11.1.0.1/12
+pod_cidr: 10.20.0.0/16
+
+app_domain: 37e53f.grapps.cn

@@ -1,0 +1,9 @@
+# to install docker service
+- hosts:
+  - deploy
+  - master
+  - worker
+  - lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: docker, tags: docker }

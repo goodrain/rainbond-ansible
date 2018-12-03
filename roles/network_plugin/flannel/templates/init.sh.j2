@@ -1,0 +1,3 @@
+#!/bin/bash
+
+etcdctl --endpoints=http://{{ MASTER_IP }}:2379 set {[ FLANNEL_ETCD_PREFIX }}/config '{"Network":"'{{ pod_cidr }}'", "SubnetLen": 24, "Backend": {"Type": "vxlan"}}'

@@ -1,0 +1,36 @@
+version: '2.1'
+services:
+- name: kube-proxy
+  endpoints:
+  - name: _ENDPOINTS
+    protocol: http
+    port:
+  health:
+    name: kube-scheduler
+    model: tcp
+    address: 127.0.0.1:10251
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm 
+  start: NODE_UUID=${NODE_UUID } {{ rbd_dir }}/scripts/kube-proxy.sh
+  stop: docker stop kube-scheduler
+  restart_policy: always
+  restart_sec: 10
+- name: kubelet
+  endpoints:
+  - name: KUBELET_ENDPOINTS
+    protocol: http
+    port: 10248
+  health:
+    name: kubelet
+    model: tcp
+    address: 127.0.0.1:10248
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  start: NODE_UUID=${NODE_UUID} {{ rbd_dir }}/scripts/kubelet.sh
+  restart_policy: always
+  restart_sec: 10

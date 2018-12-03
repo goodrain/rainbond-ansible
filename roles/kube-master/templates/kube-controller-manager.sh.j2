@@ -1,0 +1,35 @@
+#!/bin/bash
+
+KUBE_LOGTOSTDERR="--logtostderr=true"
+KUBE_LOG_LEVEL="--v=2"
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+KUBE_MASTER="--master=http://127.0.0.1:8080"
+
+KUBE_CONTROLLER_MANAGER_ARGS="  --bind-address=0.0.0.0 \
+                                --cluster-name=kubernetes \
+                                --cluster-signing-cert-file={{ ca_dir }}/ca.pem \
+                                --cluster-signing-key-file={{ ca_dir }}/ca-key.pem \
+                                --controllers=*,bootstrapsigner,tokencleaner \
+                                --deployment-controller-sync-period=10s \
+                                --experimental-cluster-signing-duration=86700h0m0s \
+                                --leader-elect=true \
+                                --node-monitor-grace-period=40s \
+                                --node-monitor-period=5s \
+                                --pod-eviction-timeout=5m0s \
+                                --terminated-pod-gc-threshold=50 \
+                                --root-ca-file={{ ca_dir }}/ca.pem \
+                                --service-account-private-key-file={{ ca_dir }}/ca-key.pem \
+                                --feature-gates=RotateKubeletServerCertificate=true"
+
+exec /usr/bin/docker \
+    run \
+    --privileged \
+    --restart=always \
+    --net=host \
+    --name kube-controller-manager \
+    --volume={{ rbd_dir }}/etc/kubernetes:/opt/rainbond/etc/kubernetes \
+    goodrain.me/{{ kubernetes_image }} controller-manager \
+            $KUBE_LOGTOSTDERR \
+            $KUBE_LOG_LEVEL \
+            $KUBE_MASTER \
+            $KUBE_CONTROLLER_MANAGER_ARGS

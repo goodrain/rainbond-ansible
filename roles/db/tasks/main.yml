@@ -1,0 +1,24 @@
+---
+- name: Rainbond | pull db from goodrain.me
+  shell: "docker pull goodrain.me/{{ rbd_db_image }}"
+  ignore_errors: "true"
+
+- name: Rainbond | prepare dir 
+  file: name={{ item }} state=directory
+  with_items:
+    - "{{ rbd_dir }}/etc/rbd-db/conf.d"
+
+- name: Rainbond | Copy DB Role
+  template:
+    src: db.role.j2
+    dest: "{{ node_role_dir }}/db.yaml"
+
+- name: Rainbond | Copy DB Conf
+  template:
+    src: my.cnf.j2
+    dest: "{{ rbd_dir }}/etc/rbd-db/my.cnf"
+
+- name: Rainbond | Copy DB Init Script
+  template:
+    src: charset.cnf.j2
+    dest: "{{ rbd_dir }}/etc/rbd-db/conf.d/charset.cnf"

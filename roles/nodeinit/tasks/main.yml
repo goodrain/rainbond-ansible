@@ -1,0 +1,12 @@
+---
+- name: Rainbond | Copy DB Script
+  template:
+    src: updatedb.sh.j2
+    dest: "/tmp/updatedb.sh"
+
+- name: Rainbond | Run update DB
+  shell: "bash /tmp/updatedb.sh"
+  register: updatedb_task_result
+  until: updatedb_task_result is succeeded
+  retries: 5
+

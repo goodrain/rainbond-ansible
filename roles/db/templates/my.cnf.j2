@@ -1,0 +1,93 @@
+# rbd-db main configuration file.
+
+[client]
+port		= 3306
+socket		= /data/tmp/mysqld.sock
+
+[mysqld_safe]
+socket		= /data/tmp/mysqld.sock
+nice		= 0
+
+[mysqld]
+user		= mysql
+pid-file	= /data/tmp/mysqld.pid
+socket		= /data/tmp/mysqld.sock
+port		= 3306
+basedir		= /usr
+datadir		= /data/data
+tmpdir		= /tmp
+lc_messages_dir	= /usr/share/mysql
+lc_messages	= en_US
+skip-external-locking
+skip-name-resolve
+
+bind-address		= 0.0.0.0
+
+
+max_connections		      = 100
+connect_timeout 	      = 5
+wait_timeout	          = 28800
+interactive_timeout       = 28800
+max_allowed_packet	      = 16M
+thread_cache_size         = 128
+sort_buffer_size	      = 4M
+bulk_insert_buffer_size	  = 16M
+tmp_table_size		      = 32M
+max_heap_table_size	      = 32M
+
+# * MyISAM
+myisam_recover_options = BACKUP
+#open-files-limit	= 2000
+table_open_cache	= 800
+myisam_sort_buffer_size	= 512M
+read_buffer_size	= 2M
+read_rnd_buffer_size	= 1M
+
+# * Query Cache Configuration
+query_cache_limit		= 0K
+query_cache_size		= 0M
+query_cache_type		= OFF
+
+# * Logging and Replication
+log_warnings		= 2
+slow_query_log= 1
+slow_query_log_file	= /data/logs/slow.log
+long_query_time = 0.5
+log_slow_rate_limit	= 1000
+log_slow_verbosity	= query_plan
+
+log-queries-not-using-indexes
+log_slow_admin_statements
+
+# logbin
+log_bin		        = /data/logs/logbin
+log_bin_index		= /data/logs/logbin.index
+#sync_binlog		= 1
+expire_logs_days	= 3
+max_binlog_size     = 100M
+
+# * InnoDB
+innodb_log_file_size	= 50M
+innodb_buffer_pool_size	= 256M
+innodb_log_buffer_size	= 8M
+innodb_file_per_table	= 1
+innodb_open_files	= 800
+innodb_io_capacity	= 400
+innodb_flush_method	= O_DIRECT
+binlog_format=row
+default_storage_engine=InnoDB
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet	= 16M
+
+[mysql]
+#no-auto-rehash	# faster start of mysql but no tab completion
+
+
+#
+# * IMPORTANT: Additional settings that can override those from this file!
+#   The files must end with '.cnf', otherwise they'll be ignored.
+#
+!includedir /etc/mysql/conf.d/

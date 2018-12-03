@@ -1,0 +1,38 @@
+- name: PKG| remove centos pkg
+  yum: 
+    name: 
+      - firewalld
+      - python-firewall
+      - firewalld-filesystem
+      - container-selinux
+      - dnsmasq
+      - nscd
+    state: absent
+
+- name: PKG| add EPEL repo
+  yum: name=epel-release state=latest
+
+- name: PKG| install centos package
+  yum: 
+    name: 
+      - conntrack-tools     # ipvs mode
+      - psmisc       
+      - nfs-utils     
+      - jq                  
+      - socat               # port forwarding
+      - bash-completion     
+      - rsync               
+      - ipset
+      - ipvsadm
+      - net-tools
+    state: latest
+
+- name: SYSTEM | disable selinux
+  shell: "setenforce 0"
+  failed_when: false
+
+- name: SYSTEM | disable selinux forover
+  lineinfile:
+    dest: /etc/selinux/config
+    regexp: "^SELINUX="
+    line: "SELINUX=disabled"

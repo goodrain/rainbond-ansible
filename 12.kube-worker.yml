@@ -1,0 +1,5 @@
+# to set up 'kube-node' nodes
+- hosts: worker
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: kube-worker, tags: kube-worker}

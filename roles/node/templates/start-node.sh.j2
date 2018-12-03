@@ -1,0 +1,5 @@
+#!/bin/bash
+
+NODE_OPTS="--log-level=info --kube-conf={{ kubecfg_dir }}/admin.kubeconfig --etcd=http://127.0.0.1:2379   --hostIP={{ nodeip }} --run-mode {{ run_mode }} --noderule {{ noderule }}"
+
+exec {{ bin_dir }}/node $NODE_OPTS

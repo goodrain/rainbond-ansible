@@ -1,0 +1,28 @@
+---
+- name: Rainbond | Copy K8S Worker Role
+  template:
+    src: k8s-worker.role.j2
+    dest: "{{ node_role_dir }}/k8s-worker.yaml"
+
+- name: Rainbond | Copy Kube Proxy Script
+  template:
+    src: kube-proxy.sh.j2
+    dest: "{{ script_dir }}/kube-proxy.sh"
+
+- name: Rainbond | Copy Kubelet Script
+  template:
+    src: kubelet.sh.j2
+    dest: "{{ script_dir }}/kubelet.sh"
+
+- name: Rainbond | Copy kubelet binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/hyperkube"
+    dest: "{{ bin_dir }}/kubelet"
+    mode: 0755
+
+- name: Rainbond | Copy kube-proxy binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/hyperkube"
+    dest: "{{ bin_dir }}/kube-proxy"
+    mode: 0755
+

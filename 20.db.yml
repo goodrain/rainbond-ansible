@@ -1,0 +1,6 @@
+# to install db
+- hosts:
+  - master[0]
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: db, tags: db }

@@ -1,0 +1,59 @@
+#!/bin/bash
+
+KUBE_LOGTOSTDERR="--logtostderr=true"
+KUBE_LOG_LEVEL="--v=2"
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+KUBE_MASTER="--master=http://127.0.0.1:8080"
+KUBE_API_ADDRESS="--advertise-address={{ master_access_address }} --bind-address={{ master_access_address }}"
+KUBE_ETCD_SERVERS="--etcd-servers={{ etcd_endpoints }}"
+KUBE_API_PORT="--secure-port=6443"
+KUBE_ADMISSION_CONTROL="--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
+KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range={{ service_cidr }}"
+
+
+KUBE_API_ARGS=" --anonymous-auth=false \
+                --apiserver-count=3 \
+                --audit-log-maxage=30 \
+                --audit-log-maxbackup=3 \
+                --audit-log-maxsize=100 \
+                --audit-log-path=/var/log/kube-audit/audit.log \
+                --audit-policy-file={{ kubecfg_dir }}/audit-policy.yaml \
+                --authorization-mode=Node,RBAC \
+                --client-ca-file={{ ca_dir }}/ca.pem \
+                --enable-bootstrap-token-auth \
+                --enable-garbage-collector \
+                --enable-logs-handler \
+                --enable-swagger-ui \
+                --etcd-compaction-interval=5m0s \
+                --etcd-count-metric-poll-period=1m0s \
+                --event-ttl=48h0m0s \
+                --kubelet-https=true \
+                --kubelet-timeout=3s \
+                --log-flush-frequency=5s \
+                --token-auth-file={{ kubecfg_dir }}/token.csv \
+                --tls-cert-file={{ ca_dir }}/kubernetes.pem \
+                --tls-private-key-file={{ ca_dir }}/kubernetes-key.pem \
+                --service-node-port-range={{ node_port_range }} \
+                --service-account-key-file={{ ca_dir }}/ca.pem \
+                --storage-backend=etcd3 \
+                --enable-swagger-ui=true"
+
+exec /usr/bin/docker \
+    run \
+    --privileged \
+    --restart=always \
+    --net=host \
+    --name kube-apiserver \
+    --volume={{ rbd_dir }}/etc/kubernetes:/opt/rainbond/etc/kubernetes \
+    --volume={{ rbd_dir }}/logs/kube-audi:/var/log/kube-audit \
+    goodrain.me/{{ kubernetes_image }} apiserver \
+            $KUBE_LOGTOSTDERR \
+            $KUBE_LOG_LEVEL \
+            $KUBE_ETCD_SERVERS \
+            $KUBE_API_ADDRESS \
+            $KUBE_API_PORT \
+            $KUBELET_PORT \
+            $KUBE_ALLOW_PRIV \
+            $KUBE_SERVICE_ADDRESSES \
+            $KUBE_ADMISSION_CONTROL \
+            $KUBE_API_ARGS

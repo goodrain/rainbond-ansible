@@ -1,0 +1,35 @@
+- name: PKG | rm ubuntu package
+  apt: 
+    name: 
+      - ufw
+      - lxd
+      - lxd-client
+      - lxcfs
+      - lxc-common
+      - nscd
+      - dnsmasq
+    state: absent
+
+- name: PKG | install ubuntu package
+  apt: 
+    name:
+      - nfs-common          
+      - conntrack           
+      - jq                  
+      - socat               # port forwarding
+      - bash-completion     
+      - rsync               
+      - ipset
+      - ipvsadm
+      - net-tools
+    update_cache: yes
+    autoclean: yes
+    state: latest
+
+- name: SYSTEM | configuration ulimits
+  lineinfile:
+    dest: /etc/profile
+    regexp: "ulimit -SHn"
+    line: "ulimit -SHn 65535"
+
+

@@ -1,0 +1,150 @@
+---
+- name: Dirs | prepare rainbond
+  file: name={{ item }} state=directory
+  with_items:
+    - "{{ bin_dir }}"
+    - "{{ ca_dir }}"
+    - /cache/build
+    - /cache/source
+    - "{{ rbd_dir }}/etc/rbd-api/region.goodrain.me/ssl"
+    - "{{ rbd_dir }}/etc/kubernetes/ssl"
+    - "{{ rbd_dir }}/etc/kubernetes/kubecfg"
+    - "{{ rbd_dir }}/health"
+    - "{{ rbd_dir }}/data"
+    - "{{ rbd_dir }}/logs"
+    - "{{ rbd_dir }}/envs"
+    - "{{ rbd_dir }}/scripts/init"
+    - "{{ rbd_dir }}/conf"
+    - "{{ rbd_dir }}/etc/cni"
+    - "{{ rbd_dir }}/bin"
+    - /root/.kube
+    - /etc/docker
+    - /root/.rbd
+    - /grdata/services/ssh
+  tags:
+    - master
+
+- name: Assign inventory name to unconfigured hostnames (non-CoreOS and Tumbleweed)
+  hostname:
+    name: "{{inventory_hostname}}"
+  when:
+    - override_system_hostname
+    - ansible_os_family not in ['Suse', 'CoreOS', 'Container Linux by CoreOS']
+
+- name: set interface ip
+  set_fact: interface_ip="{% if k8s_interface is defined %}{{hostvars[inventory_hostname]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[inventory_hostname]['ip']|default(hostvars[inventory_hostname]['ansible_default_ipv4']['address'])}}{% endif %}"
+
+- name: Hosts | populate inventory into hosts file
+  blockinfile:
+    dest: /etc/hosts
+    block: |-
+      {% for item in (groups['master'] + groups['worker'] + groups['etcd'] +groups['lb'] |default([]))|unique -%}{% if k8s_interface is defined %}{{hostvars[item]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[item]['ip']|default(hostvars[item]['ansible_default_ipv4']['address'])}}{% endif %} {{ item }}
+      {% endfor %}
+    state: present
+    create: yes
+    backup: yes
+    marker: "# Ansible inventory hosts {mark}"
+
+- name: Hosts | populate rainbond into hosts file
+  blockinfile:
+    dest: /etc/hosts
+    block: |-
+      {% if k8s_interface is defined %}{{hostvars[groups['master'][0]]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[groups['master'][0]]['ip']|default(hostvars[groups['master'][0]]['ansible_default_ipv4']['address'])}}{% endif %}  {{ rainbond_domain }}
+    state: present
+    create: yes
+    backup: yes
+    marker: "# Rainbond hosts {mark}"
+
+- name: Hosts | localhost ipv4 in hosts file
+  lineinfile:
+    dest: /etc/hosts
+    line: "127.0.0.1 localhost localhost.localdomain"
+    regexp: '^127.0.0.1.*$'
+    state: present
+    backup: yes
+
+- name: Hosts | localhost ipv6 in hosts file
+  lineinfile:
+    dest: /etc/hosts
+    line: "::1 localhost6 localhost6.localdomain"
+    regexp: '^::1.*$'
+    state: present
+    backup: yes
+
+- name: Tools | Copy Rainbond Tools
+  copy: src={{ item }} dest={{ bin_dir }} owner=root mode=777
+  with_fileglob:
+    - "{{ base_dir }}/files/bin/grtools/*"
+
+- name: health check | Copy Rainbond Health Check
+  copy: src={{ item }} dest={{ rbd_dir }}/health owner=root mode=777
+  with_fileglob:
+    - "{{ base_dir }}/files/health/*"
+
+- name: User | Create Rain User Group
+  group:
+    name: rain
+    gid: 200
+    system: yes
+    state: present
+
+- name: User | Create Rain User
+  user:
+    name: rain
+    uid: 200
+    shell: /sbin/nologin
+    comment: "Rainbond user"
+    create_home: yes
+    groups: rain
+    system: yes
+    state: present
+
+- name: Create remote_tmp for it is used by another module
+  file:
+    path: "{{ lookup('config', 'DEFAULT_REMOTE_TMP', on_missing='skip', wantlist=True) | first | default('~/.ansible/tmp') }}"
+    state: directory
+    mode: 0700
+
+- name:  System | update ulimits
+  template: src=30-kubeasz.conf.j2 dest=/etc/security/limits.d/30-kubeasz.conf
+
+# add calico config 
+- name: System | add NetworkManager 
+  template: 
+    src: calico.conf.j2 
+    dest: /etc/NetworkManager/conf.d/calico.conf
+  ignore_errors: True
+
+- name: System | disable swap
+  shell: "swapoff -a && sysctl -w vm.swappiness=0"
+  ignore_errors: true
+
+- name: System | disable swap from fstab 
+  lineinfile:
+    path: /etc/fstab
+    regexp: 'swap'
+    state: absent
+    backup: 'yes'
+
+- name: System | modprobe 
+  modprobe: name={{ item }} state=present
+  with_items:
+    - br_netfilter
+    - ip_vs
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - nf_conntrack_ipv4
+  ignore_errors: true
+
+- name: System | add nf_conntrack for kernel 4.19
+  modprobe: name=nf_conntrack state=present
+  ignore_errors: true
+  when: '"4.19" in ansible_kernel'
+
+- name: System | k8s.sysctl 
+  template: src=95-k8s-sysctl.conf.j2 dest=/etc/sysctl.d/95-k8s-sysctl.conf
+
+- name: System | sysctl -p 
+  shell: "sysctl -p /etc/sysctl.d/95-k8s-sysctl.conf"
+  ignore_errors: true

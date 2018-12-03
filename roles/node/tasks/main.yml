@@ -1,0 +1,39 @@
+---
+- name: Rainbond | Copy node binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/node"
+    dest: "{{ bin_dir }}/node"
+    mode: 0755
+
+- name: Rainbond | Copy Master Node Role
+  template:
+    src: master.role.j2
+    dest: "{{ node_role_dir }}/master.yaml"
+  when: inventory_hostname in groups['master']
+
+- name: Rainbond | Copy Master Worker Role
+  template:
+    src: worker.role.j2
+    dest: "{{ node_role_dir }}/worker.yaml"
+  when: inventory_hostname in groups['worker']
+
+- name: Rainbond | Copy Node Script
+  template:
+    src: start-node.sh.j2
+    dest: "{{ script_dir }}/start-node.sh"
+    mode: 0755
+
+- name: Rainbond | Copy Node Env
+  template:
+    src: node.sh.j2
+    dest: "{{ env_dir }}/node.sh"
+    mode: 0755
+
+- name: Rainbond | Copy Node Services
+  template:
+    src: node.service.j2
+    dest: /etc/systemd/system/node.service
+
+- name: Rainbond | Start Node
+  shell: "systemctl daemon-reload && systemctl enable node && systemctl start node"
+

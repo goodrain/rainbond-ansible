@@ -1,0 +1,18 @@
+# to install clust-addons
+#- hosts:
+#  - master
+#  roles:
+#    - { role: rainvar, tags: default }
+#    - { role: master-node, tags: master-node }
+
+#- hosts:
+#  - worker
+#  roles:
+#    - { role: rainvar, tags: default }
+#    - { role: worker, tags: worker-node }
+
+- hosts:
+  - lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: lb, tags: lb }

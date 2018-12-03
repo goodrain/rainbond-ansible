@@ -1,0 +1,56 @@
+version: '2.1'
+services:
+- name: kube-apiserver
+  endpoints:
+  - name: APISERVER_ENDPOINTS
+    protocol: http
+    port: 8181
+  health:
+    name: kube-apiserver
+    model: http
+    address: 127.0.0.1:8181/version
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm kube-apiserver
+  start: {{ rbd_dir }}/scripts/kube-apiserver.sh
+  stop: docker stop kube-apiserver
+  restart_policy: always
+  restart_sec: 10
+- name: kube-scheduler
+  endpoints:
+  - name: SCHEDULER_ENDPOINTS
+    protocol: http
+    port:
+  health:
+    name: kube-scheduler
+    model: tcp
+    address: 127.0.0.1:10251
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm kube-scheduler
+  start: {{ rbd_dir }}/scripts/kube-scheduler.sh
+  stop: docker stop kube-scheduler
+  restart_policy: always
+  restart_sec: 10
+- name: kube-controller-manager
+  endpoints:
+  - name: CONTROLLER_MANAGER_ENDPOINTS
+    protocol:
+    port: 10252
+  health:
+    name: kube-controller-manager
+    model: tcp
+    address: 127.0.0.1:10252
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm kube-controller-manager
+  start: {{ rbd_dir }}/scripts/kube-controller-manager.sh
+  stop: docker stop kube-controller-manager
+  restart_policy: always
+  restart_sec: 10

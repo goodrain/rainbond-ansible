@@ -1,0 +1,26 @@
+version: '2.1'
+services:
+- name: rbd-db
+  endpoints:
+  - name: DB_ENDPOINTS
+    protocol: tcp
+    port: 3306
+  health:
+    name: rbd-db
+    model: tcp
+    address: 127.0.0.1:3306
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-db
+  start: >-
+    docker run --name rbd-db
+    --network host
+    -e MYSQL_ALLOW_EMPTY_PASSWORD="true"
+    -v {{ rbd_dir }}/data/rbd-db:/data
+    -v {{ rbd_dir }}/etc/rbd-db:/etc/mysql
+    -i goodrain.me/{{ rbd_db_image }}
+  stop: docker stop rbd-db
+  restart_policy: always
+  restart_sec: 10

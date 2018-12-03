@@ -1,0 +1,17 @@
+[Unit]
+Description=Goodrain Rainbond node
+After=network.target
+
+[Service]
+Type=simple
+User=root
+LimitCORE=infinity
+LimitNOFILE=102400
+LimitNPROC=102400
+PermissionsStartOnly=true
+ExecStart=/opt/rainbond/scripts/start-etcd.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

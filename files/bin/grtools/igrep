@@ -1,0 +1,9 @@
+#!/bin/bash
+
+grep_info=$1
+if [ "$grep_info" == "" ];then
+  echo 'Please enter a image keyword for search.'
+  exit 1
+fi
+
+docker images --format 'table {{.ID}}\t{{.CreatedSince}}\t{{.Size}}\t{{.Repository}}:{{.Tag}}' | sort -t 4 | grep -v '<none>' | grep --color $grep_info

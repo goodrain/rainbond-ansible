@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# cleanup dangling docker volumes
+
+echo -e "\e[32m01.cleanup dangling images...\e[0m"
+iclear
+
+echo -e "\e[32m02.cleaup dangling docker volumes...\e[0m"
+volumes=`docker volume ls -qf dangling=true`
+if [ "$volumes" == "" ];then
+   docker volume rm ${volumes}
+else
+   echo -e "\e[31mNo dangling volume.\e[0m"
+fi
