@@ -153,7 +153,7 @@
 - name: System | deploy check ssh
   shell: "ls /root/.ssh/id_rsa.pub"
   register: deploy_check_ssh
-  delegate_to: deploy 
+  delegate_to: "{{ groups.deploy[0] }}"
 
 - name: System | Copy ssh pub key as builder pub key
   copy:

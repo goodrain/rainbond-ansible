@@ -4,3 +4,13 @@
 
 > Deploy a Production Ready Rainbond Cluster
 
+
+## Try
+
+```
+mkdir -p /opt/rainbond
+cd /opt/rainbond
+git clone https://github.com/goodrain/rainbond-ansible.git
+cd rainbond-ansible
+./setup.sh <deploy ip>
+```

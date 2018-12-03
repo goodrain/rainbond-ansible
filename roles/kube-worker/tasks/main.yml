@@ -8,11 +8,13 @@
   template:
     src: kube-proxy.sh.j2
     dest: "{{ script_dir }}/kube-proxy.sh"
+    mode: 0755
 
 - name: Rainbond | Copy Kubelet Script
   template:
     src: kubelet.sh.j2
     dest: "{{ script_dir }}/kubelet.sh"
+    mode: 0755
 
 - name: Rainbond | Copy kubelet binary from deploy
   copy:
