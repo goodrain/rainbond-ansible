@@ -1,0 +1,30 @@
+version: '2.1'
+services:
+- name: etcd-proxy
+  health:
+    name: etcd-proxy
+    model: cmd
+    address: ((`ETCDCTL_API=3 c:\k\etcdctl.exe --endpoints=http://127.0.0.1:2379 endpoint health | grep " health" | wc -l` ==1))
+    time_interval: 5
+  type: simple
+  start: c:\k\etcd.exe grpc-proxy start --endpoints=http://172.16.0.192:2379 --listen-addr=127.0.0.1:2379
+  restart_policy: always
+  restart_sec: 10
+- name: kubelet
+  health:
+    name: kubelet
+    model: tcp
+    address: 127.0.0.1:10248
+    time_interval: 5
+  start: c:\k\start-kubelet.ps1
+  restart_policy: always
+  restart_sec: 10
+- name: flannel
+  health:
+    name: flannel
+    model: udp
+    address: 127.0.0.1:10248
+    time_interval: 5
+  start: c:\k\flanneld.exe  -etcd-endpoints=http://172.16.0.192:2379 -etcd-prefix="/kubernetes/network"
+  restart_policy: always
+  restart_sec: 10

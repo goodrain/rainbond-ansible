@@ -1,0 +1,6 @@
+---
+- name: Install docker 
+  shell: "yum install docker-ce"
+  register: docker_task_result
+  until: docker_task_result is succeeded
+  retries: 4

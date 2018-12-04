@@ -21,6 +21,12 @@
     dest: "{{ rbd_dir }}/health/local-dns.sh"
     mode: 0777
 
+- name: Health | Add network Health Check
+  template:
+    src: "network_{{ CLUSTER_NETWORK }}.j2"
+    dest: "{{ rbd_dir }}/health/network.sh"
+    mode: 0777
+
 - name: Health | Add Dns Health Check
   template:
     src: "{{ base_dir }}/hack/files/health/storage.sh"
