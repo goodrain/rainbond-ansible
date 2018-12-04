@@ -192,7 +192,7 @@ onenode(){
     get_default_netwrok_type
     get_default_install_type
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
-    ansible-playbook -i inventory/hosts 90.setup.yml
+    ansible-playbook -i inventory/hosts setup.yml
 }
 
 case $DEPLOY_TYPE in
