@@ -1,6 +1,11 @@
 version: '2.1'
 services:
 - name: rbd-gateway
+  health:
+    name: rbd-gateway
+    model: http
+    address: 127.0.0.1:10253/healthz
+    time_interval: 5
   after:
     - docker
   type: simple
