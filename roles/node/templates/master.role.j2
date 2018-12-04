@@ -68,7 +68,7 @@ services:
     -v {{ kubecfg_dir }}:/opt/rainbond/etc/kubernetes/kubecfg
     -v {{ rbd_dir }}/logs/docker_logs:/data/docker_logs
     -v {{ rbd_dir }}/logs/rbd-api:/logs
-    -i rainbond/{{ api }}
+    -i goodrain.me/{{ api }}
     --etcd=${ETCD_ENDPOINTS}
     --api-addr-ssl={{ nodeip }}:8443
     --api-addr={{ nodeip }}:8888
@@ -105,7 +105,7 @@ services:
     -v /cache:/cache
     -v /var/run:/var/run
     -v /grdata/services/ssh:/root/.ssh
-    -i rainbond/{{ chaos }}
+    -i goodrain.me/{{ chaos }}
     --etcd-endpoints=${ETCD_ENDPOINTS} --log-level=debug --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
   stop: docker stop rbd-chaos
   restart_policy: always
@@ -127,7 +127,7 @@ services:
   start: >-
     docker run --name rbd-mq
     --network host
-    -i rainbond/{{ mq }}
+    -i goodrain.me/{{ mq }}
     --log-level=debug --etcd-endpoints=${ETCD_ENDPOINTS}
   stop: docker stop rbd-mq
   restart_policy: always
@@ -177,7 +177,7 @@ services:
     -e EX_DOMAIN={{ app_domain }}
     -v {{ kubecfg_dir }}:/etc/goodrain/kubernetes
     -v /grdata:/grdata
-    -i rainbond/{{ worker }}
+    -i goodrain.me/{{ worker }}
     --log-level=info
     --etcd-endpoints=${ETCD_ENDPOINTS}
     --node-name={{ inventory_hostname }}
@@ -233,7 +233,7 @@ services:
     -e K8S_MASTER=http://127.0.0.1:8181
     -v {{ rbd_dir }}/logs/rbd-eventlog:/var/log
     -v /grdata/downloads/log:/grdata/logs
-    -i rainbond/{{ eventlog }}
+    -i goodrain.me/{{ eventlog }}
     --cluster.bind.ip={{ nodeip }} --db.type=mysql --db.url="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ nodeip }} --websocket.bind.ip={{ nodeip }}
   stop: docker stop rbd-eventlog
   restart_policy: always
