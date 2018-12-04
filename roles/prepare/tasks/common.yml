@@ -17,6 +17,7 @@
     - "{{ rbd_dir }}/conf"
     - "{{ rbd_dir }}/etc/cni"
     - "{{ rbd_dir }}/bin"
+    - "{{ rbd_dir }}/etc/node"
     - /root/.kube
     - /etc/docker
     - /root/.rbd

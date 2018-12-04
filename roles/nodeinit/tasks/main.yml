@@ -4,6 +4,11 @@
     src: updatedb.sh.j2
     dest: "/tmp/updatedb.sh"
 
+- name: Rainbond | Copy init db script
+  template:
+    src: init.sql.j2
+    dest: /tmp/init.sql.j2
+
 - name: Rainbond | Run update DB
   shell: "bash /tmp/updatedb.sh"
   register: updatedb_task_result

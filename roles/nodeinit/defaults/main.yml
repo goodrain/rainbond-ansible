@@ -1,0 +1,2 @@
+---
+lbip: "{% if k8s_interface is defined %}{{hostvars[groups['lb'][0]]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[groups['lb'][0]]['ip']|default(hostvars[groups['lb'][0]]['ansible_default_ipv4']['address'])}}{% endif %}"

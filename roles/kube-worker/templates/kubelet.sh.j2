@@ -1,5 +1,11 @@
 #!/bin/bash
 
+{% if CLUSTER_NETWORK == "calico" %}
+NETWROK_ARGS="--network-plugin=cni --cni-bin-dir=/opt/rainbond/bin --cni-conf-dir=/opt/rainbond/etc/cni"
+{% else %}
+NETWROK_ARGS=""
+{% endif %}
+
 exec /usr/local/bin/kubelet \
     --address={{ worker_access_address }} \
     --port=10250 \
@@ -10,11 +16,8 @@ exec /usr/local/bin/kubelet \
     --cluster-dns={{ worker_access_address }} \
     --register-node=false \
     --max-pods=10000 \
-    --network-plugin=cni \
-    --cni-bin-dir=/opt/rainbond/bin \
-    --cni-conf-dir=/opt/rainbond/etc/cni/ \
     --cpu-cfs-quota=false \
     --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
     --logtostderr=true \
     --maximum-dead-containers-per-container=0 \
-    --v=2
+    --v=2 ${NETWROK_ARGS}
