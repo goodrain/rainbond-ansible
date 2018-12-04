@@ -175,6 +175,7 @@ services:
     --network host
     -e K8S_MASTER=http://127.0.0.1:8181
     -e EX_DOMAIN={{ app_domain }}
+    -e DOCKER_BRIDGE_IP={{ DOCKER_BRIDGE_IP }}
     -v {{ kubecfg_dir }}:/etc/goodrain/kubernetes
     -v /grdata:/grdata
     -i goodrain.me/{{ worker }}
