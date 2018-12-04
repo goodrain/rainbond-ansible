@@ -22,6 +22,7 @@ NETWORK_TYPE=${4:-calico}
 
 DOMAIN_API="http://domain.grapps.cn"
 
+[ -z "$1" ] && exit 1
 [ ! -d "/opt/rainbond/.init" ] && mkdir -p /opt/rainbond/.init
 
 init(){
@@ -78,6 +79,9 @@ get_distribution() {
 	echo "$lsb_dist"
 }
 
+lsb_dist=$( get_distribution )
+lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
+
 command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
@@ -114,10 +118,9 @@ EOF
     fi
 }
 
-lsb_dist=$( get_distribution )
-lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
-
-case "$lsb_dist" in
+online_init(){
+    [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $1
+    case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
             apt-get install sshpass python-pip uuid-runtime pwgen -y
@@ -137,15 +140,57 @@ case "$lsb_dist" in
             exit 1
 		;;
 
-esac
+    esac
+}
 
-init
-[ -z "$1" ] && exit 1
-[ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $1
+offline_init(){
+    case "$lsb_dist" in
+		ubuntu|debian)
+            # local todo
+            # apt-get update
+            # apt-get install sshpass python-pip uuid-runtime pwgen -y
+            # pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
+            echo "todo"
+		;;
+		centos)
+            #yum install -y epel-release
+            #yum makecache fast
+            #yum install -y sshpass python-pip uuidgen pwgen
+            #pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
+            cat > /etc/yum.repos.d/rainbond.repo << EOF
+[rainbond]
+name=rainbond_offline_install_repo
+baseurl=file:///opt/rainbond/rainbond-ansible/offline/pkgs/centos/7/
+gpgcheck=0
+enabled=1
+EOF
+            yum makecache
+            yum install -y sshpass python-pip uuidgen pwgen
+
+		;;
+		*)
+            ee_notice "$lsb_dist"
+            exit 1
+		;;
+
+    esac
+}
+
+get_default_install_type(){
+    echo "Install Type: $INSTALL_TYPE"
+    sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
+    if [ "$INSTALL_TYPE" == "online" ];then
+        online_init
+    else
+        offline_init
+    fi
+}
 
 onenode(){
+    init
     get_default_dns
     get_default_netwrok_type
+    get_default_install_type
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     ansible-playbook -i inventory/hosts 90.setup.yml
 }
