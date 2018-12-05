@@ -119,7 +119,6 @@ EOF
 }
 
 online_init(){
-    [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $1
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
@@ -141,6 +140,8 @@ online_init(){
 		;;
 
     esac
+    [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $1
+
 }
 
 offline_init(){
