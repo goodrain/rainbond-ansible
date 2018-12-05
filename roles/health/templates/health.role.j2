@@ -14,7 +14,7 @@ services:
     - network.target
   requires:
     - network.target
-  type: only_health_check
+  only_health_check: true
   start: none
   restart_policy: always
   restart_sec: 10
