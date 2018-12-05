@@ -20,6 +20,7 @@ DEPLOY_TYPE=${2:-onenode}
 INSTALL_TYPE=${3:-online}
 NETWORK_TYPE=${4:-calico}
 
+
 DOMAIN_API="http://domain.grapps.cn"
 
 [ -z "$1" ] && exit 1
@@ -79,9 +80,6 @@ get_distribution() {
 	echo "$lsb_dist"
 }
 
-lsb_dist=$( get_distribution )
-lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
-
 command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
@@ -118,14 +116,32 @@ EOF
     fi
 }
 
+copy_from_centos(){
+    cp -a ./hack/chinaos/centos-release /etc/os-release
+    cp -a ./hack/chinaos/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
+}
+
+other_type_linux(){
+    lsb_dist=$( get_distribution )
+    lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
+    case "$lsb_dist" in
+        neokylin)
+            copy_from_centos
+        ;;
+    esac
+}
+
 online_init(){
+    lsb_dist=$( get_distribution )
+    lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
             apt-get install sshpass python-pip uuid-runtime pwgen -y
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
-		centos|neokylin)
+		centos)
+            yum makecache fast
             yum install -y epel-release
             yum makecache fast
             yum install -y sshpass python-pip uuidgen pwgen
@@ -145,6 +161,8 @@ online_init(){
 }
 
 offline_init(){
+    lsb_dist=$( get_distribution )
+    lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
     case "$lsb_dist" in
 		ubuntu|debian)
             # local todo
@@ -189,6 +207,8 @@ get_default_install_type(){
 
 onenode(){
     init
+    # support copy china os
+    other_type_linux 
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
