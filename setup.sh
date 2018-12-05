@@ -126,7 +126,7 @@ online_init(){
             apt-get install sshpass python-pip uuid-runtime pwgen -y
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
-		centos)
+		centos|neokylin)
             yum install -y epel-release
             yum makecache fast
             yum install -y sshpass python-pip uuidgen pwgen
@@ -152,7 +152,7 @@ offline_init(){
             # pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
             echo "todo"
 		;;
-		centos)
+		centos|neokylin)
             #yum install -y epel-release
             #yum makecache fast
             #yum install -y sshpass python-pip uuidgen pwgen
