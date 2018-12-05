@@ -21,7 +21,6 @@
   register: region_ca_is_done
   ignore_errors: true
 
-
 - name: Rainbond | check_or_create_region-ssl-ca
   shell: "grcert create --is-ca --ca-name={{ region_ca_dir }}/ca.pem --ca-key-name={{ region_ca_dir }}/ca.key.pem"
   when: region_ca_is_done != 0
