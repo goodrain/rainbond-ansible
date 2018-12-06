@@ -17,7 +17,6 @@
 
 installer_dir="$(dirname "${0}")"
 
-[ -z "$1" ] && exit 1
 [ ! -d "/opt/rainbond/.init" ] && mkdir -p /opt/rainbond/.init
 
 if [ -f "${installer_dir}/scripts/installer/functions.sh" ]; then
@@ -28,11 +27,10 @@ if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
 	source "${installer_dir}/scripts/installer/global.sh" || exit 1
 fi
 
-IIP=$1
-DEPLOY_TYPE=${2:-onenode}
-INSTALL_TYPE=${3:-online}
-NETWORK_TYPE=${4:-calico}
-REINIT=${5}
+
+
+[ -z "$IIP" ] && $IIP=$1
+[ -z "$IIP" ] && exit 1
 
 get_default_config(){
     progress "Generate the default configuration"
