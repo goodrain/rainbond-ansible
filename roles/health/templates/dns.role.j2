@@ -7,8 +7,9 @@ services:
     port: 53
   health:
     name: rbd-dns
-    model: cmd
-    address: {{ rbd_dir }}/health/rbd-dns.sh
+    model: tcp
+    address: {{ nodeip }}:53
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
