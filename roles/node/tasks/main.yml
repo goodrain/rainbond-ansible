@@ -11,11 +11,11 @@
     dest: "{{ node_role_dir }}/master.yaml"
   when: inventory_hostname in groups['master']
 
-- name: Rainbond | Copy Master Worker Role
-  template:
-    src: worker.role.j2
-    dest: "{{ node_role_dir }}/worker.yaml"
-  when: inventory_hostname in groups['worker']
+#- name: Rainbond | Copy Master Worker Role
+#  template:
+#    src: worker.role.j2
+#    dest: "{{ node_role_dir }}/worker.yaml"
+#  when: inventory_hostname in groups['worker']
 
 - name: Rainbond | Copy Node Script
   template:

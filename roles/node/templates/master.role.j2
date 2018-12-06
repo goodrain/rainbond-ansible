@@ -9,6 +9,7 @@ services:
     name: rbd-hub
     model: http
     address: 127.0.0.1:5000
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -31,6 +32,7 @@ services:
     name: rbd-repo
     model: http
     address: 127.0.0.1:8081/artifactory/libs-release
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -52,6 +54,7 @@ services:
     name: rbd-api
     model: http
     address: {{ nodeip }}:8888/v2/health
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -90,6 +93,7 @@ services:
     name: rbd-chaos
     model: http
     address: 127.0.0.1:3228/v2/builder/health
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -119,6 +123,7 @@ services:
     name: rbd-mq
     model: http
     address: 127.0.0.1:6301/health
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -141,6 +146,7 @@ services:
     name: rbd-webcli
     model: http
     address: 127.0.0.1:7171/health
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -165,6 +171,7 @@ services:
     name: rbd-worker
     model: http
     address: 127.0.0.1:6369/worker/health
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -201,6 +208,7 @@ services:
     name: rbd-monitor
     model: http
     address: 127.0.0.1:3329/monitor/health
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -224,6 +232,7 @@ services:
     name: rbd-eventlog
     model: http
     address: {{ nodeip }}:6363/health
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker
@@ -249,6 +258,7 @@ services:
     name: rbd-app-ui
     model: http
     address: 127.0.0.1:7070
+    max_errors_num: 3
     time_interval: 5
   after:
     - docker

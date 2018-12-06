@@ -38,12 +38,12 @@
 - name: Rainbond | pull tcm from docker hub
   docker_image:
     name: "rainbond/{{ tcm }}"
-    repository: "goodrain.me/tcm"
+    repository: "goodrain.me/tcm:latest"
 
 - name: Rainbond | pull mesh from docker hub
   docker_image:
     name: "rainbond/{{ mesh }}"
-    repository: "goodrain.me/mesh_plugin"
+    repository: "goodrain.me/mesh_plugin:latest"
 
 - name: Rainbond | pull runner from docker hub
   docker_image:
