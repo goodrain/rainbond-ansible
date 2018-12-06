@@ -102,25 +102,28 @@ ee_notice() {
 }
 
 Generate_domain(){
-    echo "" > /opt/rainbond/.domain.log
     DOMAIN_IP=$1
     DOMAIN_UUID=$(cat /opt/rainbond/.init/uuid)
     DOMAIN_TYPE=False
     DOMAIN_LOG="/opt/rainbond/.domain.log"
     AUTH=$(cat /opt/rainbond/.init/secretkey)
+    echo "" > $DOMAIN_LOG
+    if [ -z "$DOMAIN" ];then
     curl -s --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/domain/new > $DOMAIN_LOG
     cat > /tmp/.lock.domain <<EOF
 curl -s --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/new > $DOMAIN_LOG
 EOF
-
     [ -f $DOMAIN_LOG ] && wilddomain=$(cat $DOMAIN_LOG )
-
     if [[ "$wilddomain" == *grapps.cn ]];then
         progress "wild-domain: $wilddomain"
         sed -i -r  "s/(^app_domain: ).*/\1$wilddomain/" roles/rainvar/defaults/main.yml
     else
         progress "not generate rainbond domain, will use example: pass.example.com"
         sed -i -r  "s/(^app_domain: ).*/\1paas.example.com/" roles/rainvar/defaults/main.yml
+    fi
+    else
+        progress "custom domain : $DOMAIN"
+        sed -i -r  "s/(^app_domain: ).*/\1$DOMAIN/" roles/rainvar/defaults/main.yml
     fi
 }
 
