@@ -15,13 +15,6 @@
 
 [[ $DEBUG ]] && set -ex || set -e
 
-IIP=$1
-DEPLOY_TYPE=${2:-onenode}
-INSTALL_TYPE=${3:-online}
-NETWORK_TYPE=${4:-calico}
-REINIT=${5}
-DOMAIN_API="http://domain.grapps.cn"
-
 installer_dir="$(dirname "${0}")"
 
 [ -z "$1" ] && exit 1
@@ -30,6 +23,16 @@ installer_dir="$(dirname "${0}")"
 if [ -f "${installer_dir}/scripts/installer/functions.sh" ]; then
 	source "${installer_dir}/scripts/installer/functions.sh" || exit 1
 fi
+
+if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
+	source "${installer_dir}/scripts/installer/global.sh" || exit 1
+fi
+
+IIP=$1
+DEPLOY_TYPE=${2:-onenode}
+INSTALL_TYPE=${3:-online}
+NETWORK_TYPE=${4:-calico}
+REINIT=${5}
 
 get_default_config(){
     progress "Generate the default configuration"
