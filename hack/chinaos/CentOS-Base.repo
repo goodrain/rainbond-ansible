@@ -2,8 +2,6 @@
 name=CentOS-7 - Base - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/7/os/x86_64/
-        http://mirrors.aliyuncs.com/centos/7/os/x86_64/
-        http://mirrors.cloud.aliyuncs.com/centos/7/os/x86_64/
 gpgcheck=0
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 
@@ -12,8 +10,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-7 - Updates - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/7/updates/x86_64/
-        http://mirrors.aliyuncs.com/centos/7/updates/x86_64/
-        http://mirrors.cloud.aliyuncs.com/centos/7/updates/x86_64/
 gpgcheck=0
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 
@@ -22,8 +18,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-7 - Extras - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/7/extras/x86_64/
-        http://mirrors.aliyuncs.com/centos/7/extras/x86_64/
-        http://mirrors.cloud.aliyuncs.com/centos/7/extras/x86_64/
 gpgcheck=0
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 
@@ -32,8 +26,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-7 - Plus - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/7/centosplus/x86_64/
-        http://mirrors.aliyuncs.com/centos/7/centosplus/x86_64/
-        http://mirrors.cloud.aliyuncs.com/centos/7/centosplus/x86_64/
 gpgcheck=0
 enabled=0
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
@@ -43,8 +35,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-7 - Contrib - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/7/contrib/x86_64/
-        http://mirrors.aliyuncs.com/centos/7/contrib/x86_64/
-        http://mirrors.cloud.aliyuncs.com/centos/7/contrib/x86_64/
 gpgcheck=0
 enabled=0
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
