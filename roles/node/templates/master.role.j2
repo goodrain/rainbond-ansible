@@ -106,7 +106,7 @@ services:
     -v /var/run:/var/run
     -v /grdata/services/ssh:/root/.ssh
     -i goodrain.me/{{ chaos }}
-    --etcd-endpoints=${ETCD_ENDPOINTS} --log-level=debug --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
+    --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }} --log-level=debug --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
   stop: docker stop rbd-chaos
   restart_policy: always
   restart_sec: 10
@@ -128,7 +128,7 @@ services:
     docker run --name rbd-mq
     --network host
     -i goodrain.me/{{ mq }}
-    --log-level=debug --etcd-endpoints=${ETCD_ENDPOINTS}
+    --log-level=debug --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }}
   stop: docker stop rbd-mq
   restart_policy: always
   restart_sec: 10
@@ -180,6 +180,7 @@ services:
     -v /grdata:/grdata
     -i goodrain.me/{{ worker }}
     --log-level=info
+    --host-ip={{ nodeip }}
     --etcd-endpoints=${ETCD_ENDPOINTS}
     --node-name={{ inventory_hostname }}
     --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
@@ -235,7 +236,7 @@ services:
     -v {{ rbd_dir }}/logs/rbd-eventlog:/var/log
     -v /grdata/downloads/log:/grdata/logs
     -i goodrain.me/{{ eventlog }}
-    --cluster.bind.ip={{ nodeip }} --db.type=mysql --db.url="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ nodeip }} --websocket.bind.ip={{ nodeip }}
+    --cluster.bind.ip={{ nodeip }} --cluster.instance.ip={{ nodeip }} --db.type=mysql --db.url="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ nodeip }} --websocket.bind.ip={{ nodeip }}
   stop: docker stop rbd-eventlog
   restart_policy: always
   restart_sec: 10

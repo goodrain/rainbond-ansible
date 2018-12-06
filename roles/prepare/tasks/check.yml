@@ -27,7 +27,6 @@
   ignore_errors: "false"
   when: inventory_hostname in groups['worker']
 
-# redhat 
 - name: Check | minimum kernel version
   fail:
     msg: >
