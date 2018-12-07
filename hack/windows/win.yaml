@@ -7,8 +7,6 @@ services:
     address: 127.0.0.1:2379
     time_interval: 5
   start: c:\k\etcd.exe grpc-proxy start --endpoints=http://192.168.56.133:2379 --listen-addr=127.0.0.1:2379
-  restart_policy: always
-  restart_sec: 10
 - name: kubelet
   health:
     name: kubelet
@@ -16,9 +14,6 @@ services:
     address: 127.0.0.1:10248
     time_interval: 5
   start: powershell -f c:\k\start.ps1 -ManagementIP 192.168.56.134 -ClusterCIDR 10.20.0.0/16 -ServiceCIDR 11.1.0.1/12 -KubeDnsServiceIP 192.168.56.133
-  restart_policy: always
-  restart_sec: 10
+
 - name: flannel
   start: c:\k\flanneld.exe -etcd-endpoints=http://192.168.56.133:2379 -etcd-prefix="/kubernetes/network"
-  restart_policy: always
-  restart_sec: 10
