@@ -218,7 +218,15 @@ get_default_install_type(){
 onenode(){
     progress "Install Rainbond On Single Node"
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
-    [ -z "$DEBUG" ] || ansible-playbook -i inventory/hosts setup.yml
+    ansible-playbook -i inventory/hosts setup.yml
+}
+
+multinode(){
+    progress "Install Rainbond On Multinode Node"
+}
+
+thirdparty(){
+    progress "Only Install Rainbond On Multinode Node"
 }
 
 prepare(){
@@ -231,6 +239,7 @@ prepare(){
     [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $IIP
 }
 
+
 case $DEPLOY_TYPE in
     onenode)
         prepare
@@ -240,7 +249,10 @@ case $DEPLOY_TYPE in
         prepare
         multinode
     ;;
+    thirdparty)
+        prepare
+        thirdparty
     *)
-        notice "Illegal parameter DEPLOY_TYPE($DEPLOY_TYPE) "
+        notice "Illegal parameter DEPLOY_TYPE($DEPLOY_TYPE)"
     ;;
 esac
