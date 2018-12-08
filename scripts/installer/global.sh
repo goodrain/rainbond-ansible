@@ -28,3 +28,6 @@ canal_pod_network_cidr="10.244.0.0/16"
 flannel_pod_network_cidr="10.244.0.0/16"
 
 POD_NETWORK_CIDR=""
+
+# api
+#--enable-feature=windows
