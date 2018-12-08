@@ -1,5 +1,5 @@
 Param(
-    [parameter(Mandatory = $true)] $ManagementIP,
+    [parameter(Mandatory = $true)] $ManagementIP
 )
 
 $BaseDir = "c:\rainbond"
