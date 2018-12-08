@@ -88,16 +88,13 @@ function RegisterNode()
 function StartFlanneld($ipaddress, $NetworkName)
 {
     CleanupOldNetwork $NetworkName
-
     # Start FlannelD, which would recreate the network.
     # Expect disruption in node connectivity for few seconds
     pushd 
     cd C:\flannel\
     [Environment]::SetEnvironmentVariable("NODE_NAME", (hostname).ToLower())
-    start C:\flannel\flanneld.exe -ArgumentList "--kubeconfig-file=C:\rainbond\config --iface=$ipaddress --ip-masq=1 --kube-subnet-mgr=1" -NoNewWindow
+    C:\flannel\flanneld.exe --kubeconfig-file=C:\rainbond\config --iface=$ipaddress --ip-masq=1 --kube-subnet-mgr=1
     popd
-
-    WaitForNetwork $NetworkName
 }
 
 function GetSourceVip($ipaddress, $NetworkName)
