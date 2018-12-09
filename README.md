@@ -1,16 +1,17 @@
 [![Build Status](https://travis-ci.org/goodrain/rainbond-ansible.svg?branch=master)](https://travis-ci.org/goodrain/rainbond-ansible)
 
-# rainbond-ansible
+# Ansible Playbook For Rainbond
+
+## Overview
 
 > Deploy a Production Ready Rainbond Cluster
 
+## Tutorial
 
-## Try
+- [使用文档](https://www.rainbond.com)
+- [配置开发文档](./docs/)
 
-```
-mkdir -p /opt/rainbond
-cd /opt/rainbond
-git clone https://github.com/goodrain/rainbond-ansible.git
-cd rainbond-ansible
-./setup.sh <deploy ip>
-```
+## License
+
+Rainbond-Ansible is under the Apache 2.0 license.
+
