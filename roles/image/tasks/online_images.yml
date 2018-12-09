@@ -121,8 +121,8 @@
 
 - name: Rainbond | pull mq from docker hub
   shell: "docker pull rainbond/{{ mq }} && docker tag rainbond/{{ mq }} goodrain.me/{{ mq }}"
-  register: pull_chaos_task_result
-  until: pull_chaos_task_result is succeeded
+  register: pull_mq_task_result
+  until: pull_mq_task_result is succeeded
   retries: 3
 
 - name: Rainbond | pull webcli from docker hub
