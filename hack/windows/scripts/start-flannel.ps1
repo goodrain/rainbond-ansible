@@ -9,7 +9,7 @@ ipmo $helper
 # Prepare Network & Start Infra services
 $NetworkMode = "L2Bridge"
 $NetworkName = "cbr0"
-CleanupOldNetwork $NetworkName
+# CleanupOldNetwork $NetworkName
 
 # before flannel start, kube-api must have this node
 $hns = "$BaseDir\scripts\hns.psm1"
@@ -22,8 +22,8 @@ if(!(Get-HnsNetwork | ? Name -EQ "External"))
 }
 # Start Flanneld
 Start-Sleep 5
-CleanupOldNetwork $NetworkName
+# CleanupOldNetwork $NetworkName
 # Start FlannelD, which would recreate the network.
 # Expect disruption in node connectivity for few seconds
 [Environment]::SetEnvironmentVariable("NODE_NAME", (hostname).ToLower())
-C:\rainbond\flanneld.exe --kubeconfig-file=C:\rainbond\config --iface=$ipaddress --ip-masq=1 --kube-subnet-mgr=1
+C:\rainbond\flanneld.exe --kubeconfig-file=C:\rainbond\config --iface=$ipaddress --healthz-port=10110 --ip-masq=1 --kube-subnet-mgr=1
