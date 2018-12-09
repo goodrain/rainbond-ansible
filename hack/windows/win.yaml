@@ -7,7 +7,7 @@ services:
     address: 127.0.0.1:2379
     time_interval: 5
     max_errors_num: 3
-  start: c:\rainbond\rainbond-windowsutil.exe --service-name etcdproxy --log-file=c:\log\etcdproxy.log --run=c:\rainbond\etcd.exe&nbsp;grpc-proxy&nbsp;start&nbsp;--endpoints=http://192.168.85.130:2379&nbsp;--listen-addr=127.0.0.1:2379
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name etcdproxy --log-file=c:\rainbond\log\etcdproxy.log --run=c:\rainbond\etcd.exe&nbsp;grpc-proxy&nbsp;start&nbsp;--endpoints=http://192.168.85.130:2379&nbsp;--listen-addr=127.0.0.1:2379
 - name: rbdchaos
   health:
     name: rbdchaos
@@ -15,7 +15,7 @@ services:
     address: 127.0.0.1:3228/v2/builder/health
     time_interval: 5
     max_errors_num: 3  
-  start: c:\rainbond\rainbond-windowsutil.exe --service-name rbdchaos --log-file=c:\log\rbdchaos.log --run=c:\rainbond\rainbond-chaos.exe&nbsp;--etcd-endpoints=http://192.168.85.130:2379&nbsp;--hostIP=192.168.85.131&nbsp;--log-level=info&nbsp;--mysql=write:ShiMah8l@tcp(192.168.85.130:3306)/region&nbsp;--topic=windows_builder
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name rbdchaos --log-file=c:\rainbond\log\rbdchaos.log --run=c:\rainbond\rainbond-chaos.exe&nbsp;--etcd-endpoints=http://192.168.85.130:2379&nbsp;--hostIP=192.168.85.131&nbsp;--log-level=info&nbsp;--mysql=write:ShiMah8l@tcp(192.168.85.130:3306)/region&nbsp;--topic=windows_builder
 - name: flanneld
   health:
     name: flanneld
@@ -23,11 +23,11 @@ services:
     address: 127.0.0.1:10110/healthz
     time_interval: 5
     max_errors_num: 3  
-  start: c:\rainbond\rainbond-windowsutil.exe --service-name flanneld --log-file=c:\log\flanneld.log --run=powershell&nbsp;-f&nbsp;c:\rainbond\start-flannel.ps1&nbsp;-ManagementIP&nbsp;192.168.56.133
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name flanneld --log-file=c:\rainbond\log\flanneld.log --run=powershell&nbsp;-f&nbsp;c:\rainbond\start-flannel.ps1&nbsp;-ManagementIP&nbsp;192.168.56.133
 - name: kubelet
   health:
     name: kubelet
     model: tcp
     address: 127.0.0.1:10248
     time_interval: 5
-  start: c:\rainbond\rainbond-windowsutil.exe --service-name kubelet --log-file=c:\log\kubelet.log --run=powershell&nbsp;-f&nbsp;c:\rainbond\start-kubelet.ps1&nbsp;-ClusterCIDR&nbsp;10.20.0.0/16&nbsp;-ServiceCIDR&nbsp;11.1.0.1/12&nbsp;-KubeDnsServiceIP&nbsp;192.168.56.133
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name kubelet --log-file=c:\rainbond\log\kubelet.log --run=powershell&nbsp;-f&nbsp;c:\rainbond\start-kubelet.ps1&nbsp;-ClusterCIDR&nbsp;10.20.0.0/16&nbsp;-ServiceCIDR&nbsp;11.1.0.1/12&nbsp;-KubeDnsServiceIP&nbsp;192.168.56.133

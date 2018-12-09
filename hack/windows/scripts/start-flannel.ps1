@@ -4,6 +4,25 @@ Param(
 
 $BaseDir = "c:\rainbond"
 $helper = "$BaseDir\scripts\helper.psm1"
+$LogDir = "$BaseDir\log"
+
+function SetupDirectories()
+{
+    md $BaseDir -ErrorAction Ignore
+    md $LogDir -ErrorAction Ignore
+    md c:\flannel -ErrorAction Ignore
+    md $BaseDir\cni\config -ErrorAction Ignore
+    md C:\etc\kube-flannel -ErrorAction Ignore
+}
+
+function CopyFiles(){
+    cp $BaseDir\flanneld.exe c:\flannel\flanneld.exe
+    cp $BaseDir\net-conf.json C:\etc\kube-flannel\net-conf.json
+}
+
+SetupDirectories
+CopyFiles
+
 ipmo $helper
 
 # Prepare Network & Start Infra services
