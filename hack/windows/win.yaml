@@ -11,17 +11,18 @@ services:
 - name: rbdchaos
   health:
     name: rbdchaos
-    model: tcp
-    address: 
+    model: http
+    address: 127.0.0.1:3228/v2/builder/health
     time_interval: 5
     max_errors_num: 3  
   start: c:\rainbond\rainbond-windowsutil.exe --service-name rbdchaos --log-file=c:\log\rbdchaos.log --run=c:\rainbond\rainbond-chaos.exe&nbsp;--etcd-endpoints=http://192.168.85.130:2379&nbsp;--hostIP=192.168.85.131&nbsp;--log-level=info&nbsp;--mysql=write:ShiMah8l@tcp(192.168.85.130:3306)/region&nbsp;--topic=windows_builder
 - name: flanneld
   health:
     name: flanneld
-    model: udp
-    address: 127.0.0.1:10248
+    model: http
+    address: 127.0.0.1:10110/healthz
     time_interval: 5
+    max_errors_num: 3  
   start: c:\rainbond\rainbond-windowsutil.exe --service-name flanneld --log-file=c:\log\flanneld.log --run=powershell&nbsp;-f&nbsp;c:\rainbond\start-flannel.ps1&nbsp;-ManagementIP&nbsp;192.168.56.133
 - name: kubelet
   health:
