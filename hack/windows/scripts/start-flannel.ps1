@@ -26,4 +26,4 @@ CleanupOldNetwork $NetworkName
 # Start FlannelD, which would recreate the network.
 # Expect disruption in node connectivity for few seconds
 [Environment]::SetEnvironmentVariable("NODE_NAME", (hostname).ToLower())
-C:\flannel\flanneld.exe --kubeconfig-file=C:\rainbond\config --iface=$ipaddress --ip-masq=1 --kube-subnet-mgr=1
+C:\rainbond\flanneld.exe --kubeconfig-file=C:\rainbond\config --iface=$ipaddress --ip-masq=1 --kube-subnet-mgr=1

@@ -1,29 +1,32 @@
 version: '2.1'
 services:
-- name: etcd-proxy
+- name: etcdproxy
   health:
-    name: etcd-proxy
-    model: cmd
-    address: ((`ETCDCTL_API=3 c:\k\etcdctl.exe --endpoints=http://127.0.0.1:2379 endpoint health | grep " health" | wc -l` ==1))
+    name: etcdproxy
+    model: tcp
+    address: 127.0.0.1:2379
     time_interval: 5
-  start: c:\k\etcd.exe grpc-proxy start --endpoints=http://192.168.56.133:2379 --listen-addr=127.0.0.1:2379
-  restart_policy: always
-  restart_sec: 10
+    max_errors_num: 3
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name etcdproxy --log-file=c:\log\etcdproxy.log --run=c:\rainbond\etcd.exe&nbsp;grpc-proxy&nbsp;start&nbsp;--endpoints=http://192.168.85.130:2379&nbsp;--listen-addr=127.0.0.1:2379
+- name: rbdchaos
+  health:
+    name: rbdchaos
+    model: tcp
+    address: 
+    time_interval: 5
+    max_errors_num: 3  
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name rbdchaos --log-file=c:\log\rbdchaos.log --run=c:\rainbond\rainbond-chaos.exe&nbsp;--etcd-endpoints=http://192.168.85.130:2379&nbsp;--hostIP=192.168.85.131&nbsp;--log-level=info&nbsp;--mysql=write:ShiMah8l@tcp(192.168.85.130:3306)/region&nbsp;--topic=windows_builder
+- name: flanneld
+  health:
+    name: flanneld
+    model: udp
+    address: 127.0.0.1:10248
+    time_interval: 5
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name flanneld --log-file=c:\log\flanneld.log --run=powershell&nbsp;-f&nbsp;c:\rainbond\start-flannel.ps1&nbsp;-ManagementIP&nbsp;192.168.56.133
 - name: kubelet
   health:
     name: kubelet
     model: tcp
     address: 127.0.0.1:10248
     time_interval: 5
-  start: powershell -f c:\k\start.ps1 -ManagementIP 192.168.56.134 -ClusterCIDR 10.20.0.0/16 -ServiceCIDR 11.1.0.1/12 -KubeDnsServiceIP 192.168.56.133
-  restart_policy: always
-  restart_sec: 10
-- name: flannel
-  health:
-    name: flannel
-    model: udp
-    address: 127.0.0.1:10248
-    time_interval: 5
-  start: c:\k\flanneld.exe  -etcd-endpoints=http://192.168.56.133:2379 -etcd-prefix="/kubernetes/network"
-  restart_policy: always
-  restart_sec: 10
+  start: c:\rainbond\rainbond-windowsutil.exe --service-name kubelet --log-file=c:\log\kubelet.log --run=powershell&nbsp;-f&nbsp;c:\rainbond\start-kubelet.ps1&nbsp;-ClusterCIDR&nbsp;10.20.0.0/16&nbsp;-ServiceCIDR&nbsp;11.1.0.1/12&nbsp;-KubeDnsServiceIP&nbsp;192.168.56.133

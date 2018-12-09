@@ -141,8 +141,8 @@ Update-CNIConfig $podCIDR
 
 if ($IsolationType -ieq "process")
 {
-    c:\k\kubelet.exe --hostname-override=$HostID --v=2 `
-        --pod-infra-container-image=kubeletwin/pause --resolv-conf="" `
+    c:\rainbond\kubelet.exe --hostname-override=$HostID --v=2 `
+        --pod-infra-container-image=rainbond/win-pause --resolv-conf="" `
         --allow-privileged=true --enable-debugging-handlers `
         --cluster-dns=$KubeDnsServiceIp --cluster-domain=cluster.local `
         --kubeconfig="$WorkingDir\config" --hairpin-mode=promiscuous-bridge `
@@ -152,8 +152,8 @@ if ($IsolationType -ieq "process")
 }
 elseif ($IsolationType -ieq "hyperv")
 {
-    c:\k\kubelet.exe --hostname-override=$HostID --v=2 `
-        --pod-infra-container-image=kubeletwin/pause --resolv-conf="" `
+    c:\rainbond\kubelet.exe --hostname-override=$HostID --v=2 `
+        --pod-infra-container-image=rainbond/win-pause --resolv-conf="" `
         --allow-privileged=true --enable-debugging-handlers `
         --cluster-dns=$KubeDnsServiceIp --cluster-domain=cluster.local `
         --kubeconfig="$WorkingDir\config" --hairpin-mode=promiscuous-bridge `
