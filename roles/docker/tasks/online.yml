@@ -4,9 +4,9 @@
   until: docker_task_result is succeeded
   retries: 4
 
-- name: Install docker api
-  shell: "pip install docker-py -i https://pypi.tuna.tsinghua.edu.cn/simple"
-  register: docker_py_task_result
-  until: docker_py_task_result is succeeded
-  retries: 4
-  when: docker_task_result is succeeded
+#- name: Install docker api
+#  shell: "pip install docker-py -i https://pypi.tuna.tsinghua.edu.cn/simple"
+#  register: docker_py_task_result
+#  until: docker_py_task_result is succeeded
+#  retries: 4
+#  when: docker_task_result is succeeded
