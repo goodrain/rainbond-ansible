@@ -3,6 +3,7 @@
   register: docker_task_result
   until: docker_task_result is succeeded
   retries: 4
+  notify: restart docker
 
 #- name: Install docker api
 #  shell: "pip install docker-py -i https://pypi.tuna.tsinghua.edu.cn/simple"

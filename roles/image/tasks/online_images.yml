@@ -163,7 +163,7 @@
 
 - name: Rainbond | pull kubecfg from docker hub
   shell: "docker pull rainbond/{{ kubecfg }}"
-  register: pull_kubecf_task_result
+  register: pull_kubecfg_task_result
   until: pull_kubecfg_task_result is succeeded
   retries: 3
 

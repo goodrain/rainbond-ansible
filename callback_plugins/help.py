@@ -40,7 +40,7 @@ class CallbackModule(CallbackBase):
         self._display.display("Ask for help:", color=C.COLOR_WARN)
         self._display.display("Contact us: rainbond@goodrain.com", color=C.COLOR_HIGHLIGHT)
         self._display.display("Community: https://t.goodrain.com", color=C.COLOR_HIGHLIGHT)
-        self._display.display("It seems that you encounter some problems. You can send an email to the above email address, attached with the rainbond-ansible/inventory/hosts.ini and rainbond-ansible/log/ansible.log files and the error message, or new issue on https://github.com/goodrain/rainbond-ansible/issues. We'll try our best to help you deploy a Rainbond cluster. Thanks. :-)", color=C.COLOR_WARN)
+        self._display.display("It seems that you encounter some problems. You can send an email to the above email address, attached with the rainbond-ansible/inventory/hosts.ini and rainbond-ansible/log/rainbond.log files and the error message, or new issue on https://github.com/goodrain/rainbond-ansible/issues. We'll try our best to help you deploy a Rainbond cluster. Thanks. :-)", color=C.COLOR_WARN)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if not ignore_errors:

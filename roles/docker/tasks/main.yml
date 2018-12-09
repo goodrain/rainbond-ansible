@@ -19,6 +19,9 @@
   changed_when: false
   ignore_errors: "true"
 
+- name: show installed_docker_version debug info
+  debug: var=installed_docker_version
+
 - name: Set docker systemd config
   import_tasks: systemd.yml
 
