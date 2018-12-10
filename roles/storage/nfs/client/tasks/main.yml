@@ -1,7 +1,8 @@
 ---
 - name: check nfs server
-  shell: "ls /etc/exports"
+  shell: "ls /grdata/kubernetes/kube-proxy.kubeconfig"
   register: check_server
+  ignore_errors: true
 
 - name: debug
   debug: var=check_server

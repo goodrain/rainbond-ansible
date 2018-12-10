@@ -23,6 +23,7 @@
     - /root/.rbd
     - /grdata/services/ssh
     - /grdata/services/storage
+    - /grdata/kubernetes
   tags:
     - master
 
