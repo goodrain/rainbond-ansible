@@ -3,9 +3,9 @@
 #
 #          FILE: setup.sh
 #
-#   DESCRIPTION: Install Rainbond Cluster
+#   DESCRIPTION: Deploy Rainbond Cluster
 #
-#          BUGS: https://github.com/goodrain/rainbond-install/issues
+#          BUGS: https://github.com/goodrain/rainbond-ansible/issues
 #
 #     COPYRIGHT: (c) 2018 by the Goodrain Delivery Team.
 #
@@ -15,24 +15,22 @@
 
 [[ $DEBUG ]] && set -ex || set -e
 
-IIP=$1
-DEPLOY_TYPE=${2:-onenode}
-INSTALL_TYPE=${3:-online}
-NETWORK_TYPE=${4:-calico}
-REINIT=${5}
-DOMAIN_API="http://domain.grapps.cn"
-
 installer_dir="$(dirname "${0}")"
 
-[ -z "$1" ] && exit 1
 [ ! -d "/opt/rainbond/.init" ] && mkdir -p /opt/rainbond/.init
 
 if [ -f "${installer_dir}/scripts/installer/functions.sh" ]; then
 	source "${installer_dir}/scripts/installer/functions.sh" || exit 1
 fi
 
+if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
+	source "${installer_dir}/scripts/installer/global.sh" || exit 1
+fi
+
+[ -z "$IIP" ] && IIP=$1
+[ -z "$IIP" ] && notice "not found IIP"
+
 get_default_config(){
-    progress "Generate the default configuration"
     [ ! -f "/opt/rainbond/.init/uuid" ] && (
         uuid=$(uuidgen)
         [ ! -z "$uuid" ] && echo "$uuid" > /opt/rainbond/.init/uuid
@@ -56,12 +54,14 @@ get_default_config(){
     )
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     touch /opt/rainbond/.init/.init_done
+    info "Generate the default configuration" "$(cat /opt/rainbond/.init/uuid)/$(cat /opt/rainbond/.init/secretkey)"
+
 }
 
 get_default_dns() {
     dns=$(cat /etc/resolv.conf | grep "^nameserver" | head -1 | awk '{print $2}')
     [ -z "$dns" ] && dns="114.114.114.114"
-    progress "default_dns_local: $dns"
+    info "default_dns_local:" "$dns"
     sed -i -r  "s/(^default_dns_local: ).*/\1$dns/" roles/rainvar/defaults/main.yml
 }
 
@@ -71,8 +71,19 @@ get_default_netwrok_type() {
     else
         network="calico"
     fi
-    progress "Defalut Network Type: ${network}"
-    sed -i -r  "s/(^CLUSTER_NETWORK: ).*/\1$network/" roles/rainvar/defaults/main.yml
+    info "Pod Network Provider" "${network}"
+    if [ -z "$POD_NETWORK_CIDR" ];then
+        if [ "$NETWORK_TYPE" == "flannel" ];then
+            pod_network_cidr="${flannel_pod_network_cidr}"
+        else
+            pod_network_cidr="${calico_pod_network_cidr}"
+        fi
+    else
+        pod_network_cidr="${POD_NETWORK_CIDR}"
+    fi
+    info "Pod Network Cidr" "${pod_network_cidr}"
+    sed -i -r "s/(^CLUSTER_NETWORK: ).*/\1$network/" roles/rainvar/defaults/main.yml
+    sed -i -r "s#(^pod_cidr: ).*#\1$pod_network_cidr#" roles/rainvar/defaults/main.yml
 
 }
 
@@ -91,40 +102,34 @@ command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
 
-ee_notice() {
-	echo
-	echo
-	echo "  WARNING: $1 is now only supported by Rainbond"
-	echo "           Check https://www.rainbond.com for information on Rainbond"
-	echo
-	echo
-}
-
 Generate_domain(){
-    echo "" > /opt/rainbond/.domain.log
     DOMAIN_IP=$1
     DOMAIN_UUID=$(cat /opt/rainbond/.init/uuid)
     DOMAIN_TYPE=False
     DOMAIN_LOG="/opt/rainbond/.domain.log"
     AUTH=$(cat /opt/rainbond/.init/secretkey)
+    echo "" > $DOMAIN_LOG
+    if [ -z "$DOMAIN" ];then
     curl -s --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/domain/new > $DOMAIN_LOG
     cat > /tmp/.lock.domain <<EOF
 curl -s --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/new > $DOMAIN_LOG
 EOF
-
     [ -f $DOMAIN_LOG ] && wilddomain=$(cat $DOMAIN_LOG )
-
     if [[ "$wilddomain" == *grapps.cn ]];then
-        progress "wild-domain: $wilddomain"
+        info "wild-domain:" "$wilddomain"
         sed -i -r  "s/(^app_domain: ).*/\1$wilddomain/" roles/rainvar/defaults/main.yml
     else
-        progress "not generate rainbond domain, will use example: pass.example.com"
+        info "not generate rainbond domain, will use example" "pass.example.com"
         sed -i -r  "s/(^app_domain: ).*/\1paas.example.com/" roles/rainvar/defaults/main.yml
+    fi
+    else
+        info "custom domain:" "$DOMAIN"
+        sed -i -r  "s/(^app_domain: ).*/\1$DOMAIN/" roles/rainvar/defaults/main.yml
     fi
 }
 
 copy_from_centos(){
-    progress "Update default $1 to CentOS"
+    info "Update default to CentOS" "$1"
     cp -a ./hack/chinaos/centos-release /etc/os-release
     mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
     mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
@@ -157,8 +162,7 @@ online_init(){
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple -q
 		;;
 		rhel|ol|sles)
-			ee_notice "$lsb_dist"
-			exit 1
+			notice "Not Support $lsb_dist"
 			;;
 		*)
             exit 1
@@ -195,15 +199,14 @@ EOF
             yum install -y sshpass python-pip uuidgen pwgen
 		;;
 		*)
-            ee_notice "$lsb_dist"
-            exit 1
+            notice "Not Support $lsb_dist"
 		;;
 
     esac
 }
 
 get_default_install_type(){
-    progress "Install Type: $INSTALL_TYPE"
+    info "Install Type:" "$INSTALL_TYPE"
     sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
     if [ "$INSTALL_TYPE" == "online" ];then
         online_init
@@ -214,21 +217,42 @@ get_default_install_type(){
 
 onenode(){
     progress "Install Rainbond On Single Node"
+    sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
+    ansible-playbook -i inventory/hosts setup.yml
+}
+
+multinode(){
+    progress "Install Rainbond On Multinode Node"
+}
+
+thirdparty(){
+    progress "Only Install Rainbond On Multinode Node"
+}
+
+prepare(){
+    progress "Prepare Init..."
     other_type_linux 
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
     [ ! -f "/opt/rainbond/.init/.init_done" ] && get_default_config
     [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $IIP
-    sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
-    ansible-playbook -i inventory/hosts setup.yml
 }
+
 
 case $DEPLOY_TYPE in
     onenode)
+        prepare
         onenode
     ;;
+    multinode)
+        prepare
+        multinode
+    ;;
+    thirdparty)
+        prepare
+        thirdparty
     *)
-        exit 0
+        notice "Illegal parameter DEPLOY_TYPE($DEPLOY_TYPE)"
     ;;
 esac

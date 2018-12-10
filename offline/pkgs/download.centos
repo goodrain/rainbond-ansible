@@ -3,41 +3,49 @@
 if [ "$1" == "bash" ];then
     exec /bin/bash
 else
-    PKG_PATH=/opt/rainbond/install/install/pkgs
-    common_pkg=(tar ntpdate wget perl bind-utils curl tree lsof htop nload net-tools telnet rsync git dstat salt-master salt-minion salt-ssh iotop lvm2 ntpdate pwgen iproute bash-completion createrepo)
+    PKG_PATH=/opt/rainbond/rainbond-ansible/offline/pkgs/centos/7/
+    [ ! -d "$PKG_PATH" ] && mkdir -p $PKG_PATH
+    common_pkg=(git tar ntpdate wget perl bind-utils curl tree lsof htop nload net-tools telnet rsync git dstat salt-master salt-minion salt-ssh iotop lvm2 ntpdate pwgen iproute bash-completion createrepo)
     storage_pkg=(glusterfs-server nfs-utils sshpass python python-pip uuidgen pwgen ansible)
     network_pkg=(bridge-utils net-tools psmisc conntrack-tools jq socat bash-completion rsync ipset ipvsadm)
-    #k8s_pkg=(kubelet kubeadm kubectl)
-
+    k8s_pkg=(kubelet kubeadm kubectl)
     docker_ce_pkg=(docker-ce)
-    k8s_version=(1.10.11-0)
-    docker_version=(17.06.2-ce)
+    k8s_version=(1.10.11 1.11.5 1.12.3 1.13.0)
+    docker_version=(17.06.2.ce 18.06.1.ce)
     yum install centos-release-gluster -y -q
-    yum install -y epel-release -y -q
     for pkg in ${common_pkg[@]} ${storage_pkg[@]} ${network_pkg[@]}
     do
-        yum install ${pkg} --downloadonly --downloaddir=$PKG_PATH/centos/ >/dev/null 2>&1
-        ls $PKG_PATH/centos/ | grep "$pkg" >/dev/null 2>&1
+        yum install ${pkg} --downloadonly --downloaddir=$PKG_PATH >/dev/null 2>&1
+        ls $PKG_PATH | grep "$pkg" >/dev/null 2>&1
         if [ "$?" == 0 ];then
             echo "download centos $pkg ok"
         else
             echo "download centos $pkg failed"
         fi
     done
-    yum install ${docker_ce_pkg}-${docker_version} --downloadonly --downloaddir=$PKG_PATH/centos/ >/dev/null 2>&1
-    #for version in ${k8s_version[@]}
-    #do
-    #    for pkg in ${k8s_pkg[@]}
-    #    do
-    #        yum install ${pkg} --downloadonly --disableexcludes=kubernetes --downloaddir=$PKG_PATH/centos/ >/dev/null 2>&1
-    #        ls $PKG_PATH/centos/ | grep "$pkg" >/dev/null 2>&1
-    #        if [ "$?" == 0 ];then
-    #            echo "download centos $pkg ok"
-    #        else
-    #            echo "download centos $pkg failed"
-    #        fi
-    #    done
-    #done
+    for version in ${docker_version[@]}
+    do
+        yum install ${docker_ce_pkg}-${version} --downloadonly --downloaddir=$PKG_PATH >/dev/null 2>&1
+        ls $PKG_PATH | grep "docker" | grep "$version" >/dev/null 2>&1
+        if [ "$?" == 0 ];then
+                echo "download centos docker ok"
+        else
+                echo "download centos docker failed"
+        fi
+    done
+    for version in ${k8s_version[@]}
+    do
+        for pkg in ${k8s_pkg[@]}
+        do
+            yum install ${pkg}-${version} --downloadonly --disableexcludes=kubernetes --downloaddir=$PKG_PATH >/dev/null 2>&1
+            ls $PKG_PATH | grep "$pkg" | grep "$version" >/dev/null 2>&1
+            if [ "$?" == 0 ];then
+                echo "download centos $pkg ok"
+            else
+                echo "download centos $pkg failed"
+            fi
+        done
+    done
     yum install -y createrepo >/dev/null 2>&1
-    createrepo /opt/rainbond/install/install/pkgs/centos/  >/dev/null 2>&1
+    createrepo /opt/rainbond/rainbond-ansible/offline/pkgs/centos/7/  >/dev/null 2>&1
 fi

@@ -1,0 +1,12 @@
+---
+- name: Upgrade | Copy Image Upgrade Script
+  template:
+    src: image.sh.j2
+    dest: /tmp/upgradeimage.sh
+    mode: 0777
+
+- name: Upgrade | Upgrade images to goodrain.me
+  shell: "bash /tmp/upgradeimage.sh"
+  register: upgrade_task_result
+  until: upgrade_task_result is succeeded
+  retries: 5
