@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 docker exec rbd-db mysql -e "show databases"
 [ "$?" -eq 0 ] && (
     docker exec rbd-db mysql -e "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";docker exec rbd-db mysql -e "delete from mysql.user where user=''; flush privileges"

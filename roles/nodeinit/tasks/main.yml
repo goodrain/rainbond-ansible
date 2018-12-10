@@ -17,10 +17,13 @@
     dest: /tmp/init.sql
 
 - name: Rainbond | Run update DB
-  shell: "bash /tmp/updatedb.sh"
+  shell: "bash /tmp/updatedb.sh > /tmp/init.log"
   register: updatedb_task_result
   until: updatedb_task_result is succeeded
   retries: 5
+
+- name: show updatedb_task_result debug info
+  debug: var=updatedb_task_result
 
 - name: Rainbond | Push local images to goodrain.me
   shell: "bash /tmp/pushimage.sh"
