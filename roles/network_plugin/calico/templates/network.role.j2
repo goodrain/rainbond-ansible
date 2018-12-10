@@ -1,0 +1,42 @@
+version: '2.1'
+services:
+- name: {{ CLUSTER_NETWORK }}
+  health:
+    name: {{ CLUSTER_NETWORK }}
+    model: cmd
+    address: {{ rbd_dir }}/health/network.sh
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm calico
+  start: >-
+    /usr/bin/docker
+    run 
+    --net=host  
+    --privileged  
+    --name=calico   
+    --restart=always  
+    -e NO_DEFAULT_POOLS=  
+    -e CALICO_LIBNETWORK_ENABLED=true 
+    -e CALICO_IPV4POOL_IPIP=always  
+    -e IP={{ NODEIP }}  
+    -e CALICO_IPV4POOL_CIDR={{ pod_cidr }} 
+    -e CALICO_LIBNETWORK_CREATE_PROFILES=true  
+    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false  
+    -e CALICO_LIBNETWORK_IFPREFIX=cali  
+    -e NODENAME={{ inventory_hostname }} 
+    -e CALICO_NETWORKING_BACKEND=bird  
+    -e IP6_AUTODETECTION_METHOD=first-found  
+    -e ETCD_ENDPOINTS={{ ETCD_ENDPOINTS }} 
+    -v /var/log/calico:/var/log/calico  
+    -v /var/run/calico:/var/run/calico  
+    -v /lib/modules:/lib/modules
+    -v /var/lib/calico:/var/lib/calico  
+    -v /run/docker/plugins:/run/docker/plugins  
+    -v /var/run/docker.sock:/var/run/docker.sock  
+    goodrain.me/{{ calico_image }}
+  stop: docker stop calico
+  restart_policy: always
+  restart_sec: 10
