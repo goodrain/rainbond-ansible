@@ -22,6 +22,11 @@
     dest: "{{ bin_dir }}/flanneld"
     mode: 0755
 
+- name: Network | Copy flannel conf
+  template:
+    src: 10-flannel.conflist.j2
+    dest: /opt/rainbond/etc/cni/10-flannel.conflist
+
 - name: Network | Run Init flanneld 
   shell: "bash {{ env_dir }}/init-flanneld.sh"
   run_once: true

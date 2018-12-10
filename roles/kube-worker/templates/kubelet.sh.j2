@@ -3,7 +3,7 @@
 {% if CLUSTER_NETWORK == "calico" %}
 NETWROK_ARGS="--network-plugin=cni --cni-bin-dir=/opt/rainbond/bin --cni-conf-dir=/opt/rainbond/etc/cni"
 {% else %}
-NETWROK_ARGS=""
+NETWROK_ARGS="--network-plugin=cni --cni-bin-dir=/opt/rainbond/bin --cni-conf-dir=/opt/rainbond/etc/cni"
 {% endif %}
 
 exec /usr/local/bin/kubelet \

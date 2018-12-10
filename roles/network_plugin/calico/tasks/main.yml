@@ -3,22 +3,21 @@
   shell: "docker pull goodrain.me/{{ calico_image }}"
   ignore_errors: "true"
 
-- name: Rainbond | Copy Calico Service
+- name: Network | Copy Calico Service
   template:
     src: calico.service.j2
     dest: /etc/systemd/system/calico.service
 
-- name: Rainbond | Copy Calico Service
+- name: Network | Copy calico conf
   template:
     src: calico.conf.j2
     dest: /opt/rainbond/etc/cni/10-calico.conf
 
-
-- name: Rainbond | Copy calicoctl binary from deploy
+- name: Network | Copy calicoctl binary from deploy
   copy:
     src: "{{ local_tools }}/bin/calicoctl"
     dest: "{{ bin_dir }}/calicoctl"
     mode: 0755
 
-- name: Rainbond | start calico
+- name: Network | start calico
   shell: "systemctl daemon-reload && systemctl enable calico && systemctl start calico"
