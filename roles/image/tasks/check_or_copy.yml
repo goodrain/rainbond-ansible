@@ -15,20 +15,3 @@
   with_fileglob:
     - "{{ rbd_dir }}/etc/tools/bin/*"
   when: cni_is_done.rc != 0 
-
-- name: Check Region SSL
-  shell: "ls {{ region_ca_dir }}/ca.pem"
-  register: region_ca_is_done
-  ignore_errors: true
-
-- name: Rainbond | check_or_create_region-ssl-ca
-  shell: "grcert create --is-ca --ca-name={{ region_ca_dir }}/ca.pem --ca-key-name={{ region_ca_dir }}/ca.key.pem"
-  when: region_ca_is_done != 0
-
-- name: Rainbond | check_or_create_region-server-ssl
-  shell: "grcert create --ca-name={{ region_ca_dir }}/ca.pem --ca-key-name={{ region_ca_dir }}/ca.key.pem --crt-name={{ region_ca_dir }}/server.pem --crt-key-name={{ region_ca_dir }}/server.key.pem --domains region.goodrain.me --address={{ MASTER_IP }} --address=127.0.0.1"
-  when: region_ca_is_done != 0
-
-- name: Rainbond | check_or_create_region-client-ssl
-  shell: "grcert create --ca-name={{ region_ca_dir }}/ca.pem --ca-key-name={{ region_ca_dir }}/ca.key.pem --crt-name={{ region_ca_dir }}/client.pem --crt-key-name={{ region_ca_dir }}/client.key.pem --domains region.goodrain.me --address={{ MASTER_IP }} --address=127.0.0.1"
-  when: region_ca_is_done != 0
