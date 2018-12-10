@@ -149,17 +149,18 @@ other_type_linux(){
 online_init(){
     lsb_dist=$( get_distribution )
     lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
+    progress "Detect $lsb_dist required packages..."
     case "$lsb_dist" in
 		ubuntu|debian)
-            apt-get update 1>/dev/null
-            apt-get install sshpass python-pip uuid-runtime pwgen -y 1>/dev/null
-            pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple -q
+            apt-get update
+            apt-get install sshpass python-pip uuid-runtime pwgen 
+            pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		centos)
-            yum install -y -q epel-release 1>/dev/null
-            yum makecache fast 1>/dev/null
-            yum install -y -q sshpass python-pip uuidgen pwgen 1>/dev/null
-            pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple -q
+            yum install -y epel-release 
+            yum makecache fast 
+            yum install -y sshpass python-pip uuidgen pwgen 
+            pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		rhel|ol|sles)
 			notice "Not Support $lsb_dist"
