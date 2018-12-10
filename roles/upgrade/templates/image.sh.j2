@@ -1,0 +1,35 @@
+#!/bin/bash
+
+version={{ rainbond_version }}
+rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog rbd-dns)
+base=(builder runner)
+
+upgrade_rainbond(){
+    for rbdimg in ${rainbond[@]}
+    do
+        docker pull rainbond/${rbdimg}:${version}
+        docker tag rainbond/${rbdimg}:${version} goodrain.me/${rbdimg}:${version}
+        docker push goodrain.me/${rbdimg}:${version}
+    done
+}
+
+upgrade_base(){
+    for baseimg in ${base[@]}
+    do
+        docker pull rainbond/${baseimg}:${version}
+        docker tag rainbond/${baseimg}:${version} goodrain.me/${baseimg}
+        docker push goodrain.me/${baseimg}:${version}
+    done
+}
+
+
+case $1 in
+    rainbond)
+        upgrade_rainbond
+    ;;
+    *)
+        upgrade_base
+        upgrade_rainbond
+    ;;
+esac
+

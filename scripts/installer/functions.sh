@@ -85,12 +85,21 @@ progress() {
 	echo >&2 " --- ${TPUT_DIM}${TPUT_BOLD}${*}${TPUT_RESET} --- "
 }
 
+info() {
+	echo >&2 " > ${TPUT_WHITE}${TPUT_BOLD} ${1} ${TPUT_RESET} ${TPUT_DIM}${2}${TPUT_RESET} "
+}
+
 run_ok() {
 	printf >&2 "${TPUT_BGGREEN}${TPUT_WHITE}${TPUT_BOLD} OK ${TPUT_RESET} ${*} \n\n"
 }
 
 run_failed() {
 	printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+}
+
+notice() {
+	printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} !!! ${TPUT_RESET} ${*} \n\n"
+	exit 1
 }
 
 run_logfile="/dev/null"

@@ -55,21 +55,3 @@ services:
   start: none
   restart_policy: always
   restart_sec: 10
-- name: {{ CLUSTER_NETWORK }}
-  health:
-    name: {{ CLUSTER_NETWORK }}
-    model: cmd
-    address: {{ rbd_dir }}/health/network.sh
-    max_errors_num: 3
-    time_interval: 5
-  after:
-    - network.target
-  requires:
-    - network.target
-  only_health_check: true
-  disable: false
-  is_init_start: true
-  type: notify
-  start: none
-  restart_policy: always
-  restart_sec: 10

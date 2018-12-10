@@ -1,0 +1,17 @@
+version: '2.1'
+services:
+- name: {{ CLUSTER_NETWORK }}
+  health:
+    name: {{ CLUSTER_NETWORK }}
+    model: cmd
+    address: {{ rbd_dir }}/health/network.sh
+    max_errors_num: 3
+    time_interval: 5
+  type: simple
+  start: >-
+    /usr/local/bin/flanneld 
+    -iface={{ NODEIP }} 
+    -etcd-endpoints={{ ETCD_ENDPOINTS}} 
+    -etcd-prefix={{ FLANNEL_ETCD_PREFIX }}
+  restart_policy: always
+  restart_sec: 10

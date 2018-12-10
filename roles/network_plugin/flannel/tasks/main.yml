@@ -1,8 +1,13 @@
 ---
-- name: Network | Copy flanneld Service
+#- name: Network | Copy flanneld Service
+#  template:
+#    src: flanneld.service.j2
+#    dest: /etc/systemd/system/flanneld.service
+
+- name: Rainbond | Copy Network Role
   template:
-    src: flanneld.service.j2
-    dest: /etc/systemd/system/flanneld.service
+    src: network.role.j2
+    dest: "{{ node_role_dir }}/network.yaml"
 
 - name: Network | Copy flanneld Service
   template:
@@ -22,10 +27,15 @@
     dest: "{{ bin_dir }}/flanneld"
     mode: 0755
 
+- name: Network | Copy flannel conf
+  template:
+    src: 10-flannel.conflist.j2
+    dest: /opt/rainbond/etc/cni/10-flannel.conflist
+
 - name: Network | Run Init flanneld 
   shell: "bash {{ env_dir }}/init-flanneld.sh"
   run_once: true
   delegate_to: "{{ groups['master'][0] }}"
 
-- name: Network | start flanneld
-  shell: "systemctl daemon-reload && systemctl enable flanneld && systemctl start flanneld"
+#- name: Network | start flanneld
+#  shell: "systemctl daemon-reload && systemctl enable flanneld && systemctl start flanneld"

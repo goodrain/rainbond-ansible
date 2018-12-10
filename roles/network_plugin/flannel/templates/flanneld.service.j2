@@ -7,7 +7,6 @@ Wants=network-online.target
 [Service]
 Type=notify
 ExecStart=/usr/local/bin/flanneld -iface={{ NODEIP }} -etcd-endpoints={{ ETCD_ENDPOINTS}} -etcd-prefix={{ FLANNEL_ETCD_PREFIX }}
-ExecStartPost={{ env_dir }}/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
 Restart=on-failure
 
 [Install]
