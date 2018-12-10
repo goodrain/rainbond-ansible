@@ -6,6 +6,7 @@
 - name: Rainbond | check etcd run status on master
   shell: "ls {{ node_role_dir }}/etcd.yaml"
   register: etcd_is_on_worker
+  ignore_errors: "true"
 
 - name: Rainbond | Copy Etcd Proxy Role
   template:

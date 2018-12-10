@@ -1,5 +1,5 @@
 ---
-- host: new-node
+- hosts: new-node
   roles:
     - { role: rainvar, tags: default }
     - { role: prepare, tags: prepare }
