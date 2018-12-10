@@ -9,5 +9,5 @@ exec /usr/bin/docker \
   goodrain.me/{{ etcd_image }} \
   /usr/local/bin/etcd \
   grpc-proxy start \
-  --endpoints=${ETCD_MASTER} \
+  --endpoints={{ etcd_access_addresses }} \
   --listen-addr=127.0.0.1:2379

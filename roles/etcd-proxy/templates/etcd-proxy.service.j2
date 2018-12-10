@@ -9,7 +9,7 @@ LimitCORE=infinity
 LimitNOFILE=102400
 LimitNPROC=102400
 PermissionsStartOnly=true
-ExecStart={{ rbd_dir }}scripts/start-etcd-proxy.sh
+ExecStart={{ rbd_dir }}/scripts/start-etcd-proxy.sh
 Restart=always
 RestartSec=10
 
