@@ -252,6 +252,7 @@ case $DEPLOY_TYPE in
     thirdparty)
         prepare
         thirdparty
+    ;;
     *)
         notice "Illegal parameter DEPLOY_TYPE($DEPLOY_TYPE)"
     ;;
