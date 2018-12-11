@@ -10,8 +10,8 @@
 - name: Rainbond | Unpack TGZ
   import_tasks: unpack_tag.yml
 
-- name: Rainbond | check_or_create certificates or kubeconfig
-  import_tasks: check_or_create.yml
-
 - name: Rainbond | check cni
   import_tasks: check_or_copy.yml
+
+- name: Rainbond | check_or_create certificates or kubeconfig
+  import_tasks: check_or_create.yml
