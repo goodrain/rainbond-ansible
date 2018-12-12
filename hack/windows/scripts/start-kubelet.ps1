@@ -4,7 +4,7 @@ Param(
     [parameter(Mandatory = $false)] $serviceCIDR="10.96.0.0/12",
     [parameter(Mandatory = $false)] $KubeDnsSuffix="svc.cluster.local",
     [parameter(Mandatory = $false)] $InterfaceName="Ethernet",
-    [parameter(Mandatory = $false)] $LogDir = "c:\rainbond",
+    [parameter(Mandatory = $false)] $LogDir = "c:\rainbond\log",
     [parameter(Mandatory = $false)] $HostID = "",
     [ValidateSet("process", "hyperv")] $IsolationType="process",
     $NetworkName = "cbr0",

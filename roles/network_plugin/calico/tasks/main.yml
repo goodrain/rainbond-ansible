@@ -1,7 +1,7 @@
 ---
 - name: K8S | pull calico from goodrain.me
   shell: "docker pull goodrain.me/{{ calico_image }}"
-  ignore_errors: "true"
+  ignore_errors: true
 
 #- name: Network | Copy Calico Service
 #  template:

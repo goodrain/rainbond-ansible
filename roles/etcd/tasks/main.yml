@@ -1,7 +1,7 @@
 ---
 - name: K8S | pull etcd from goodrain.me
   shell: "docker pull goodrain.me/{{ etcd_image }}"
-  ignore_errors: "true"
+  ignore_errors: true
 
 - name: Rainbond | Copy Etcd Role
   template:

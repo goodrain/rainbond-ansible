@@ -1,7 +1,7 @@
 ---
 - name: Rainbond | pull db from goodrain.me
   shell: "docker pull goodrain.me/{{ rbd_db_image }}"
-  ignore_errors: "true"
+  ignore_errors: true
 
 - name: Rainbond | prepare dir 
   file: name={{ item }} state=directory

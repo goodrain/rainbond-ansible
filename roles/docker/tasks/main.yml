@@ -17,7 +17,7 @@
   command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
   register: installed_docker_version
   changed_when: false
-  ignore_errors: "true"
+  ignore_errors: true
 
 - name: show installed_docker_version debug info
   debug: var=installed_docker_version

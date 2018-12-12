@@ -1,6 +1,9 @@
 ---
-- name: Install docker 
+- name: Install docker offline
   shell: "yum install docker-ce"
   register: docker_task_result
   until: docker_task_result is succeeded
   retries: 4
+
+#- name: show docker info
+#  debug: var=docker_task_result
