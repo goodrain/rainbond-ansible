@@ -43,19 +43,22 @@ get_default_config(){
         secretkey=$(pwgen 32 1)
         [ ! -z "$secretkey" ] &&  (
             echo "$secretkey" > /opt/rainbond/.init/secretkey
-            sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
         )
     )
     [ ! -f "/opt/rainbond/.init/db" ] && (
         db=$(pwgen 8 1)
         [ ! -z "$db" ] &&  (
             echo "$db" > /opt/rainbond/.init/db
-            sed -i -r  "s/(^db_pass: ).*/\1$db/" roles/rainvar/defaults/main.yml
+            
         )
     )
     [ ! -f "/root/.ssh/id_rsa.pub" ] && (
         ssh-keygen -t rsa -f /root/.ssh/id_rsa -P "" 1>/dev/null
     )
+    db=$(/opt/rainbond/.init/db)
+    secretkey=$(cat /opt/rainbond/.init/secretkey)
+    sed -i -r  "s/(^db_pass: ).*/\1$db/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     touch /opt/rainbond/.init/.init_done
     info "Generate the default configuration" "$(cat /opt/rainbond/.init/uuid)/$(cat /opt/rainbond/.init/secretkey)"
@@ -251,8 +254,8 @@ prepare(){
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
-    [ ! -f "/opt/rainbond/.init/.init_done" ] && get_default_config
-    [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $IIP
+    get_default_config
+    Generate_domain $IIP
 }
 
 case $DEPLOY_TYPE in
