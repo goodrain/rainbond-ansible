@@ -122,6 +122,15 @@ EOF
     if [[ "$wilddomain" == *grapps.cn ]];then
         info "wild-domain:" "$wilddomain"
         sed -i -r  "s/(^app_domain: ).*/\1$wilddomain/" roles/rainvar/defaults/main.yml
+        [ ! -d "/opt/rainbond/bin" ] && mkdir -p /opt/rainbond/bin
+        cp -a hack/tools/update-domain.sh /opt/rainbond/bin/.domain.sh
+        chmod +x /opt/rainbond/bin/.domain.sh
+        cat > /opt/rainbond/.init/domain.yaml <<EOF
+iip: $DOMAIN_IP
+domain: $wilddomain
+uuid: $DOMAIN_UUID
+secretkey: $AUTH
+EOF
     else
         info "not generate rainbond domain, will use example" "pass.example.com"
         sed -i -r  "s/(^app_domain: ).*/\1paas.example.com/" roles/rainvar/defaults/main.yml
@@ -245,7 +254,6 @@ prepare(){
     [ ! -f "/opt/rainbond/.init/.init_done" ] && get_default_config
     [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $IIP
 }
-
 
 case $DEPLOY_TYPE in
     onenode)
