@@ -6,7 +6,11 @@ NETWROK_ARGS="--network-plugin=cni --cni-bin-dir=/opt/rainbond/bin --cni-conf-di
 NETWROK_ARGS="--network-plugin=cni --cni-bin-dir=/opt/rainbond/bin --cni-conf-dir=/opt/rainbond/etc/cni"
 {% endif %}
 
-exec /usr/local/bin/kubelet \
+KUBE_LOGTOSTDERR="--logtostderr=true"
+KUBE_LOG_LEVEL="--v=2"
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+
+NETWROK_ARGS="
     --address={{ worker_access_address }} \
     --port=10250 \
     --hostname_override=${NODE_UUID} \
@@ -15,9 +19,22 @@ exec /usr/local/bin/kubelet \
     --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge \
     --cluster-dns={{ worker_access_address }} \
     --register-node=false \
+    --fail-swap-on=false \
+    --image-gc-high-threshold=90 \
+    --image-gc-low-threshold=80 \
+    --kube-reserved=cpu=500m,memory=512Mi,ephemeral-storage=1Gi \
+    --system-reserved=cpu=1000m,memory=1024Mi,ephemeral-storage=1Gi \
     --max-pods=10000 \
     --cpu-cfs-quota=false \
+    --fail-swap-on=false \
+    --eviction-max-pod-grace-period=40 \
     --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
-    --logtostderr=true \
-    --maximum-dead-containers-per-container=0 \
-    --v=2 ${NETWROK_ARGS}
+    --maximum-dead-containers-per-container=0"
+
+
+exec /usr/local/bin/kubelet \
+    $KUBE_LOGTOSTDERR \
+    $KUBE_LOG_LEVEL \
+    $KUBE_ALLOW_PRIV \
+    $NETWROK_ARGS \
+    $KUBELET_ARGS

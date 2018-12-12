@@ -23,4 +23,4 @@ if (!$infraPodImage)
 
 SetupDirectories
 
-c:\rainbond\rainbond-node.exe --register-service --auto-registnode=false --log-level=info --log-file=c:\rainbond\log\node.log --kube-conf=c:\rainbond\config --etcd=http://$ETCDIP:2379 --hostIP=$ManagementIP --noderule=compute --nodeid-file=c:\rainbond\node_host_uuid.conf --service-list-file=c:\rainbond\conf
+c:\rainbond\rainbond-node.exe --register-service --log-level=info --log-file=c:\rainbond\log\node.log --kube-conf=c:\rainbond\config --etcd=http://$ETCDIP:2379 --hostIP=$ManagementIP --noderule=compute --run-mode=worker --nodeid-file=c:\rainbond\node_host_uuid.conf --service-list-file=c:\rainbond\conf

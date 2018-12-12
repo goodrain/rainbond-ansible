@@ -23,6 +23,10 @@ if [ -f "${installer_dir}/scripts/installer/functions.sh" ]; then
 	source "${installer_dir}/scripts/installer/functions.sh" || exit 1
 fi
 
+if [ -f "${installer_dir}/scripts/installer/default.sh" ]; then
+	source "${installer_dir}/scripts/installer/default.sh" || exit 1
+fi
+
 if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
 	source "${installer_dir}/scripts/installer/global.sh" || exit 1
 fi
@@ -224,10 +228,12 @@ onenode(){
 
 multinode(){
     progress "Install Rainbond On Multinode Node"
+    ansible-playbook -i inventory/hosts hack/multinode/setup.yaml
 }
 
 thirdparty(){
     progress "Only Install Rainbond On Multinode Node"
+    ansible-playbook -i inventory/hosts hack/thirdparty/setup.yaml
 }
 
 prepare(){

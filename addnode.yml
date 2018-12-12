@@ -11,3 +11,8 @@
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
     - { role: node, tags: node }
+
+- hosts: deploy
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: nodeup, tags: nodeup }

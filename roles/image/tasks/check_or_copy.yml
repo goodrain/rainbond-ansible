@@ -1,6 +1,6 @@
 ---
 - name: Check CNI
-  shell: "ls {{ rbd_dir }}/bin/calico"
+  stat: path="{{ rbd_dir }}/bin/calico"
   register: cni_is_done
   ignore_errors: true
 
@@ -8,10 +8,10 @@
   copy: src={{ item }} dest={{ rbd_dir }}/bin owner=root mode=777
   with_fileglob:
     - "{{ rbd_dir }}/etc/tools/cni/bin/*"
-  when: cni_is_done.rc != 0 
+  when: cni_is_done.stat.isreg is not defined
 
 - name: K8S | Copy tools
   copy: src={{ item }} dest={{ bin_dir }} owner=root mode=777
   with_fileglob:
     - "{{ rbd_dir }}/etc/tools/bin/*"
-  when: cni_is_done.rc != 0 
+  when: cni_is_done.stat.isreg is not defined

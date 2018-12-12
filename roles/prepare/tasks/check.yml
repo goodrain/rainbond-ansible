@@ -8,7 +8,7 @@
 - name: Check | Stop if non systemd OS type
   assert:
     that: ansible_service_mgr == "systemd"
-  ignore_errors: "true"
+  ignore_errors: true
 
 - name: Check | Stop if unknown OS
   assert:
