@@ -55,7 +55,7 @@ get_default_config(){
     [ ! -f "/root/.ssh/id_rsa.pub" ] && (
         ssh-keygen -t rsa -f /root/.ssh/id_rsa -P "" 1>/dev/null
     )
-    db=$(/opt/rainbond/.init/db)
+    db=$(cat /opt/rainbond/.init/db)
     secretkey=$(cat /opt/rainbond/.init/secretkey)
     sed -i -r  "s/(^db_pass: ).*/\1$db/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
@@ -169,7 +169,7 @@ online_init(){
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
-            apt-get install sshpass python-pip uuid-runtime pwgen 
+            apt-get install sshpass python-pip uuid-runtime pwgen -y
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		centos)
