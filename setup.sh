@@ -43,19 +43,22 @@ get_default_config(){
         secretkey=$(pwgen 32 1)
         [ ! -z "$secretkey" ] &&  (
             echo "$secretkey" > /opt/rainbond/.init/secretkey
-            sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
         )
     )
     [ ! -f "/opt/rainbond/.init/db" ] && (
         db=$(pwgen 8 1)
         [ ! -z "$db" ] &&  (
             echo "$db" > /opt/rainbond/.init/db
-            sed -i -r  "s/(^db_pass: ).*/\1$db/" roles/rainvar/defaults/main.yml
+            
         )
     )
     [ ! -f "/root/.ssh/id_rsa.pub" ] && (
         ssh-keygen -t rsa -f /root/.ssh/id_rsa -P "" 1>/dev/null
     )
+    db=$(cat /opt/rainbond/.init/db)
+    secretkey=$(cat /opt/rainbond/.init/secretkey)
+    sed -i -r  "s/(^db_pass: ).*/\1$db/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     touch /opt/rainbond/.init/.init_done
     info "Generate the default configuration" "$(cat /opt/rainbond/.init/uuid)/$(cat /opt/rainbond/.init/secretkey)"
@@ -122,6 +125,15 @@ EOF
     if [[ "$wilddomain" == *grapps.cn ]];then
         info "wild-domain:" "$wilddomain"
         sed -i -r  "s/(^app_domain: ).*/\1$wilddomain/" roles/rainvar/defaults/main.yml
+        [ ! -d "/opt/rainbond/bin" ] && mkdir -p /opt/rainbond/bin
+        cp -a hack/tools/update-domain.sh /opt/rainbond/bin/.domain.sh
+        chmod +x /opt/rainbond/bin/.domain.sh
+        cat > /opt/rainbond/.init/domain.yaml <<EOF
+iip: $DOMAIN_IP
+domain: $wilddomain
+uuid: $DOMAIN_UUID
+secretkey: $AUTH
+EOF
     else
         info "not generate rainbond domain, will use example" "pass.example.com"
         sed -i -r  "s/(^app_domain: ).*/\1paas.example.com/" roles/rainvar/defaults/main.yml
@@ -157,7 +169,7 @@ online_init(){
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
-            apt-get install sshpass python-pip uuid-runtime pwgen 
+            apt-get install sshpass python-pip uuid-runtime pwgen -y
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		centos)
@@ -242,10 +254,9 @@ prepare(){
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
-    [ ! -f "/opt/rainbond/.init/.init_done" ] && get_default_config
-    [ ! -f "/opt/rainbond/.init/domain" ] && Generate_domain $IIP
+    get_default_config
+    Generate_domain $IIP
 }
-
 
 case $DEPLOY_TYPE in
     onenode)

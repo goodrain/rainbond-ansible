@@ -20,6 +20,7 @@ services:
     -v {{ rbd_dir }}/etc/rbd-gateway/lua-resty-balancer:/run/nginxtmp/lua/lua-resty-balancer
     -e DEFAULT_PORT=80
     -i goodrain.me/{{ gateway }}
+    --etcd-endpoints=${ETCD_ENDPOINTS}
     --log-level=debug
     --error-log=/dev/stderr error
   stop: docker stop rbd-gateway
