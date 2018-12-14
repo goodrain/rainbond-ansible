@@ -10,7 +10,7 @@ KUBE_LOGTOSTDERR="--logtostderr=true"
 KUBE_LOG_LEVEL="--v=2"
 KUBE_ALLOW_PRIV="--allow-privileged=true"
 
-NETWROK_ARGS="
+KUBELET_ARGS="
     --address={{ worker_access_address }} \
     --port=10250 \
     --hostname_override=${NODE_UUID} \
