@@ -86,7 +86,7 @@ progress() {
 }
 
 info() {
-	echo >&2 " > ${TPUT_GREEN}${TPUT_BOLD} ${1} ${TPUT_RESET} ${TPUT_DIM}${2}${TPUT_RESET} "
+	echo >&2 " > ${TPUT_WHITE}${TPUT_BOLD} ${1} ${TPUT_RESET} ${TPUT_GREEN}${2}${TPUT_RESET} "
 }
 
 run_ok() {

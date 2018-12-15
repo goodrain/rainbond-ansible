@@ -206,5 +206,5 @@
   when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | write pull image done
-  file: path=/opt/rainbond/.init/image.pulled
+  file: path=/opt/rainbond/.init/image.pulled state=touch
   when: check_image_pulled.stat.isreg is not defined

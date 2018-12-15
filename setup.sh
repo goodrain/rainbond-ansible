@@ -251,6 +251,8 @@ onenode(){
         up_domain_dns
         progress "Congratulations on your successful installation"
         info "访问地址" "$IIP:7070"
+    else
+        notice "The installation did not succeed, please redo it or ask for help"
     fi
 }
 
