@@ -1,9 +1,9 @@
 ---
-- name: K8S | pull kubernetes from docker hub
-  shell: "docker pull rainbond/{{ kubernetes_image }} && docker tag rainbond/{{ kubernetes_image }} goodrain.me/{{ kubernetes_image }}"
-  register: pull_k8s_task_result
-  until: pull_k8s_task_result is succeeded
-  retries: 3
+#- name: K8S | pull kubernetes from docker hub
+#  shell: "docker pull rainbond/{{ kubernetes_image }} && docker tag rainbond/{{ kubernetes_image }} goodrain.me/{{ kubernetes_image }}"
+#  register: pull_k8s_task_result
+#  until: pull_k8s_task_result is succeeded
+#  retries: 3
 
 - name: K8S | pull kube-apiserver from docker hub
   shell: "docker pull rainbond/{{ kube_apiserver_image }} && docker tag rainbond/{{ kube_apiserver_image }} goodrain.me/{{ kube_apiserver_image }}"
