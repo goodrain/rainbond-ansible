@@ -5,10 +5,22 @@
     dest: "{{ bin_dir }}/node"
     mode: 0755
 
-- name: Rainbond | Copy Master Node Role
+- name: Rainbond | Copy Master Node Rainbond Role 
   template:
     src: master.role.j2
     dest: "{{ node_role_dir }}/master.yaml"
+  when: inventory_hostname in groups['master']
+
+- name: Rainbond | Copy Master Node UI Role
+  template:
+    src: ui.role.j2
+    dest: "{{ node_role_dir }}/ui.yaml"
+  when: inventory_hostname in groups['master']
+
+- name: Rainbond | Copy Master Node Base Role
+  template:
+    src: base.role.j2
+    dest: "{{ node_role_dir }}/base.yaml"
   when: inventory_hostname in groups['master']
 
 #- name: Rainbond | Copy Master Worker Role
