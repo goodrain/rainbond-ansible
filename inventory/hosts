@@ -18,3 +18,7 @@ node1
 
 [lb]
 node1
+
+[new-master]
+
+[new-worker]

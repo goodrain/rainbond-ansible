@@ -133,6 +133,7 @@ iip: $DOMAIN_IP
 domain: $wilddomain
 uuid: $DOMAIN_UUID
 secretkey: $AUTH
+api: $DOMAIN_API
 EOF
     else
         info "not generate rainbond domain, will use example" "pass.example.com"
@@ -141,6 +142,16 @@ EOF
     else
         info "custom domain:" "$DOMAIN"
         sed -i -r  "s/(^app_domain: ).*/\1$DOMAIN/" roles/rainvar/defaults/main.yml
+    fi
+}
+
+up_domain_dns(){
+    uid=$(cat /opt/rainbond/.init/domain.yaml | grep uuid | awk '{print $2}')
+    iip=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk '{print $2}')
+    domain=$(cat /opt/rainbond/.init/domain.yaml | grep domain | awk '{print $2}')
+    DOMAIN_API=$(cat /opt/rainbond/.init/domain.yaml | grep api | awk '{print $2}')
+    if [[ "$domain" =~ "grapps" ]];then
+        curl -s --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain >/dev/null 
     fi
 }
 
@@ -236,6 +247,11 @@ onenode(){
     progress "Install Rainbond On Single Node"
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     ansible-playbook -i inventory/hosts setup.yml
+    if [ "$?" -eq 0 ];then
+        up_domain_dns
+        progress "Congratulations on your successful installation"
+        info "访问地址" "$IIP:7070"
+    fi
 }
 
 multinode(){

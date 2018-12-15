@@ -79,3 +79,13 @@ kubectl.exe
 ## 4. 修改hostID
 
 根据c:\rainbond\node_host_uuid.conf来修改c:\rainbond\conf\win.yaml的关于kubelet uuid的信息
+
+> flannel subnet.env 应该在c:\run\flannel\subnet.env
+
+```
+FLANNEL_NETWORK=10.20.0.0/16
+FLANNEL_SUBNET=10.20.48.1/24
+FLANNEL_MTU=1500
+FLANNEL_IPMASQ=true
+```
+
