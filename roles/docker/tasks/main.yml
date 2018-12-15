@@ -24,7 +24,7 @@
 - import_tasks: offline.yml
   when: install_type == "offline" and docker_check.stat.isreg is not defined
 
-- name: Docker | Check Version if docker is installed
+- name: Docker | Get Docker Version
   command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
   register: installed_docker_version
 

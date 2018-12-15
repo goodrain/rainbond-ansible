@@ -1,12 +1,14 @@
 ---
-- name: K8S | pull calico from goodrain.me
-  shell: "docker pull goodrain.me/{{ calico_image }}"
-  ignore_errors: true
+- name: DB | run if image is pulled
+  command: /usr/local/bin/check_img calico
 
-#- name: Network | Copy Calico Service
-#  template:
-#    src: calico.service.j2
-#    dest: /etc/systemd/system/calico.service
+- name: DB | check if image is pulled
+  stat: path="/tmp/check_calico_img"
+  register: check_calico_img
+
+- name: DB | pull calico from goodrain.me
+  shell: "docker pull goodrain.me/{{ calico_image }}"
+  when: check_calico_img.stat.isreg is not defined
 
 - name: Rainbond | Copy Network Role
   template:

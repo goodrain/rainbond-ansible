@@ -32,6 +32,7 @@ if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
 fi
 
 [ -z "$IIP" ] && IIP=$1
+[ -z "$IIP"] && IIP=$( get_default_ip )
 [ -z "$IIP" ] && notice "not found IIP"
 
 get_default_config(){
@@ -68,7 +69,7 @@ get_default_config(){
 get_default_dns() {
     dns=$(cat /etc/resolv.conf | grep "^nameserver" | head -1 | awk '{print $2}')
     [ -z "$dns" ] && dns="114.114.114.114"
-    info "default_dns_local:" "$dns"
+    info "default nameserver local" "$dns"
     sed -i -r  "s/(^default_dns_local: ).*/\1$dns/" roles/rainvar/defaults/main.yml
 }
 
@@ -234,7 +235,7 @@ EOF
 }
 
 get_default_install_type(){
-    info "Install Type:" "$INSTALL_TYPE"
+    info "Install Type" "$INSTALL_TYPE"
     sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
     if [ "$INSTALL_TYPE" == "online" ];then
         online_init
@@ -245,12 +246,14 @@ get_default_install_type(){
 
 onenode(){
     progress "Install Rainbond On Single Node"
+    hname=$(hostname -s)
+    sed -i "s#node1#$hname#g" inventory/hosts
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
         up_domain_dns
         progress "Congratulations on your successful installation"
-        info "访问地址" "$IIP:7070"
+        info "访问地址" "http://$IIP:7070"
     else
         notice "The installation did not succeed, please redo it or ask for help"
     fi
@@ -268,10 +271,12 @@ thirdparty(){
 
 prepare(){
     progress "Prepare Init..."
-    other_type_linux 
+    info "default bind ip" $IIP
+    other_type_linux
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
+    info "Deploy Type" $DEPLOY_TYPE
     get_default_config
     Generate_domain $IIP
 }

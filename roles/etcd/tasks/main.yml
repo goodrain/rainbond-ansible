@@ -1,30 +1,37 @@
 ---
-- name: K8S | pull etcd from goodrain.me
-  shell: "docker pull goodrain.me/{{ etcd_image }}"
-  ignore_errors: true
+- name: Etcd | run if image is pulled
+  command: /usr/local/bin/check_img etcd
 
-- name: Rainbond | Copy Etcd Role
+- name: Etcd | check if image is pulled
+  stat: path="/tmp/check_etcd_img"
+  register: check_etcd_img
+
+- name: Etcd | pull etcd from goodrain.me
+  shell: "docker pull goodrain.me/{{ etcd_image }}"
+  when: check_etcd_img.stat.isreg is not defined
+
+- name: Etcd | Copy Etcd Role
   template:
     src: etcd.role.j2
     dest: "{{ node_role_dir }}/etcd.yaml"
 
-- name: Rainbond | Copy Etcd Script
+- name: Etcd | Copy Etcd Script
   template:
     src: start-etcd.sh.j2
     dest: "{{ script_dir }}/start-etcd.sh"
     mode: 0777
 
-- name: Rainbond | Copy Etcd Service
+- name: Etcd | Copy Etcd Service
   template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
 
-- name: Rainbond | Copy etcdctl binary from deploy
+- name: Etcd | Copy etcdctl binary from deploy
   copy:
     src: "{{ local_tools }}/bin/etcdctl"
     dest: "{{ bin_dir }}/etcdctl"
     mode: 0755
 
-- name: Rainbond | start etcd
+- name: Etcd | start etcd
   shell: "systemctl daemon-reload && systemctl start etcd"
 

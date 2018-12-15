@@ -3,8 +3,8 @@
   stat: path="/grdata/kubernetes/kube-proxy.kubeconfig"
   register: check_server
 
-- name: debug
-  debug: var=check_server
+#- name: debug
+#  debug: var=check_server
 
 - name: install nfs client debian
   action: apt pkg=nfs-common state=present
