@@ -32,7 +32,7 @@ if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
 fi
 
 [ -z "$IIP" ] && IIP=$1
-[ -z "$IIP"] && IIP=$( get_default_ip )
+[ -z "$IIP" ] && IIP=$( get_default_ip )
 [ -z "$IIP" ] && notice "not found IIP"
 
 get_default_config(){
