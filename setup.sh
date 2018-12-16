@@ -164,6 +164,14 @@ copy_from_centos(){
     cp -a ./hack/chinaos/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 }
 
+copy_from_ubuntu(){
+    info "Update default to Ubuntu" "$1"
+    cp -a ./hack/chinaos/ubuntu-release /etc/os-release
+    cp -a ./hack/chinaos/ubuntu-lsb-release /etc/lsb-release
+    cp -a /etc/apt/sources.list /etc/apt/sources.list.old
+    cp -a ./hack/chinaos/sources.list /etc/apt/sources.list
+}
+
 other_type_linux(){
     lsb_dist=$( get_distribution )
     lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
@@ -171,6 +179,9 @@ other_type_linux(){
         neokylin)
             copy_from_centos $lsb_dist
         ;;
+        kylin)
+            copy_from_ubuntu $lsb_dist
+        ;;    
     esac
 }
 
@@ -182,19 +193,18 @@ online_init(){
 		ubuntu|debian)
             apt-get update
             apt-get install sshpass python-pip uuid-runtime pwgen -y
+            pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
             yum install -y sshpass python-pip uuidgen pwgen 
+            pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
-		rhel|ol|sles)
-			notice "Not Support $lsb_dist"
-			;;
 		*)
-            exit 1
+           notice "Not Support $lsb_dist"
 		;;
 
     esac
