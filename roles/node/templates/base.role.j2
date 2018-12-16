@@ -1,0 +1,47 @@
+version: '2.1'
+services:
+- name: rbd-hub
+  endpoints:
+  - name: HUB_ENDPOINTS
+    protocol:
+    port: 5000
+  health:
+    name: rbd-hub
+    model: http
+    address: 127.0.0.1:5000
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-hub
+  start: >-
+    docker run --name rbd-hub
+    --network host
+    -v /grdata/services/registry/:/var/lib/registry
+    -i goodrain.me/{{ hub }}
+  stop: docker stop rbd-hub
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-repo
+  endpoints:
+  - name: REPO_ENDPOINTS
+    protocol:
+    port: 8081
+  health:
+    name: rbd-repo
+    model: http
+    address: 127.0.0.1:8081/artifactory/libs-release
+    max_errors_num: 3
+    time_interval: 30
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-repo
+  start: >-
+    docker run --name rbd-repo
+    --network host
+    -v /grdata/services/artifactory-{{ inventory_hostname }}:/var/opt/jfrog/artifactory
+    -i goodrain.me/{{ repo }}
+  stop: docker stop rbd-repo
+  restart_policy: always

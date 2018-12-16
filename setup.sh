@@ -32,6 +32,7 @@ if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
 fi
 
 [ -z "$IIP" ] && IIP=$1
+[ -z "$IIP" ] && IIP=$( get_default_ip )
 [ -z "$IIP" ] && notice "not found IIP"
 
 get_default_config(){
@@ -68,7 +69,7 @@ get_default_config(){
 get_default_dns() {
     dns=$(cat /etc/resolv.conf | grep "^nameserver" | head -1 | awk '{print $2}')
     [ -z "$dns" ] && dns="114.114.114.114"
-    info "default_dns_local:" "$dns"
+    info "default nameserver local" "$dns"
     sed -i -r  "s/(^default_dns_local: ).*/\1$dns/" roles/rainvar/defaults/main.yml
 }
 
@@ -133,6 +134,7 @@ iip: $DOMAIN_IP
 domain: $wilddomain
 uuid: $DOMAIN_UUID
 secretkey: $AUTH
+api: $DOMAIN_API
 EOF
     else
         info "not generate rainbond domain, will use example" "pass.example.com"
@@ -144,12 +146,30 @@ EOF
     fi
 }
 
+up_domain_dns(){
+    uid=$(cat /opt/rainbond/.init/domain.yaml | grep uuid | awk '{print $2}')
+    iip=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk '{print $2}')
+    domain=$(cat /opt/rainbond/.init/domain.yaml | grep domain | awk '{print $2}')
+    DOMAIN_API=$(cat /opt/rainbond/.init/domain.yaml | grep api | awk '{print $2}')
+    if [[ "$domain" =~ "grapps" ]];then
+        curl -s --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain >/dev/null 
+    fi
+}
+
 copy_from_centos(){
     info "Update default to CentOS" "$1"
     cp -a ./hack/chinaos/centos-release /etc/os-release
     mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
     mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
     cp -a ./hack/chinaos/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
+}
+
+copy_from_ubuntu(){
+    info "Update default to Ubuntu" "$1"
+    cp -a ./hack/chinaos/ubuntu-release /etc/os-release
+    cp -a ./hack/chinaos/ubuntu-lsb-release /etc/lsb-release
+    cp -a /etc/apt/sources.list /etc/apt/sources.list.old
+    cp -a ./hack/chinaos/sources.list /etc/apt/sources.list
 }
 
 other_type_linux(){
@@ -159,6 +179,9 @@ other_type_linux(){
         neokylin)
             copy_from_centos $lsb_dist
         ;;
+        kylin)
+            copy_from_ubuntu $lsb_dist
+        ;;    
     esac
 }
 
@@ -170,19 +193,18 @@ online_init(){
 		ubuntu|debian)
             apt-get update
             apt-get install sshpass python-pip uuid-runtime pwgen -y
+            pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
             yum install -y sshpass python-pip uuidgen pwgen 
+            pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
-		rhel|ol|sles)
-			notice "Not Support $lsb_dist"
-			;;
 		*)
-            exit 1
+           notice "Not Support $lsb_dist"
 		;;
 
     esac
@@ -223,7 +245,7 @@ EOF
 }
 
 get_default_install_type(){
-    info "Install Type:" "$INSTALL_TYPE"
+    info "Install Type" "$INSTALL_TYPE"
     sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
     if [ "$INSTALL_TYPE" == "online" ];then
         online_init
@@ -234,8 +256,17 @@ get_default_install_type(){
 
 onenode(){
     progress "Install Rainbond On Single Node"
+    hname=$(hostname -s)
+    sed -i "s#node1#$hname#g" inventory/hosts
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     ansible-playbook -i inventory/hosts setup.yml
+    if [ "$?" -eq 0 ];then
+        up_domain_dns
+        progress "Congratulations on your successful installation"
+        info "访问地址" "http://$IIP:7070"
+    else
+        notice "The installation did not succeed, please redo it or ask for help"
+    fi
 }
 
 multinode(){
@@ -250,10 +281,12 @@ thirdparty(){
 
 prepare(){
     progress "Prepare Init..."
-    other_type_linux 
+    info "default bind ip" $IIP
+    other_type_linux
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
+    info "Deploy Type" $DEPLOY_TYPE
     get_default_config
     Generate_domain $IIP
 }

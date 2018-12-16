@@ -86,7 +86,7 @@ progress() {
 }
 
 info() {
-	echo >&2 " > ${TPUT_WHITE}${TPUT_BOLD} ${1} ${TPUT_RESET} ${TPUT_DIM}${2}${TPUT_RESET} "
+	echo >&2 " > ${TPUT_WHITE}${TPUT_BOLD} ${1} ${TPUT_RESET} ${TPUT_GREEN}${2}${TPUT_RESET} "
 }
 
 run_ok() {
@@ -134,4 +134,9 @@ run() {
 	fi
 
 	return ${ret}
+}
+
+get_default_ip(){
+	ip=$(ip addr | grep inet | grep -Ev 'inet6|docker0| lo' | awk '{print $2}' | awk -F/ '{print $1}' | head -1)
+	echo ${ip}
 }

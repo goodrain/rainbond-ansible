@@ -1,0 +1,8 @@
+---
+- name: Docker | minimum docker version
+  fail:
+    msg: >
+          docker requires a minimum version of
+          {{ docker_min_version }} on
+          {{ ansible_distribution }}-{{ ansible_distribution_version }}
+  when: get_docker_version.stdout is version(docker_min_version, "<")

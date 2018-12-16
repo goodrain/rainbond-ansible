@@ -17,7 +17,6 @@
 - name: Ensure directories to export exist
   file: 'path="/grdata" state=directory'
 
-
 - name: Ensure nfs is running.
   service: "name={{ nfs_server_daemon }} state=started enabled=yes"
 
@@ -32,7 +31,6 @@
 
 - name: Update exports
   shell: "exportfs -ra"
-
 
 - name: Health | Copy health storage check
   template:

@@ -1,34 +1,40 @@
 ---
-#- include_tasks: set_facts_dns.yml
-#  when: dns_mode != 'none' and resolvconf_mode == 'docker_dns'
-#  tags:
-#    - facts
+- name: Docker | Check if docker is installed
+  stat: path="/usr/bin/docker"
+  register: docker_check
+
+#- name: show docker_check
+#  debug: var=docker_check
+
+- name: Docker | Check Version if docker is installed
+  command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
+  register: get_docker_version
+  when: docker_check.stat.isreg is defined
+
+#- name: show installed_docker_version debug info
+#  debug: var=get_docker_version
+
+- name: Docker | import docker check version
+  import_tasks: check_docker_version.yml
+  when: docker_check.stat.isreg is defined
 
 - import_tasks: online.yml
-  when: install_type == "online"
+  when: install_type == "online" and docker_check.stat.isreg is not defined
 
 - import_tasks: offline.yml
-  when: install_type == "offline"
+  when: install_type == "offline" and docker_check.stat.isreg is not defined
 
-- name: flush handlers so we can wait for docker to come up
-  meta: flush_handlers
-
-- name: set fact for docker_version
+- name: Docker | Get Docker Version
   command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
   register: installed_docker_version
-  changed_when: false
-  ignore_errors: true
 
-- name: show installed_docker_version debug info
-  debug: var=installed_docker_version
-
-- name: Set docker systemd config
+- name: Docker | Set docker systemd config
   import_tasks: systemd.yml
-
-- name: ensure docker service is started and enabled
+  
+- name: Docker | ensure docker service is started and enabled
   service:
     name: "{{ item }}"
     enabled: yes
-    state: started
+    state: restarted
   with_items:
     - docker

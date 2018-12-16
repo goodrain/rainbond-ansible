@@ -1,7 +1,22 @@
 ---
-- name: K8S | pull kubernetes from goodrain.me
-  shell: "docker pull goodrain.me/{{ kubernetes_image }}"
-  ignore_errors: true
+- name: K8S | run if image is pulled
+  command: /usr/local/bin/check_img k8s
+
+- name: K8S | check if image is pulled
+  stat: path="/tmp/check_k8s_img"
+  register: check_k8s_img
+
+- name: K8S | pull kubernetes apiserver from goodrain.me
+  shell: "docker pull goodrain.me/{{ kube_apiserver_image }}"
+  when: check_k8s_img.stat.isreg is not defined
+
+- name: K8S | pull kubernetes controller_manager from goodrain.me
+  shell: "docker pull goodrain.me/{{ kube_controller_manager_image}}"
+  when: check_k8s_img.stat.isreg is not defined
+
+- name: K8S | pull kubernetes scheduler from goodrain.me
+  shell: "docker pull  goodrain.me/{{ kube_scheduler_image }}"
+  when: check_k8s_img.stat.isreg is not defined
 
 - name: Rainbond | Copy K8S Master Role
   template:

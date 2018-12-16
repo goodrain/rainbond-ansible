@@ -7,3 +7,9 @@
 
 #- name: show docker info
 #  debug: var=docker_task_result
+
+- name: Docker | Start docker
+  service:
+    name: docker
+    enabled: yes
+    state: started

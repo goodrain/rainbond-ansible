@@ -5,7 +5,7 @@ etcd_member_name: |-
   {% for host in groups['etcd'] %}
   {%   if inventory_hostname == host %}{{"etcd"+loop.index|string }}{% endif %}
   {% endfor %}
-etcd_access_address: "{% if k8s_interface is defined %}{{hostvars[inventory_hostname]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[inventory_hostname]['ip']|default(hostvars[inventory_hostname]['ansible_default_ipv4']['address'])}}{% endif %}"
+etcd_access_address: "{{ hostvars[inventory_hostname]['ip'] }}"
 
 etcd_peer_url: "http://{{ etcd_access_address }}:2380"
 
@@ -13,13 +13,9 @@ etcd_client_url: "http://{{ etcd_access_address }}:2379,http://{{ etcd_access_ad
 
 etcd_peer_addresses: |-
   {% for item in groups['etcd'] -%}
-    {{ "etcd"+loop.index|string }}=http://{% if k8s_interface is defined %}{{hostvars[item]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[item]['ip']|default(hostvars[item]['ansible_default_ipv4']['address'])}}{% endif %}:2380{% if not loop.last %},{% endif %}
+    {{ "etcd"+loop.index|string }}=http://{{ hostvars[item]['ip'] }}:2380{% if not loop.last %},{% endif %}
   {%- endfor %}
 etcd_access_addresses: |-
   {% for item in groups['etcd'] -%}
-  {% if k8s_interface is defined %}
-  http://{{ hostvars[item]['ansible_'+k8s_interface].ipv4.address}}:2379{% if not loop.last %},{% endif %}
-  {% else %}
-  http://{{ hostvars[item]['ip'] | default(hostvars[item]['access_ip'] | default(hostvars[item]['ansible_default_ipv4']['address'])) }}:2379{% if not loop.last %},{% endif %}
-  {% endif %}
+  http://{{ hostvars[item]['ip'] }}:2379{% if not loop.last %},{% endif %}
   {%- endfor %}

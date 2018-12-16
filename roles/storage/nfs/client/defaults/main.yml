@@ -1,7 +1,7 @@
 ---
 storage_type: nfs
 
-nfsserver: "{{hostvars[groups['master'][0]]['ip']|default(hostvars[groups['master'][0]]['ansible_default_ipv4']['address'])}}"
+nfsserver: "{{hostvars[groups['master'][0]]['ip']}}"
 nfspath: "/grdata"
 nfsmount: "/grdata"
 nfsoptions: "rw"

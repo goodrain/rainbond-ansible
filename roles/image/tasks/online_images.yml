@@ -1,174 +1,210 @@
 ---
-- name: K8S | pull kubernetes from docker hub
-  shell: "docker pull rainbond/{{ kubernetes_image }} && docker tag rainbond/{{ kubernetes_image }} goodrain.me/{{ kubernetes_image }}"
-  register: pull_k8s_task_result
-  until: pull_k8s_task_result is succeeded
-  retries: 3
+#- name: K8S | pull kubernetes from docker hub
+#  shell: "docker pull rainbond/{{ kubernetes_image }} && docker tag rainbond/{{ kubernetes_image }} goodrain.me/{{ kubernetes_image }}"
+#  register: pull_k8s_task_result
+#  until: pull_k8s_task_result is succeeded
+#  retries: 3
+
+- name: Check | Check if image is pullled
+  stat: path=/opt/rainbond/.init/image.pulled
+  register: check_image_pulled
 
 - name: K8S | pull kube-apiserver from docker hub
   shell: "docker pull rainbond/{{ kube_apiserver_image }} && docker tag rainbond/{{ kube_apiserver_image }} goodrain.me/{{ kube_apiserver_image }}"
   register: pull_k8s_api_task_result
   until: pull_k8s_api_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: K8S | pull kube-controller-manager from docker hub
   shell: "docker pull rainbond/{{ kube_controller_manager_image }} && docker tag rainbond/{{ kube_controller_manager_image }} goodrain.me/{{ kube_controller_manager_image}}"
   register: pull_k8s_cm_task_result
   until: pull_k8s_cm_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: K8S | pull kube-scheduler from docker hub
   shell: "docker pull rainbond/{{ kube_scheduler_image }} && docker tag rainbond/{{ kube_scheduler_image }} goodrain.me/{{ kube_scheduler_image }}"
   register: pull_k8s_sc_task_result
   until: pull_k8s_sc_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: K8S | pull etcd from docker hub
   shell: "docker pull rainbond/{{ etcd_image }} && docker tag rainbond/{{ etcd_image }} goodrain.me/{{ etcd_image }}"
   register: pull_etcd_task_result
   until: pull_etcd_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: K8S | pull calico from docker hub
   shell: "docker pull rainbond/{{ calico_image }} && docker tag rainbond/{{ calico_image }} goodrain.me/{{ calico_image }}"
   register: pull_calico_task_result
   until: pull_calico_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull rbd-db from docker hub
   shell: "docker pull rainbond/{{ rbd_db_image }} && docker tag rainbond/{{ rbd_db_image }} goodrain.me/{{ rbd_db_image }}"
   register: pull_db_task_result
   until: pull_db_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull tcm from docker hub
   shell: "docker pull rainbond/{{ tcm }} && docker tag rainbond/{{ tcm }} goodrain.me/tcm:latest"
   register: pull_tcm_task_result
   until: pull_tcm_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull mesh from docker hub
   shell: "docker pull rainbond/{{ mesh }} && docker tag rainbond/{{ mesh }} goodrain.me/mesh_plugin:latest"
   register: pull_mesh_task_result
   until: pull_mesh_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull runner from docker hub
   shell: "docker pull rainbond/{{ runner }} && docker tag rainbond/{{ runner }} goodrain.me/runner:latest"
   register: pull_runner_task_result
   until: pull_runner_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull builder from docker hub
   shell: "docker pull rainbond/{{ builder }} && docker tag rainbond/{{ builder }} goodrain.me/builder:latest"
   register: pull_builder_task_result
   until: pull_builder_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull adapter from docker hub
   shell: "docker pull rainbond/{{ adapter }} && docker tag rainbond/{{ adapter }} goodrain.me/adapter:latest"
   register: pull_adapter_task_result
   until: pull_adapter_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull pause-amd64 from docker hub
   shell: "docker pull rainbond/{{ pause_amd64 }} && docker tag rainbond/{{ pause_amd64 }} goodrain.me/{{ pause_amd64 }}"
   register: pull_pause_task_result
   until: pull_pause_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull hub from docker hub
   shell: "docker pull rainbond/{{ hub }} && docker tag rainbond/{{ hub }} goodrain.me/{{ hub }}"
   register: pull_hub_task_result
   until: pull_hub_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull repo from docker hub
   shell: "docker pull rainbond/{{ repo }} && docker tag rainbond/{{ repo }} goodrain.me/{{ repo }}"
   register: pull_repo_task_result
   until: pull_repo_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull api from docker hub
   shell: "docker pull rainbond/{{ api }} && docker tag rainbond/{{ api }} goodrain.me/{{ api }}"
   register: pull_api_task_result
   until: pull_api_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull worker from docker hub
   shell: "docker pull rainbond/{{ worker }} && docker tag rainbond/{{ worker }} goodrain.me/{{ worker }}"
   register: pull_worker_task_result
   until: pull_worker_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull eventlog from docker hub
   shell: "docker pull rainbond/{{ eventlog }} && docker tag rainbond/{{ eventlog }} goodrain.me/{{ eventlog }}"
   register: pull_eventlog_task_result
   until: pull_eventlog_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull gateway from docker hub
   shell: "docker pull rainbond/{{ gateway }} && docker tag rainbond/{{ gateway }} goodrain.me/{{ gateway }}"
   register: pull_gateway_task_result
   until: pull_gateway_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull chaos from docker hub
   shell: "docker pull rainbond/{{ chaos }} && docker tag rainbond/{{ chaos }} goodrain.me/{{ chaos }}"
   register: pull_chaos_task_result
   until: pull_chaos_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull mq from docker hub
   shell: "docker pull rainbond/{{ mq }} && docker tag rainbond/{{ mq }} goodrain.me/{{ mq }}"
   register: pull_mq_task_result
   until: pull_mq_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull webcli from docker hub
   shell: "docker pull rainbond/{{ webcli }} && docker tag rainbond/{{ webcli }} goodrain.me/{{ webcli }}"
   register: pull_webcli_task_result
   until: pull_webcli_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull rbd-app-ui from docker hub
   shell: "docker pull rainbond/{{ rbd_app_ui }} && docker tag rainbond/{{ rbd_app_ui }} goodrain.me/{{ rbd_app_ui }}"
   register: pull_rbd_app_ui_task_result
   until: pull_rbd_app_ui_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull rbd-dns from docker hub
   shell: "docker pull rainbond/{{ dns }} && docker tag rainbond/{{ dns }} goodrain.me/{{ dns }}"
   register: pull_dns_task_result
   until: pull_dns_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull rbd-monitor from docker hub
   shell: "docker pull rainbond/{{ monitor }} && docker tag rainbond/{{ monitor }} goodrain.me/{{ monitor }}"
   register: pull_monitor_task_result
   until: pull_monitor_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull k8s-cni from docker hub
   shell: "docker pull rainbond/{{ k8s_cni }}"
   register: pull_k8s_cni_task_result
   until: pull_k8s_cni_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull rbd-cni from docker hub
   shell: "docker pull rainbond/{{ rbd_cni }}"
   register: pull_rbd_cni_task_result
   until: pull_rbd_cni_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull kubecfg from docker hub
   shell: "docker pull rainbond/{{ kubecfg }}"
   register: pull_kubecfg_task_result
   until: pull_kubecfg_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
 
 - name: Rainbond | pull cfssl from docker hub
   shell: "docker pull rainbond/{{ cfssl }}"
   register: pull_cfssl_task_result
   until: pull_cfssl_task_result is succeeded
   retries: 3
+  when: check_image_pulled.stat.isreg is not defined
+
+- name: Rainbond | write pull image done
+  file: path=/opt/rainbond/.init/image.pulled state=touch
+  when: check_image_pulled.stat.isreg is not defined

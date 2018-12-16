@@ -13,18 +13,18 @@
 - name: Check | Stop if unknown OS
   assert:
     that: ansible_distribution in [ 'CentOS','RedHat','Debian','Ubuntu']
-  ignore_errors: "false"
+  ignore_errors: false
 
 - name: Check | Stop if memory is too small for masters
   assert:
     that: ansible_memtotal_mb >= 3500
-  ignore_errors: "false"
+  ignore_errors: false
   when: inventory_hostname in groups['master']
 
 - name: Check | Stop if memory is too small for workers
   assert:
     that: ansible_memtotal_mb >= 3500
-  ignore_errors: "false"
+  ignore_errors: false
   when: inventory_hostname in groups['worker']
 
 - name: Check | minimum kernel version
