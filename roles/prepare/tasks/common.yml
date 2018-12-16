@@ -28,12 +28,12 @@
   tags:
     - master
 
-- name: Assign inventory name to unconfigured hostnames (non-CoreOS and Tumbleweed)
-  hostname:
-    name: "{{inventory_hostname}}"
-  when:
-    - override_system_hostname
-    - ansible_os_family not in ['Suse', 'CoreOS', 'Container Linux by CoreOS']
+#- name: Assign inventory name to unconfigured hostnames (non-CoreOS and Tumbleweed)
+#  hostname:
+#    name: "{{inventory_hostname}}"
+#  when:
+#    - override_system_hostname
+#    - ansible_os_family not in ['Suse', 'CoreOS', 'Container Linux by CoreOS']
 
 #- name: set interface ip
 #  set_fact: interface_ip="{% if k8s_interface is defined %}{{hostvars[inventory_hostname]['ansible_'+k8s_interface].ipv4.address}}{% else %}{{hostvars[inventory_hostname]['ip']|default(hostvars[inventory_hostname]['ansible_default_ipv4']['address'])}}{% endif %}"

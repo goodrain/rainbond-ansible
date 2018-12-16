@@ -28,13 +28,13 @@
   command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
   register: installed_docker_version
 
-- name: Set docker systemd config
+- name: Docker | Set docker systemd config
   import_tasks: systemd.yml
   
-- name: ensure docker service is started and enabled
+- name: Docker | ensure docker service is started and enabled
   service:
     name: "{{ item }}"
     enabled: yes
-    state: started
+    state: restarted
   with_items:
     - docker
