@@ -193,14 +193,14 @@ online_init(){
 		ubuntu|debian)
             apt-get update
             apt-get install sshpass python-pip uuid-runtime pwgen -y
-            pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
+            # pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
             yum install -y sshpass python-pip uuidgen pwgen 
-            pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
+            # pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
             pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		*)
