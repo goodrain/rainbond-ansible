@@ -1,0 +1,11 @@
+#!/bin/bash
+
+IP=$(cat {{ env_dir }}/etcd.sh | awk -F= '{print $2}')
+
+echo $IP | grep "{{ MASTER_IP }}" > /dev/null
+
+if [ "$?" -ne 0 ];then
+    curl http://{{ MASTER_IP }}:2379/v2/members -XPOST -H "Content-Type: application/json" -d '{"peerURLs": ["http://'$IP':2380"]}'
+else
+    echo "master node {{ MASTER_IP }}"
+fi
