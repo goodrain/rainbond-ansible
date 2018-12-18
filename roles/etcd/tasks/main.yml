@@ -45,9 +45,9 @@
     mode: 0755
 
 - name: Etcd | Run add etcd cluster
-  shell: "bash {{ script_dir }}/add-cluster.sh"
+  shell: "bash {{ script_dir }}/add-cluster.sh > /tmp/etcd.cluster.log"
   register: add_etcd_cluster_task_result
-  until: add_etcd_cluster is succeeded
+  until: add_etcd_cluster_task_result is succeeded
   retries: 3
 
 - name: Etcd | start etcd
