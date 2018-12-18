@@ -16,7 +16,7 @@ chmod +x ./grctl
 ```
 mkdir -pv /opt/rainbond
 cd /opt/rainbond
-git clone https://github.com/goodrain/rainbond-ansible.git 
+git clone --depth 1 -b 5.0 https://github.com/goodrain/rainbond-ansible.git 
 cd rainbond-ansible
 # 编辑自定义选项 scripts/installer/global.sh
 
