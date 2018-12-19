@@ -26,7 +26,7 @@ services:
     -e CALICO_LIBNETWORK_CREATE_PROFILES=true  
     -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false  
     -e CALICO_LIBNETWORK_IFPREFIX=cali  
-    -e NODENAME={{ inventory_hostname }} 
+    -e NODENAME={{ inventory_hostname | lower }} 
     -e CALICO_NETWORKING_BACKEND=bird  
     -e IP6_AUTODETECTION_METHOD=first-found  
     -e ETCD_ENDPOINTS={{ ETCD_ENDPOINTS }} 
