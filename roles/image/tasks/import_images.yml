@@ -1,0 +1,6 @@
+---
+- name: Rainbond | load image from local
+  shell: "bash {{ base_dir }}/offline/images/load.sh"
+  register: load_task_result
+  until: load_task_result is succeeded
+  retries: 4
