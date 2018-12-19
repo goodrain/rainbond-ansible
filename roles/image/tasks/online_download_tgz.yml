@@ -5,14 +5,14 @@
 
 - name: Rainbond | Download base image tgz
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/5.0/base_images.tgz
-    dest: /grdata/services/offline/base_images.tgz
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/5.0/base.images.tgz
+    dest: /grdata/services/offline/base.images.tgz
   when: check_image_tgz_download.stat.isreg is not defined
 
 - name: Rainbond | Download rainbond image tgz
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/5.0/rainbond_images.tgz
-    dest: /grdata/services/offline/rainbond_images.tgz
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/5.0/rainbond.images.tgz
+    dest: /grdata/services/offline/rainbond.images.tgz
   when: check_image_tgz_download.stat.isreg is not defined
 
 - name: Check | Check if image.tgz is unarchive
@@ -21,13 +21,13 @@
 
 - name: Rainbond | Unzip base image
   unarchive:
-    src: /grdata/services/offline/base_images.tgz
+    src: /grdata/services/offline/base.images.tgz
     dest: "{{ base_dir }}/offline/images"
   when: check_image_tgz_unarchive.stat.isreg is not defined
 
 - name: Rainbond | Unzip rainbond image
   unarchive:
-    src: /grdata/services/offline/rainbond_images.tgz
+    src: /grdata/services/offline/rainbond.images.tgz
     dest: "{{ base_dir }}/offline/images"
   when: check_image_tgz_unarchive.stat.isreg is not defined
 
