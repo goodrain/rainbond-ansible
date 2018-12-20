@@ -17,7 +17,7 @@
     dest: /tmp/init.sql
 
 - name: Rainbond | Run update DB
-  shell: "bash /tmp/updatedb.sh > /tmp/init.log"
+  shell: "bash /tmp/updatedb.sh >> /tmp/init.log"
   register: updatedb_task_result
   until: updatedb_task_result is succeeded
   retries: 5

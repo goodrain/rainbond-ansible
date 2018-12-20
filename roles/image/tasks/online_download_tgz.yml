@@ -1,0 +1,36 @@
+---
+- name: Check | Check if image.tgz is download
+  stat: path=/opt/rainbond/.init/tgz.download
+  register: check_image_tgz_download
+
+- name: Rainbond | Download base image tgz
+  get_url:
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/5.0/base.images.tgz
+    dest: /grdata/services/offline/base.images.tgz
+  when: check_image_tgz_download.stat.isreg is not defined
+
+- name: Rainbond | Download rainbond image tgz
+  get_url:
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/5.0/rainbond.images.tgz
+    dest: /grdata/services/offline/rainbond.images.tgz
+  when: check_image_tgz_download.stat.isreg is not defined
+
+- name: Check | Check if image.tgz is unarchive
+  stat: path="{{ base_dir }}/offline/images/etcd.tgz"
+  register: check_image_tgz_unarchive
+
+- name: Rainbond | Unzip base image
+  unarchive:
+    src: /grdata/services/offline/base.images.tgz
+    dest: "{{ base_dir }}/offline/images"
+  when: check_image_tgz_unarchive.stat.isreg is not defined
+
+- name: Rainbond | Unzip rainbond image
+  unarchive:
+    src: /grdata/services/offline/rainbond.images.tgz
+    dest: "{{ base_dir }}/offline/images"
+  when: check_image_tgz_unarchive.stat.isreg is not defined
+
+- name: Rainbond | write download image.tgz done
+  file: path=/opt/rainbond/.init/tgz.download state=touch
+  when: check_image_tgz_download.stat.isreg is not defined

@@ -21,16 +21,34 @@
     dest: "{{ script_dir }}/start-etcd.sh"
     mode: 0777
 
+- name: Etcd | Copy add cluster
+  template:
+    src: add-cluster.sh.j2
+    dest: "{{ script_dir }}/add-cluster.sh"
+    mode: 0777
+
+- name: Etcd | Copy Etcd env
+  template:
+    src: etcd.sh.j2
+    dest: "{{ env_dir }}/etcd.sh"
+    mode: 0777
+
 - name: Etcd | Copy Etcd Service
   template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
 
 - name: Etcd | Copy etcdctl binary from deploy
-  copy:
+  copy: 
     src: "{{ local_tools }}/bin/etcdctl"
     dest: "{{ bin_dir }}/etcdctl"
     mode: 0755
+
+- name: Etcd | Run add etcd cluster
+  shell: "bash {{ script_dir }}/add-cluster.sh > /tmp/etcd.cluster.log"
+  register: add_etcd_cluster_task_result
+  until: add_etcd_cluster_task_result is succeeded
+  retries: 3
 
 - name: Etcd | start etcd
   shell: "systemctl daemon-reload && systemctl start etcd"
