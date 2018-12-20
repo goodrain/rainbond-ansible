@@ -44,6 +44,9 @@ base_images(){
         [ -f "${offline_image_path}/base/${kimg}.tgz" ] && rm -rf ${offline_image_path}/base/${kimg}.tgz
         docker save goodrain.me/${kimg}:v1.10.11 > ${offline_image_path}/base/${kimg}.tgz
     done
+    docker pull rainbond/rbd-registry:2.6.2
+    docker tag rainbond/rbd-registry:2.6.2 goodrain.me/rbd-registry:2.6.2
+    docker save goodrain.me/rbd-registry:2.6.2 > ${offline_image_path}/base/hub.tgz
     docker pull rainbond/calico-node:v3.3.1
     docker tag rainbond/calico-node:v3.3.1 goodrain.me/calico-node:v3.3.1
     docker save goodrain.me/calico-node:v3.3.1 > ${offline_image_path}/base/calico.tgz

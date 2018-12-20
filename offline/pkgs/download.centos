@@ -10,8 +10,8 @@ else
     network_pkg=(bridge-utils net-tools psmisc conntrack-tools jq socat bash-completion rsync ipset ipvsadm)
     k8s_pkg=(kubelet kubeadm kubectl)
     docker_ce_pkg=(docker-ce)
-    k8s_version=(1.10.11 1.11.5 1.12.3 1.13.0)
-    docker_version=(17.06.2.ce 18.06.1.ce)
+    k8s_version=(1.10.11)
+    docker_version=(17.06.2.ce)
     yum install centos-release-gluster -y -q
     for pkg in ${common_pkg[@]} ${storage_pkg[@]} ${network_pkg[@]}
     do

@@ -1,3 +1,4 @@
+all: centos-build centos-make
 centos-build:
 	docker build -t localbuild:centos -f Dockerfile.centos .
 
