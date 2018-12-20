@@ -235,7 +235,7 @@ gpgcheck=0
 enabled=1
 EOF
             yum makecache
-            yum install -y sshpass python-pip uuidgen pwgen
+            yum install -y sshpass python-pip uuidgen pwgen ansible
 		;;
 		*)
             notice "Not Support $lsb_dist"
