@@ -12,6 +12,10 @@ mkdir -pv ${offline_image_path}/{base,rainbond}
 base_images(){
     docker pull rainbond/cni:k8s_5.0
     docker save rainbond/cni:k8s_5.0 > ${offline_image_path}/base/cni_k8s.tgz
+    docker pull rainbond/kubecfg:dev
+    docker save rainbond/kubecfg:dev > ${offline_image_path}/base/kubecfg_dev.tgz
+    docker pull rainbond/cfssl:dev
+    docker save rainbond/cfssl:dev > ${offline_image_path}/base/cfssl_dev.tgz
     for img in ${base[@]}
     do
         [ -f "${offline_image_path}/base/${img}.tgz" ] && rm -rf ${offline_image_path}/base/${img}.tgz
