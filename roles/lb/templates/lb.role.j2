@@ -15,9 +15,7 @@ services:
     docker run --name rbd-gateway
     --network host
     -v {{ rbd_dir }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
-    -v {{ rbd_dir }}/etc/rbd-gateway/cert:/run/nginx/cert
-    -v {{ rbd_dir }}/etc/rbd-gateway/default:/run/nginx/default
-    -v {{ rbd_dir }}/etc/rbd-gateway/lua-resty-balancer:/run/nginxtmp/lua/lua-resty-balancer
+    -v {{ rbd_dir }}/etc/rbd-gateway/ssl:/run/nginx/rainbond/ssl
     -e DEFAULT_PORT=80
     -i goodrain.me/{{ gateway }}
     --etcd-endpoints=${ETCD_ENDPOINTS}
