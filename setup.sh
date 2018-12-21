@@ -263,7 +263,7 @@ onenode(){
     if [ "$?" -eq 0 ];then
         up_domain_dns
         progress "Congratulations on your successful installation"
-        info "访问地址" "http://$IIP:7070"
+        [ ! -z "$EIP" ] && info "访问地址" "http://$EIP:7070" || info "访问地址" "http://$IIP:7070"
     else
         notice "The installation did not succeed, please redo it or ask for help"
     fi
