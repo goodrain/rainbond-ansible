@@ -12,10 +12,10 @@ etcd_peer_url: "http://{{ etcd_access_address }}:2380"
 etcd_client_url: "http://{{ etcd_access_address }}:2379,http://{{ etcd_access_address }}:4001"
 
 etcd_peer_addresses: |-
-  {% for item in groups['etcd'] -%}
+  {% for item in groups['etcd'] + groups['new-master'] -%}
     {{ "etcd"+loop.index|string }}=http://{{ hostvars[item]['ip'] }}:2380{% if not loop.last %},{% endif %}
   {%- endfor %}
 etcd_access_addresses: |-
-  {% for item in groups['etcd'] -%}
+  {% for item in groups['etcd'] + groups['new-master'] -%}
   http://{{ hostvars[item]['ip'] }}:2379{% if not loop.last %},{% endif %}
   {%- endfor %}

@@ -281,14 +281,17 @@ thirdparty(){
 
 prepare(){
     progress "Prepare Init..."
-    info "default bind ip" $IIP
+    info "internal ip" $IIP
+    [ ! -z "$EIP" ] && info "external ip" $EIP
+    [ ! -z "$VIP" ] && info "virtual ip" $VIP
+
     other_type_linux
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
     info "Deploy Type" $DEPLOY_TYPE
     get_default_config
-    Generate_domain $IIP
+    [ ! -z "$EIP" ] && Generate_domain $EIP || Generate_domain $IIP
 }
 
 case $DEPLOY_TYPE in

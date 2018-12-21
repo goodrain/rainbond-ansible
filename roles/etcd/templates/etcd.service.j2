@@ -9,7 +9,9 @@ LimitCORE=infinity
 LimitNOFILE=102400
 LimitNPROC=102400
 PermissionsStartOnly=true
+ExecStartPre=-/bin/bash -c 'docker rm etcd'
 ExecStart={{ rbd_dir }}/scripts/start-etcd.sh
+ExecStop=/bin/bash -c 'docker stop etcd'
 Restart=always
 RestartSec=10
 
