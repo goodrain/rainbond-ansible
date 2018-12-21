@@ -11,7 +11,7 @@ do
         docker exec rbd-db mysql -e "CREATE DATABASE IF NOT EXISTS region DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
         docker exec rbd-db mysql -e "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
         for ((i=1;i<=60;i++ ));do
-            sleep 1
+            sleep 5
             uiready=$(docker ps | grep app-ui)
             [ ! -z "$uiready" ] && break
         done

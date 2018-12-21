@@ -263,7 +263,11 @@ onenode(){
     if [ "$?" -eq 0 ];then
         up_domain_dns
         progress "Congratulations on your successful installation"
-        [ ! -z "$EIP" ] && info "访问地址" "http://$EIP:7070" || info "访问地址" "http://$IIP:7070"
+        info "查询集群状态" "grctl cluster"
+        [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
+        info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
+        info "操作文档" "https://www.rainbond.com/docs/dev/getting-started/rainbond-overview.html"
+        info "社区" "https://t.goodrain.com"
     else
         notice "The installation did not succeed, please redo it or ask for help"
     fi
