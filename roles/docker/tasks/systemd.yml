@@ -16,8 +16,7 @@
     src: docker.sh.j2
     dest: "{{ rbd_dir }}/envs/docker.sh"
   notify: restart docker
-  when: docker_check.stat.isreg is not defined
-
+#  when: docker_check.stat.isreg is not defined
 
 - name: Check docker dir
   file: path=/etc/docker state=directory mode=0755
