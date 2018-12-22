@@ -12,6 +12,8 @@ upgrade(){
             docker pull rainbond/${img}:${version}
             docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
             docker push goodrain.me/${img}:${version}
+            systemctl restart ${img}
+            [ "$?" -eq 0 ] && echo "restart ${img} ok."
         done
     else
         echo "will upgrade $1 image"
@@ -21,6 +23,8 @@ upgrade(){
                 docker pull rainbond/${img}:${version}
                 docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
                 docker push goodrain.me/${img}:${version}
+                systemctl restart ${img}
+                [ "$?" -eq 0 ] && echo "restart ${img} ok."
             fi
         done
     fi

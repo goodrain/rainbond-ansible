@@ -1,9 +1,9 @@
 ---
 nodeip: "{{hostvars[inventory_hostname]['ip']}}"
 run_mode: |-
-  {% if inventory_hostname in groups['master'] %}master{% else %}worker{% endif %}
+  {% if inventory_hostname in groups['master'] + groups['new-master'] %}master{% else %}worker{% endif %}
 noderule: |-
-  {% if inventory_hostname in groups['master'] %}
+  {% if inventory_hostname in groups['master'] + groups['new-master'] %}
     {% if inventory_hostname in groups['worker'] %}
       manage,compute
     {% else %}
