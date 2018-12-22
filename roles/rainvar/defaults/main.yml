@@ -85,3 +85,7 @@ DOCKER_BRIDGE_IP: 172.30.42.1
 
 #FLANNEL_BACKEND: "vxlan"
 FLANNEL_BACKEND: host-gw
+
+etcd_port_c1: 2379
+etcd_port_c2: 4001
+etcd_port_s1: 2380

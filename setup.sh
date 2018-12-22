@@ -252,6 +252,16 @@ get_default_install_type(){
     fi
 }
 
+show_succeed(){
+    up_domain_dns
+    progress "Congratulations on your successful installation"
+    info "查询集群状态" "grctl cluster"
+    [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
+    info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
+    info "操作文档" "https://www.rainbond.com/docs/dev/getting-started/rainbond-overview.html"
+    info "社区" "https://t.goodrain.com"
+}
+
 onenode(){
     progress "Install Rainbond On Single Node"
     hname=$(hostname -s)
@@ -259,13 +269,7 @@ onenode(){
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
-        up_domain_dns
-        progress "Congratulations on your successful installation"
-        info "查询集群状态" "grctl cluster"
-        [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
-        info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
-        info "操作文档" "https://www.rainbond.com/docs/dev/getting-started/rainbond-overview.html"
-        info "社区" "https://t.goodrain.com"
+        show_succeed
     else
         notice "The installation did not succeed, please redo it or ask for help"
     fi
@@ -279,6 +283,11 @@ multinode(){
 thirdparty(){
     progress "Only Install Rainbond On Multinode Node"
     ansible-playbook -i inventory/hosts hack/thirdparty/setup.yaml
+    if [ "$?" -eq 0 ];then
+        show_succeed
+    else
+        notice "The installation did not succeed, please redo it or ask for help"
+    fi
 }
 
 prepare(){
@@ -296,6 +305,18 @@ prepare(){
     [ ! -z "$EIP" ] && Generate_domain $EIP || Generate_domain $IIP
 }
 
+update_etcd(){
+    info "update default etcd port" "$etcd_port_c1/23800/$etcd_port_c2"
+    sed -i -r  "s/(^etcd_port_c1: ).*/\1$etcd_port_c1/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^etcd_port_c2: ).*/\1$etcd_port_c2/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^etcd_port_s1: ).*/\1$etcd_port_s1/" roles/rainvar/defaults/main.yml
+
+}
+3rdprepare(){
+    progress "Check thirdparty Init..."
+    update_etcd
+}
+
 case $DEPLOY_TYPE in
     onenode)
         prepare
@@ -307,6 +328,7 @@ case $DEPLOY_TYPE in
     ;;
     thirdparty)
         prepare
+        3rdprepare
         thirdparty
     ;;
     *)

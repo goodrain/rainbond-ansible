@@ -2,9 +2,9 @@
 
 ETCD_NAME={{ etcd_member_name }}
 ETCD_DATA_DIR="/data/etcd"
-ETCD_LISTEN_CLIENT_URLS="http://{{ etcd_access_address }}:2379,http://{{ etcd_access_address }}:4001,http://127.0.0.1:2379,http://127.0.0.1:4001"
-ETCD_ADVERTISE_CLIENT_URLS="http://{{ etcd_access_address }}:2379,http://{{ etcd_access_address }}:4001"
-ETCD_LISTEN_PEER_URLS="http://{{ etcd_access_address }}:2380"
+ETCD_LISTEN_CLIENT_URLS="http://{{ etcd_access_address }}:{{ etcd_port_c1 }},http://{{ etcd_access_address }}:{{ etcd_port_c2 }},http://127.0.0.1:{{ etcd_port_c1 }},http://127.0.0.1:{{ etcd_port_c2 }}"
+ETCD_ADVERTISE_CLIENT_URLS="http://{{ etcd_access_address }}:{{ etcd_port_c1 }},http://{{ etcd_access_address }}:{{ etcd_port_c2 }}"
+ETCD_LISTEN_PEER_URLS="http://{{ etcd_access_address }}:{{ etcd_port_s1 }}"
 ETCD_INITIAL_ADVERTISE_PEER_URLS="{{ etcd_peer_url }}"
 ETCD_INITIAL_CLUSTER="{{ etcd_peer_addresses }}"
 ETCD_INITIAL_CLUSTER_TOKEN="rainbond_k8s_etcd"

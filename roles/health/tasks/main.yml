@@ -26,6 +26,7 @@
     src: "network_{{ CLUSTER_NETWORK }}.sh.j2"
     dest: "{{ rbd_dir }}/health/network.sh"
     mode: 0777
+  tags: health
 
 - name: Health | Add Dns Health Check
   template:

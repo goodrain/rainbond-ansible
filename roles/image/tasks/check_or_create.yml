@@ -2,18 +2,23 @@
 - name: Check certificates 
   stat: path="{{ ca_dir }}/kubernetes.pem"
   register: certificates_is_done
+  tags: image
 
 - name: Check kubecfg
   stat: path="{{ kubecfg_dir }}/token.csv"
   register: kubecfg_is_done
+  tags: image
+
 
 - name: K8S | check_or_create_certificates
   shell: "docker run --rm -v {{ ca_dir }}:/ssl -w /ssl rainbond/{{ cfssl }} kip {{ MASTER_IP }}"
   when: certificates_is_done.stat.isreg is not defined
+  tags: image
 
 - name: K8S | check_or_create_kubeconfig
   shell: "docker run --rm -v {{ ca_dir }}:/etc/goodrain/kubernetes/ssl -v {{ kubecfg_dir }}:/k8s rainbond/{{ kubecfg }}"
   when: kubecfg_is_done.stat.isreg is not defined
+  tags: image
 
 - name: Rainbond | Copy kube-proxy
   copy:

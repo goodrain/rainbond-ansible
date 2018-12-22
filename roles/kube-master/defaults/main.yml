@@ -2,5 +2,5 @@
 master_access_address: "{{hostvars[inventory_hostname]['ip']}}"
 etcd_endpoints: |-
   {% for item in groups['etcd'] -%}
-    http://{{hostvars[item]['ip']}}:2379{% if not loop.last %},{% endif %}
+    http://{{hostvars[item]['ip']}}:{{ etcd_port_c1 }}{% if not loop.last %},{% endif %}
   {%- endfor %}
