@@ -69,7 +69,7 @@ get_default_config(){
 get_default_dns() {
     dns=$(cat /etc/resolv.conf | grep "^nameserver" | head -1 | awk '{print $2}')
     [ -z "$dns" ] && dns="114.114.114.114"
-    info "default nameserver local" "$dns"
+    info "nameserver" "$dns"
     sed -i -r  "s/(^default_dns_local: ).*/\1$dns/" roles/rainvar/defaults/main.yml
 }
 
@@ -192,22 +192,20 @@ online_init(){
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
-            apt-get install sshpass python-pip uuid-runtime pwgen -y
-            # pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
+            apt-get install -y sshpass python-pip uuid-runtime pwgen
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
-            yum install -y sshpass python-pip uuidgen pwgen 
-            # pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
-            pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
+            yum install -y sshpass python-pip uuidgen pwgen
 		;;
 		*)
            notice "Not Support $lsb_dist"
 		;;
-
     esac
+    export LC_ALL=C
+    # pip install setuptools pip -U -i https://pypi.tuna.tsinghua.edu.cn/simple
+    pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 }
 
@@ -263,7 +261,11 @@ onenode(){
     if [ "$?" -eq 0 ];then
         up_domain_dns
         progress "Congratulations on your successful installation"
-        info "访问地址" "http://$IIP:7070"
+        info "查询集群状态" "grctl cluster"
+        [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
+        info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
+        info "操作文档" "https://www.rainbond.com/docs/dev/getting-started/rainbond-overview.html"
+        info "社区" "https://t.goodrain.com"
     else
         notice "The installation did not succeed, please redo it or ask for help"
     fi
@@ -281,14 +283,17 @@ thirdparty(){
 
 prepare(){
     progress "Prepare Init..."
-    info "default bind ip" $IIP
+    info "internal ip" $IIP
+    [ ! -z "$EIP" ] && info "external ip" $EIP
+    [ ! -z "$VIP" ] && info "virtual ip" $VIP
+
     other_type_linux
     get_default_dns
     get_default_netwrok_type
     get_default_install_type
     info "Deploy Type" $DEPLOY_TYPE
     get_default_config
-    Generate_domain $IIP
+    [ ! -z "$EIP" ] && Generate_domain $EIP || Generate_domain $IIP
 }
 
 case $DEPLOY_TYPE in

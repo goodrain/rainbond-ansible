@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/goodrain/rainbond-ansible.svg?branch=devel)](https://travis-ci.org/goodrain/rainbond-ansible)
+[![Build Status](https://travis-ci.org/goodrain/rainbond-ansible.svg?branch=5.0)](https://travis-ci.org/goodrain/rainbond-ansible)
 
 # Ansible Playbook For Rainbond
 
@@ -10,6 +10,7 @@
 
 - [使用文档](https://www.rainbond.com)
 - [配置开发文档](./docs/)
+- [安装FAQ](https://github.com/goodrain/rainbond-ansible/wiki/Install-FAQ)
 
 ## License
 

@@ -1,17 +1,17 @@
 #!/bin/bash
 
-set -e
+set -x
 
 for ((i=1;i<=6;i++))
 do
-    sleep 10
-    docker exec rbd-db mysql -e "show databases"
-    [ "$?" -eq 0 ] && (
+    docker exec rbd-db mysql -e "show databases;"
+    status=$?
+    [ "$status" -eq 0 ] && (
         docker exec rbd-db mysql -e "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";docker exec rbd-db mysql -e "delete from mysql.user where user=''; flush privileges"
         docker exec rbd-db mysql -e "CREATE DATABASE IF NOT EXISTS region DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
         docker exec rbd-db mysql -e "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
         for ((i=1;i<=60;i++ ));do
-            sleep 1
+            sleep 5
             uiready=$(docker ps | grep app-ui)
             [ ! -z "$uiready" ] && break
         done
@@ -19,7 +19,8 @@ do
         docker cp /tmp/init.sql rbd-db:/root
         docker exec rbd-db mysql -e "use console;truncate table console_sys_config"
         docker exec rbd-db mysql -e "use console;source /root/init.sql;"
-        IP={{ lbip }}
+        # IP={{ lbip }}
+        IP=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk -F ': ' '{print $2}')
         ssl_ca_cert=$(cat {{ region_ca_dir }}/ca.pem)
         key_file=$(cat {{ region_ca_dir }}/client.key.pem)
         cert_file=$(cat {{ region_ca_dir }}/client.pem)
@@ -33,6 +34,10 @@ EOF
             docker exec rbd-db mysql -e "use console;source /root/region_info.sql;"
         fi
     ) && break
+    [ "$status" -ne 0 ] && (
+        systemctl stop rbd-db && rm -rf /opt/rainbond/data/rbd-db
+	    sleep 20
+    )
 done
 
 

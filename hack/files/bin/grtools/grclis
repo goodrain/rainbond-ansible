@@ -1,7 +1,8 @@
 #!/bin/bash
 
 version=5.0
-rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog rbd-dns)
+rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog)
+all=(node rbd-chaos rbd-worker rbd-api rbd-eventlog rbd-db rbd-repo calico kube-controller-manager kube-scheduler rbd-app-ui rbd-monitor rbd-webcli rbd-mq rbd-gateway kube-apiserver rbd-dns rbd-hub etcd)
 
 upgrade(){
     if [ "$1" == "all" ];then
@@ -11,6 +12,8 @@ upgrade(){
             docker pull rainbond/${img}:${version}
             docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
             docker push goodrain.me/${img}:${version}
+            systemctl restart ${img}
+            [ "$?" -eq 0 ] && echo "restart ${img} ok."
         done
     else
         echo "will upgrade $1 image"
@@ -20,14 +23,31 @@ upgrade(){
                 docker pull rainbond/${img}:${version}
                 docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
                 docker push goodrain.me/${img}:${version}
+                systemctl restart ${img}
+                [ "$?" -eq 0 ] && echo "restart ${img} ok."
             fi
         done
     fi
 }
 
+stop(){
+    [ ! -z "$1" ] && (
+        systemctl stop $1
+    ) || (
+        for s in ${all[@]}
+        do          
+            echo "will stop $s"
+            systemctl stop $s
+        done
+    )
+}
+
 case $1 in
     upgrade)
         upgrade $2 
+    ;;
+    stop)
+        stop $2
     ;;
     *)
         echo "not support cmd $1"
