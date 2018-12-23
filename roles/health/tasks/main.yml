@@ -88,4 +88,4 @@
   template:
     src: only_health.role.j2
     dest: "{{ node_role_dir }}/only_health.yaml"
-  when: docker_install_by_rainbond.stat.isreg is not defined
+  when: docker_install_by_rainbond.stat.isreg is defined
