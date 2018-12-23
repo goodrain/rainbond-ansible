@@ -3,6 +3,7 @@
   roles:
     - { role: rainvar, tags: default }
     - { role: prepare, tags: prepare-thirdparty }
+    - { role: thirdparty, tags: thirdparty}
 
 - hosts: deploy
   roles:

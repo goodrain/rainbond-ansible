@@ -1,0 +1,10 @@
+---
+- name: Check | Docker Daemon
+  stat: path=/etc/docker/daemon.json
+  register: check_docker_daemon
+
+- name: Thirdparty | Write docker daemon
+  template: 
+    src: daemon.json.j2 
+    dest: /etc/docker/daemon.json
+  when: check_docker_daemon.stat.isreg is not defined

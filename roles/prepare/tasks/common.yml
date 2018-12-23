@@ -184,3 +184,8 @@
   copy:
     src: "{{ base_dir }}/hack/files/ssl/goodrain.me/server.crt"
     dest: /etc/docker/certs.d/goodrain.me/server.crt
+
+- name: Rainbond | Copy grctl from deploy
+  template:
+    src: grctl.yaml.j2
+    dest: /root/.rbd/grctl.yaml
