@@ -10,12 +10,12 @@
   tags: image
 
 
-- name: K8S | check_or_create_certificates
+- name: K8S | check_certificates
   shell: "docker run --rm -v {{ ca_dir }}:/ssl -w /ssl rainbond/{{ cfssl }} kip {{ MASTER_IP }}"
   when: certificates_is_done.stat.isreg is not defined
   tags: image
 
-- name: K8S | check_or_create_kubeconfig
+- name: K8S | create_kubeconfig
   shell: "docker run --rm -v {{ ca_dir }}:/etc/goodrain/kubernetes/ssl -v {{ kubecfg_dir }}:/k8s rainbond/{{ kubecfg }}"
   when: kubecfg_is_done.stat.isreg is not defined
   tags: image
@@ -30,14 +30,14 @@
   stat: path="{{ region_ca_dir }}/ca.pem"
   register: region_ca_is_done
 
-- name: Rainbond | check_or_create_region-ssl-ca
+- name: Rainbond | create region ssl ca
   shell: "grcert create --is-ca --ca-name={{ region_ca_dir }}/ca.pem --ca-key-name={{ region_ca_dir }}/ca.key.pem"
   when: region_ca_is_done.stat.isreg is not defined
 
-- name: Rainbond | check_or_create_region-server-ssl
+- name: Rainbond | create region server ssl
   shell: "grcert create --ca-name={{ region_ca_dir }}/ca.pem --ca-key-name={{ region_ca_dir }}/ca.key.pem --crt-name={{ region_ca_dir }}/server.pem --crt-key-name={{ region_ca_dir }}/server.key.pem --domains region.goodrain.me --address={{ MASTER_IP }} --address=127.0.0.1"
   when: region_ca_is_done.stat.isreg is not defined
 
-- name: Rainbond | check_or_create_region-client-ssl
+- name: Rainbond | create region client ssl
   shell: "grcert create --ca-name={{ region_ca_dir }}/ca.pem --ca-key-name={{ region_ca_dir }}/ca.key.pem --crt-name={{ region_ca_dir }}/client.pem --crt-key-name={{ region_ca_dir }}/client.key.pem --domains region.goodrain.me --address={{ MASTER_IP }} --address=127.0.0.1"
   when: region_ca_is_done.stat.isreg is not defined
