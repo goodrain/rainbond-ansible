@@ -127,6 +127,8 @@
     regexp: 'swap'
     state: absent
     backup: 'yes'
+  tags: prepare
+
 
 - name: System | modprobe 
   modprobe: name={{ item }} state=present
@@ -138,6 +140,7 @@
     - ip_vs_sh
     - nf_conntrack_ipv4
   ignore_errors: true
+  tags: prepare
 
 - name: System | add nf_conntrack for kernel 4.19
   modprobe: name=nf_conntrack state=present

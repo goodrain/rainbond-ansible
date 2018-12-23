@@ -264,9 +264,6 @@ show_succeed(){
 
 onenode(){
     progress "Install Rainbond On Single Node"
-    hname=$(hostname -s)
-    sed -i "s#node1#$hname#g" inventory/hosts
-    sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
         show_succeed
@@ -281,7 +278,7 @@ multinode(){
 }
 
 thirdparty(){
-    progress "Only Install Rainbond On Multinode Node"
+    progress "Only Install Rainbond On Thirdparty Node"
     ansible-playbook -i inventory/hosts hack/thirdparty/setup.yaml
     if [ "$?" -eq 0 ];then
         show_succeed
@@ -298,11 +295,14 @@ prepare(){
 
     other_type_linux
     get_default_dns
-    get_default_netwrok_type
+    [ "$DEPLOY_TYPE" != "thirdparty" ] && get_default_netwrok_type
     get_default_install_type
     info "Deploy Type" $DEPLOY_TYPE
     get_default_config
     [ ! -z "$EIP" ] && Generate_domain $EIP || Generate_domain $IIP
+    hname=$(hostname -s)
+    sed -i "s#node1#$hname#g" inventory/hosts
+    sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
 }
 
 update_etcd(){
