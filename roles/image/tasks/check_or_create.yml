@@ -5,7 +5,7 @@
   tags: image
 
 - name: Check kubecfg
-  stat: path="{{ kubecfg_dir }}/token.csv"
+  stat: path="{{ kubecfg_dir }}/admin.kubeconfig"
   register: kubecfg_is_done
   tags: image
 

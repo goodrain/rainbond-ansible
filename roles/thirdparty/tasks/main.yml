@@ -1,5 +1,5 @@
 ---
-- name: Check | Docker Daemon
+- name: Thirdparty | Check Docker Daemon
   stat: path=/etc/docker/daemon.json
   register: check_docker_daemon
 
@@ -8,3 +8,22 @@
     src: daemon.json.j2 
     dest: /etc/docker/daemon.json
   when: check_docker_daemon.stat.isreg is not defined
+
+- name: Thirdparty | check admin.kubeconfig
+  stat: path="/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig"
+  register: check_admin_kubeconfig
+  delegate_to: "{{ groups.deploy[0] }}"
+
+- name: Thirdparty | Copy admin.kubeconfig
+  template: 
+    src: /root/.kube/config
+    dest: /opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
+  when: check_admin_kubeconfig.stat.isreg is not defined
+  delegate_to: "{{ groups.deploy[0] }}"
+
+- name: Thirdparty | Copy kube-proxy.kubeconfig
+  template: 
+    src: /root/.kube/config
+    dest: /opt/rainbond/etc/kubernetes/kubecfg/kube-proxy.kubeconfig
+  when: check_admin_kubeconfig.stat.isreg is not defined
+  delegate_to: "{{ groups.deploy[0] }}"
