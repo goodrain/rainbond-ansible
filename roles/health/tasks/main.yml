@@ -79,3 +79,13 @@
   with_fileglob:
     - "{{ region_ca_dir }}/*"
   when: ck_ca_ssl_is_done.stat.isreg is not defined
+
+- name: Rainbond | Check docker.env
+  stat: path=/opt/rainbond/envs/docker.sh
+  register: docker_install_by_rainbond
+
+- name: Health | Add Health Only Health Role
+  template:
+    src: only_health.role.j2
+    dest: "{{ node_role_dir }}/only_health.yaml"
+  when: docker_install_by_rainbond.stat.isreg is not defined

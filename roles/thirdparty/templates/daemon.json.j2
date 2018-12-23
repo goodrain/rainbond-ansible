@@ -1,13 +1,9 @@
 {
   "registry-mirrors": ["{{ REG_MIRROR_1 }}", "{{ REG_MIRROR_2 }}"], 
-  "insecure-registry": ["{{INSECURE_REG}}"],
+  "insecure-registries": ["{{INSECURE_REG}}"],
   "max-concurrent-downloads": 10,
   "log-driver": "{{ LOG_DRIVER }}",
   "log-level": "{{ LOG_LEVEL }}",
-  "hosts": [
-     "unix:///var/run/docker.sock",
-     "tcp://127.0.0.1:2376"
-  ],
   "log-opts": {
     "max-size": "{{ LOG_MAX_SIZE }}",
     "max-file": "{{ LOG_MAX_FILE }}"
