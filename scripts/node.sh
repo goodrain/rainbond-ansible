@@ -9,10 +9,24 @@ login_type=$4
 login_key=$5
 node_uuid=$6
 
-if [ "$login_type" == "pass" ];then
-    echo "configure ssh for secure login"
-    echo yes | ssh-copy-id -i /root/.ssh/id_rsa.pub root@$node_ip -f 
-fi
+
+ssh_key_copy()
+{
+    # delete history
+    # sed "/$1/d" -i ~/.ssh/known_hosts
+
+    # start copy 
+    expect -c "
+    set timeout 100
+    spawn ssh-copy-id root@$1
+    expect {
+    \"yes/no\"   { send \"yes\n\"; exp_continue; }
+    \"password\" { send \"$2\n\"; }
+    \"already exist on the remote system\" { exit 1; }
+    }
+    expect eof
+    "
+}
 
 check_exist(){
     local check_status=0
@@ -23,6 +37,10 @@ check_exist(){
     echo $check_status
 }
 
+if [ "$login_type" == "pass" ];then
+    echo "configure ssh for secure login"
+    ssh_key_copy $node_ip $login_key
+fi
 
 [ "$(check_exist $node_hostname $node_ip)" -eq 0 ] || (echo "New compute node hostname or ip existing" && exit 1)
 
