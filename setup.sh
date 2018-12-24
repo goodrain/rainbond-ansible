@@ -63,7 +63,7 @@ get_default_config(){
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     touch /opt/rainbond/.init/.init_done
     info "Generate the default configuration" "$(cat /opt/rainbond/.init/uuid)/$(cat /opt/rainbond/.init/secretkey)"
-
+    echo "" > /opt/rainbond/.init/node.uuid
 }
 
 get_default_dns() {
