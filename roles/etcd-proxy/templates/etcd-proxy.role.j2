@@ -4,11 +4,11 @@ services:
   endpoints:
   - name: ETCD_PROXY_ENDPOINTS
     protocol: http
-    port: 2379
+    port: {{ etcd_port_c1 }}
   health:
     name: etcd-proxy
     model: tcp
-    address: 127.0.0.1:2379
+    address: 127.0.0.1:{{ etcd_port_c1 }}
     max_errors_num: 3
     time_interval: 5
   after:

@@ -8,6 +8,7 @@
       - dnsmasq
       - nscd
     state: absent
+  tags: prepare
 
 - name: PKG| add EPEL repo
   yum: name=epel-release state=latest

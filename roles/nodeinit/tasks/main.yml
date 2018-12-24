@@ -11,6 +11,12 @@
     dest: /tmp/pushimage.sh
     mode: 0777
 
+- name: Rainbond | Copy check Insecure Registries
+  template:
+    src: check_registries.sh.j2
+    dest: /tmp/check_registries.sh
+    mode: 0777
+
 - name: Rainbond | Copy init db script
   template:
     src: init.sql.j2
@@ -25,8 +31,16 @@
 #- name: show updatedb_task_result debug info
 #  debug: var=updatedb_task_result
 
+- name: Rainbond | Check goodrain.me
+  shell: "bash /tmp/check_registries.sh"
+
+- name: Rainbond | Check check_ok
+  stat: path=/opt/rainbond/.init/goodrain.me.ok
+  register: check_goodrainme_done
+
 - name: Rainbond | Push local images to goodrain.me
   shell: "bash /tmp/pushimage.sh"
   register: pushimage_task_result
   until: pushimage_task_result is succeeded
   retries: 5
+  when: check_goodrainme_done.stat.isreg is defined

@@ -1,0 +1,21 @@
+version: '2.1'
+services:
+- name: docker
+  endpoints:
+  - name: DOCKER_ENDPOINTS
+    protocol: http
+    port: 2376
+  health:
+    name: docker
+    model: http
+    address: 127.0.0.1:2376/version
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - network.target
+  requires:
+    - network.target
+  only_health_check: true
+  start: none
+  restart_policy: always
+  restart_sec: 10
