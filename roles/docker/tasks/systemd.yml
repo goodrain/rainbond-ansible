@@ -8,14 +8,14 @@
   template:
     src: http-proxy.conf.j2
     dest: /etc/systemd/system/docker.service.d/http-proxy.conf
-  notify: restart docker
+#  notify: restart docker
   when: http_proxy is defined or https_proxy is defined
 
 - name: Write docker EnvironmentFile 
   template:
     src: docker.sh.j2
     dest: "{{ rbd_dir }}/envs/docker.sh"
-  notify: restart docker
+#  notify: restart docker
 #  when: docker_check.stat.isreg is not defined
 
 - name: Check docker dir
@@ -25,7 +25,7 @@
   template: 
     src: daemon.json.j2 
     dest: /etc/docker/daemon.json
-  notify: restart docker
+#  notify: restart docker
 
 - name: Write docker.service systemd file
   template:
