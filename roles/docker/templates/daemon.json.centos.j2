@@ -1,0 +1,15 @@
+{
+  "registry-mirrors": ["{{ REG_MIRROR_1 }}", "{{ REG_MIRROR_2 }}"], 
+  "insecure-registries": ["{{INSECURE_REG}}"],
+  "max-concurrent-downloads": 10,
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ],
+  "log-driver": "{{ LOG_DRIVER }}",
+  "log-level": "{{ LOG_LEVEL }}",
+  "log-opts": {
+    "max-size": "{{ LOG_MAX_SIZE }}",
+    "max-file": "{{ LOG_MAX_FILE }}"
+    }
+}
