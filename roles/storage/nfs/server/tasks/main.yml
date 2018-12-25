@@ -1,36 +1,19 @@
 ---
-- name: Rainbond | Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
-
-- name: Rainbond | Include overrides specific to RHEL 7.
-  include_vars: RedHat-7.yml
-  when:
-    - ansible_os_family == 'RedHat'
-    - ansible_distribution_major_version == "7"
-
-- include_tasks: setup-RedHat.yml
-  when: ansible_os_family == 'RedHat'
-
-- include_tasks: setup-Debian.yml
-  when: ansible_os_family == 'Debian'
-
-- name: Ensure directories to export exist
-  file: 'path="/grdata" state=directory'
-
-- name: Ensure nfs is running.
-  service: "name={{ nfs_server_daemon }} state=started enabled=yes"
-
-- name: Copy exports file.
+- name: Storage | copy check storage
   template:
-    src: exports.j2
-    dest: /etc/exports
-    owner: root
-    group: root
-    mode: 0644
-  notify: reload nfs
+    src: check_storage.sh.j2
+    dest: /tmp/check_storage.sh
+    mode: 0777
 
-- name: Update exports
-  shell: "exportfs -ra"
+- name: Storage | run check storage
+  shell: "bash /tmp/check_storage.sh"
+
+- name: Storage | check grdata
+  stat: path=/tmp/.grdata.init
+  register: check_grdata_server
+
+- import_tasks: config.yml
+  when: check_grdata_server.stat.isreg is not defined
 
 - name: Health | Copy health storage check
   template:
