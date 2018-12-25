@@ -3,8 +3,8 @@
 offline_image_path=${1:-/opt/rainbond/offline/images}
 version=5.0
 rainbond=(mq eventlog webcli gateway worker chaos api app-ui monitor)
-base=(rbd-db rbd-dns rbd-repo)
-runtime=(builder runner adapter)
+base=(rbd-db rbd-dns)
+runtime=(runner adapter)
 k8s=(kube-scheduler kube-controller-manager kube-apiserver)
 plugins=(tcm mesh_plugin)
 mkdir -pv ${offline_image_path}/{base,rainbond}
@@ -44,6 +44,12 @@ base_images(){
         [ -f "${offline_image_path}/base/${kimg}.tgz" ] && rm -rf ${offline_image_path}/base/${kimg}.tgz
         docker save goodrain.me/${kimg}:v1.10.11 > ${offline_image_path}/base/${kimg}.tgz
     done
+    docker pull rainbond/rbd-builder:5.0
+    docker tag rainbond/rbd-builder:5.0 goodrain.me/builder
+    docker save goodrain.me/builder > ${offline_image_path}/base/builder.tgz
+    docker pull rainbond/rbd-repo:6.5.9
+    docker tag rainbond/rbd-repo:6.5.9 goodrain.me/rbd-repo:6.5.9
+    docker save goodrain.me/rbd-repo:6.5.9 > ${offline_image_path}/base/repo.tgz
     docker pull rainbond/rbd-registry:2.6.2
     docker tag rainbond/rbd-registry:2.6.2 goodrain.me/rbd-registry:2.6.2
     docker save goodrain.me/rbd-registry:2.6.2 > ${offline_image_path}/base/hub.tgz

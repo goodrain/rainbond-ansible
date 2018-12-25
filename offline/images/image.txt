@@ -13,7 +13,7 @@ rainbond/kube-scheduler:v1.10.11
 rainbond/kube-controller-manager:v1.10.11
 rainbond/kube-apiserver:v1.10.11
 rainbond/hyperkube:v1.10.11
-rainbond/builder:5.0
+rainbond/rbd-builder:5.0
 rainbond/calico-node:v3.3.1
 rainbond/etcd:v3.2.25
 rainbond/rbd-registry:2.6.2
@@ -22,7 +22,7 @@ rainbond/plugins:tcm
 rainbond/adapter:5.0
 rainbond/kubecfg:dev
 rainbond/plugins:mesh
-rainbond/rbd-repo:5.0
+rainbond/rbd-repo:6.5.9
 rainbond/cfssl:dev
 rainbond/runner:5.0
 rainbond/rbd-db:5.0
