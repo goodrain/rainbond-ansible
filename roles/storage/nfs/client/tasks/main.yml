@@ -1,39 +1,16 @@
 ---
-- name: check nfs server
-  stat: path="/grdata/kubernetes/kube-proxy.kubeconfig"
-  register: check_server
+- name: Storage | copy check storage
+  template:
+    src: check_storage.sh.j2
+    dest: /tmp/check_storage.sh
+    mode: 0777
 
-#- name: debug
-#  debug: var=check_server
+- name: Storage | run check storage
+  shell: "bash /tmp/check_storage.sh"
 
-- name: install nfs client debian
-  action: apt pkg=nfs-common state=present
-  when: ansible_os_family == 'Debian' and check_server.stat.isreg is not defined
+- name: Storage | check grdata
+  stat: path=/tmp/.grdata.init
+  register: check_grdata
 
-- name: install nfs client centos
-  action: yum pkg=nfs-utils state=present
-  when: ansible_os_family == 'RedHat' and check_server.stat.isreg is not defined
-
-- name: Ensure rpcbind is running (CentOS)
-  action: service name=rpcbind state=started enabled=yes
-  when: ansible_os_family == 'RedHat' and check_server.stat.isreg is not defined
-
-#- name: Ensure rpcbind is running
-#  action: service name=rpcbind state=started enabled=yes
-#  when: is_ubuntu|bool and ansible_lsb.major_release is defined and ansible_lsb.major_release|int >= 14 and check_server.rc != 0
-
-- name: Ensure rpcbind is running (Debian)
-  action: service name=rpcbind state=started enabled=yes
-  when: ansible_os_family == 'Debian' and check_server.stat.isreg is not defined
-
-- name: Ensure {{nfsmount}} directory exists
-  action: file path={{nfsmount}} state=directory
-
-- shell: if [ -z "$nfsoptions" ]; then  echo rw,sync,nfsvers=3; else echo $nfsoptions; fi
-  register: _nfsopts
-  sudo: false
-  connection: local
-
-- name: configure /etc/fstab on clients
-  action: mount name={{nfsmount}} src={{nfsserver}}:{{nfspath}} fstype=nfs opts={{_nfsopts.stdout}} state=mounted
-  when: check_server.stat.isreg is not defined
+- import_tasks: config.yml
+  when: check_grdata.stat.isreg is not defined
