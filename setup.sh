@@ -198,6 +198,8 @@ online_init(){
             yum install -y epel-release 
             yum makecache fast 
             yum install -y sshpass python-pip uuidgen pwgen
+            # fix centos 7.5 pip install ImportError
+            pip install -U setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		*)
            notice "Not Support $lsb_dist"
