@@ -26,6 +26,7 @@
       - ipset
       - ipvsadm
       - net-tools
+      - expect
     state: latest
 
 - name: SYSTEM | disable selinux

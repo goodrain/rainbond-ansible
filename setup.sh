@@ -192,12 +192,12 @@ online_init(){
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
-            apt-get install -y sshpass python-pip uuid-runtime pwgen
+            apt-get install -y sshpass python-pip uuid-runtime pwgen expect
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
-            yum install -y sshpass python-pip uuidgen pwgen
+            yum install -y sshpass python-pip uuidgen pwgen expect
             # fix centos 7.5 pip install ImportError
             pip install -U setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
@@ -265,7 +265,7 @@ show_succeed(){
 }
 
 onenode(){
-    progress "Install Rainbond On Single Node"
+    progress "Initialize the data center"
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
         show_succeed

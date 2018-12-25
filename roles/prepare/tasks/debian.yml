@@ -24,6 +24,7 @@
       - ipset
       - ipvsadm
       - net-tools
+      - expect
     update_cache: yes
     autoclean: yes
     state: latest
