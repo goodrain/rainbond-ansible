@@ -7,10 +7,10 @@ services:
     port: 2376
   health:
     name: docker
-    model: http
-    address: 127.0.0.1:2376/version
-    max_errors_num: 3
-    time_interval: 5
+    model: cmd
+    address: {{ rbd_dir }}/health/check_docker.sh
+    max_errors_num: 5
+    time_interval: 10
   after:
     - network.target
   requires:

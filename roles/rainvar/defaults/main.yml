@@ -80,6 +80,7 @@ pod_cidr: 10.20.0.0/16
 app_domain: pass.example.com
 
 storage_type: nfs
+storage_path: "/grdata"
 default_dns_local: 114.114.114.114 
 DOCKER_BRIDGE_IP: 172.30.42.1
 
@@ -89,3 +90,6 @@ FLANNEL_BACKEND: host-gw
 etcd_port_c1: 2379
 etcd_port_c2: 4001
 etcd_port_s1: 2380
+
+# 安装完自动上线节点
+autoreg_node: disable
