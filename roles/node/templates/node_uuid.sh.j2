@@ -1,0 +1,14 @@
+#!/bin/bash
+
+nodeip={{ nodeip }}
+
+uuid=""
+
+[ -f "/tmp/node.uuid" ] && uuid=$(cat /tmp/node.uuid | grep $nodeip | awk -F: '{print $2}')
+
+[ ! -z "$uuid" ] && (
+    [ -f "/opt/rainbond/etc/node/node_host_uuid.conf" ] && rm -rf /opt/rainbond/etc/node/node_host_uuid.conf
+    cat > /opt/rainbond/etc/node/node_host_uuid.conf <<EOF
+host_uuid=$uuid
+EOF
+)

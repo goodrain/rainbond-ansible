@@ -9,6 +9,8 @@
       - nscd
       - dnsmasq
     state: absent
+  tags: prepare
+
 
 - name: PKG | install ubuntu package
   apt: 

@@ -57,8 +57,3 @@
     src: "{{  kubecfg_dir }}/admin.kubeconfig"
     dest: "/root/.kube/config"
     mode: 0755
-
-- name: Rainbond | Copy grctl from deploy
-  template:
-    src: grctl.yaml.j2
-    dest: /root/.rbd/grctl.yaml

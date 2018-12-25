@@ -42,6 +42,22 @@ stop(){
     )
 }
 
+del_role(){
+    mv /opt/rainbond/conf/k8s-worker.yaml /opt/rainbond/conf/k8s-worker.yaml.bak
+    systemctl stop kubelet
+    systemctl disable kubelet
+    sed -i "s#manage,compute#manage#g" /opt/rainbond/scripts/start-node.sh
+    systemctl restart node
+}
+
+help(){
+    echo "grclis stop <服务名>"
+    echo "grclis upgrade <服务名/all>"
+    echo "grclis del role worker"
+}
+
+
+
 case $1 in
     upgrade)
         upgrade $2 
@@ -49,7 +65,9 @@ case $1 in
     stop)
         stop $2
     ;;
+    del)
+        del_role $2 $3
     *)
-        echo "not support cmd $1"
+        help        
     ;;
 esac

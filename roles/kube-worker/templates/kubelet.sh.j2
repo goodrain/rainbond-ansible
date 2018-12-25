@@ -12,6 +12,7 @@ KUBE_ALLOW_PRIV="--allow-privileged=true"
 
 KUBELET_ARGS="
     --address={{ worker_access_address }} \
+    --node-ip={{ worker_access_address }} \
     --port=10250 \
     --hostname_override=${NODE_UUID} \
     --kubeconfig={{ kubecfg_dir }}/admin.kubeconfig \

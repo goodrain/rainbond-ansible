@@ -2,44 +2,28 @@
 - hosts: all
   roles:
     - { role: rainvar, tags: default }
-    - { role: prepare, tags: prepare }
-
-- hosts: deploy:master:worker:lb
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: docker, tags: docker }
+    - { role: prepare, tags: prepare-thirdparty }
+    - { role: thirdparty, tags: thirdparty}
 
 - hosts: deploy
   roles:
     - { role: rainvar, tags: default }
-    - { role: image, tags: image }
+    - { role: image, tags: image-thirdparty }
 
 - hosts: etcd
   roles:
     - { role: rainvar, tags: default }
     - { role: etcd, tags: etcd }
 
-- hosts: master
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: kube-master, tags: kube-master }
-
 - hosts: worker
   roles:
     - { role: rainvar, tags: default }
-    - { role: kube-worker, tags: kube-worker }
     - { role: etcd-proxy, tags: etcd-proxy }
 
 - hosts: master:worker
   roles:
     - { role: rainvar, tags: default }
-    - { role: health, tags: health }
-
-- hosts: master:worker:lb
-  roles:
-  - { role: rainvar, tags: default }
-  - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
-  - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
+    - { role: health, tags: health-thirdparty }
 
 - hosts: master[0]
   roles:

@@ -5,6 +5,17 @@
     dest: "{{ bin_dir }}/node"
     mode: 0755
 
+- name: Rainbond | Copy node uuid
+  copy:
+    src: /opt/rainbond/.init/node.uuid
+    dest: /tmp/node.uuid
+
+- name: Rainbond | Prepare check node uuid
+  template:
+    src: node_uuid.sh.j2
+    dest: /tmp/node_uuid.sh
+    mode: 0777
+
 - name: Rainbond | Copy Master Node Rainbond Role 
   template:
     src: master.role.j2
