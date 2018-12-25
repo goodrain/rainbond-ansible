@@ -16,6 +16,9 @@
     dest: /tmp/node_uuid.sh
     mode: 0777
 
+- name: Rainbond | Write node uuid
+  shell: "bash /tmp/node_uuid.sh > /tmp/write_node.log"
+
 - name: Rainbond | Copy Master Node Rainbond Role 
   template:
     src: master.role.j2

@@ -8,24 +8,34 @@
   template:
     src: http-proxy.conf.j2
     dest: /etc/systemd/system/docker.service.d/http-proxy.conf
-  notify: restart docker
+#  notify: restart docker
   when: http_proxy is defined or https_proxy is defined
 
 - name: Write docker EnvironmentFile 
   template:
     src: docker.sh.j2
     dest: "{{ rbd_dir }}/envs/docker.sh"
-  notify: restart docker
+#  notify: restart docker
 #  when: docker_check.stat.isreg is not defined
 
 - name: Check docker dir
   file: path=/etc/docker state=directory mode=0755
 
-- name: Write docker daemon
+- name: Docker | Check if daemon is existing
+  stat: path=/etc/docker/daemon.json
+  register: docker_daemon_check
+
+- name: Write docker daemon For CentOS
+  template: 
+    src: daemon.json.centos.j2 
+    dest: /etc/docker/daemon.json
+  when: ansible_distribution == "CentOS" and docker_daemon_check.stat.isreg is not defined
+
+- name: Write docker daemon For Debian/Ubuntu
   template: 
     src: daemon.json.j2 
     dest: /etc/docker/daemon.json
-  notify: restart docker
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" and docker_daemon_check.stat.isreg is not defined
 
 - name: Write docker.service systemd file
   template:

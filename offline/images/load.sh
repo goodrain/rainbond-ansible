@@ -2,6 +2,6 @@
 
 set -x
 
-pushd /opt/rainbond/rainbond-ansible/offline/images
+pushd /grdata/services/offline/images
 ls | grep tgz | xargs -I {} docker load -i ./{}
 popd

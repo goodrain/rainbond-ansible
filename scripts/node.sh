@@ -49,7 +49,7 @@ cd /opt/rainbond/rainbond-ansible
 sed -i "/\[all\]/a$node_hostname ansible_host=$node_ip ip=$node_ip" inventory/hosts
 
 cat >> /opt/rainbond/.init/node.uuid <<EOF
-$node_ip:$node_ip
+$node_ip:$node_uuid
 EOF
 
 if [ "$node_role" == "master" ];then

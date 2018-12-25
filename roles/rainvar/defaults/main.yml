@@ -59,7 +59,7 @@ cfssl: cfssl:dev
 builder: builder:{{ rainbond_version }}
 runner: runner:{{ rainbond_version }}
 adapter: adapter:{{ rainbond_version }}
-repo: rbd-repo:{{ rainbond_version }}
+repo: rbd-repo:6.5.9
 api: rbd-api:{{ rainbond_version }}
 worker: rbd-worker:{{ rainbond_version }}
 eventlog: rbd-eventlog:{{ rainbond_version }}

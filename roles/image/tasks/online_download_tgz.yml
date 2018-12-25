@@ -20,19 +20,19 @@
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
 
 - name: Check | Check if image.tgz is unarchive
-  stat: path="{{ base_dir }}/offline/images/etcd.tgz"
+  stat: path=/grdata/services/offline/images/etcd.tgz
   register: check_image_tgz_unarchive
 
 - name: Rainbond | Unzip base image
   unarchive:
     src: /grdata/services/offline/base.images.tgz
-    dest: "{{ base_dir }}/offline/images"
+    dest: /grdata/services/offline/images
   when: check_image_tgz_unarchive.stat.isreg is not defined
 
 - name: Rainbond | Unzip rainbond image
   unarchive:
     src: /grdata/services/offline/rainbond.images.tgz
-    dest: "{{ base_dir }}/offline/images"
+    dest: /grdata/services/offline/images
   when: check_image_tgz_unarchive.stat.isreg is not defined
 
 #- name: Rainbond | write download image.tgz done
