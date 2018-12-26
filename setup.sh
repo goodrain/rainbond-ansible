@@ -118,10 +118,12 @@ Generate_domain(){
     AUTH=$(cat /opt/rainbond/.init/secretkey)
     echo "" > $DOMAIN_LOG
     if [ -z "$DOMAIN" ];then
-    curl -s --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/domain/new > $DOMAIN_LOG
-    cat > /tmp/.lock.domain <<EOF
+    if [ "$INSTALL_TYPE" == "online" ];then
+        curl -s --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/domain/new > $DOMAIN_LOG
+        cat > /tmp/.lock.domain <<EOF
 curl -s --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/new > $DOMAIN_LOG
 EOF
+    fi
     [ -f $DOMAIN_LOG ] && wilddomain=$(cat $DOMAIN_LOG )
     if [[ "$wilddomain" == *grapps.cn ]];then
         info "wild-domain:" "$wilddomain"
@@ -259,7 +261,7 @@ get_default_install_type(){
 }
 
 show_succeed(){
-    up_domain_dns
+    [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
     progress "Congratulations on your successful installation"
     info "查询集群状态" "grctl cluster"
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
