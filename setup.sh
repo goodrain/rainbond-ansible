@@ -223,6 +223,7 @@ offline_init(){
             cat > /etc/apt/sources.list.d/local_rainbond.list <<EOF
 deb file:/grdata/services/offline/pkgs/debian/9/ rainbond 5.0
 EOF
+            touch /opt/rainbond/.init/.offline
 		;;
 		centos|neokylin)
             #yum install -y epel-release
@@ -232,10 +233,11 @@ EOF
             cat > /etc/yum.repos.d/rainbond.repo << EOF
 [rainbond]
 name=rainbond_offline_install_repo
-baseurl=file:///grdata/services/offline/pkgs/centos/7/
+baseurl=file:///grdata/services/offline/pkgs/rpm/centos/7
 gpgcheck=0
 enabled=1
 EOF
+            touch /opt/rainbond/.init/.offline
             yum makecache
             yum install -y sshpass python-pip uuidgen pwgen ansible
 		;;
