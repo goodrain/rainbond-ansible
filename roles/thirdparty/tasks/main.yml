@@ -33,7 +33,7 @@
   register: check_kubectl
 
 - name: Thirdparty | Copy kubectl
-  template:
+  copy:
     src: /usr/bin/kubectl
     dest: /usr/local/bin/kubectl
     mode: '0777'
