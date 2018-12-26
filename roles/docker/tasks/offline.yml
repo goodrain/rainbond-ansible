@@ -1,6 +1,12 @@
 ---
+- name: Offline | Copy Docker Install Script
+  template:
+    src: get_docker.sh.j2
+    dest: /tmp/install_docker.sh
+    mode: 0777
+
 - name: Install docker offline
-  shell: "yum install docker-ce"
+  shell: "bash -x /tmp/install_docker.sh"
   register: docker_task_result
   until: docker_task_result is succeeded
   retries: 4

@@ -1,4 +1,7 @@
 ---
+- import_tasks: offline.yml
+  when: install_type == "offline"
+
 - import_tasks: check.yml
 
 - import_tasks: debian.yml
