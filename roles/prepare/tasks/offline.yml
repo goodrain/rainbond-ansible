@@ -1,0 +1,26 @@
+---
+- name: Offline | Add Debian/Ubuntu Repository
+  apt_repository:
+    repo: deb http://repo.goodrain.me/debian/9/rainbond 5.0
+    filename: local_rbd_list
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: Offline | Add CentOS Repository
+  yum_repository:
+    name: local
+    description: rpm local
+    file: local_rbd_repo
+    baseurl: http://repo.goodrain.me/centos/7/
+  when: ansible_distribution == "CentOS"
+
+- name: Offline | yum-clean-metadata
+  command: yum clean all
+  args:
+    warn: no
+  when: ansible_distribution == "CentOS"
+
+- name: Offline | apt-cache
+  command: apt update
+  args:
+    warn: no
+  when: ansible_distribution == "CentOS"

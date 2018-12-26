@@ -220,7 +220,9 @@ offline_init(){
             # apt-get update
             # apt-get install sshpass python-pip uuid-runtime pwgen -y
             # pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
-            echo "todo"
+            cat > /etc/apt/sources.list.d/local_rainbond.list <<EOF
+deb file:/grdata/services/offline/pkgs/debian/9/ rainbond 5.0
+EOF
 		;;
 		centos|neokylin)
             #yum install -y epel-release
@@ -230,7 +232,7 @@ offline_init(){
             cat > /etc/yum.repos.d/rainbond.repo << EOF
 [rainbond]
 name=rainbond_offline_install_repo
-baseurl=file:///opt/rainbond/rainbond-ansible/offline/pkgs/centos/7/
+baseurl=file:///grdata/services/offline/pkgs/centos/7/
 gpgcheck=0
 enabled=1
 EOF
