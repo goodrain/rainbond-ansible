@@ -1,7 +1,7 @@
 ---
 - name: Offline | Copy Docker Install Script
   template:
-    src: get_docker.sh
+    src: get_docker.sh.j2
     dest: /tmp/install_docker.sh
     mode: 0777
 
