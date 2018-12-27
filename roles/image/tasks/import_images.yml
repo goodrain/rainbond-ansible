@@ -1,19 +1,23 @@
 ---
-- name: Check | Check if image.tgz is unarchive
+- name: Check | Check if base.image.tgz is unarchive
   stat: path=/grdata/services/offline/images/etcd.tgz
-  register: check_image_tgz_unarchive
+  register: check_base_image_tgz_unarchive
 
 - name: Rainbond | Unzip base image
   unarchive:
     src: /grdata/services/offline/base.images.tgz
     dest: /grdata/services/offline/images
-  when: check_image_tgz_unarchive.stat.isreg is not defined
+  when: check_base_image_tgz_unarchive.stat.isreg is not defined
+
+- name: Check | Check if rainbond.image.tgz is unarchive
+  stat: path=/grdata/services/offline/images/mq.tgz
+  register: check_rainbond_image_tgz_unarchive
 
 - name: Rainbond | Unzip rainbond image
   unarchive:
     src: /grdata/services/offline/rainbond.images.tgz
     dest: /grdata/services/offline/images
-  when: check_image_tgz_unarchive.stat.isreg is not defined
+  when: check_rainbond_image_tgz_unarchive.stat.isreg is not defined
 
 - name: Rainbond | load image from local
   shell: "bash {{ base_dir }}/offline/images/load.sh > /tmp/local.image.log"
