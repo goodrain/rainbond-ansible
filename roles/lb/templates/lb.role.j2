@@ -16,6 +16,7 @@ services:
     --network host
     -v {{ rbd_dir }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -v {{ rbd_dir }}/etc/rbd-gateway/ssl:/run/nginx/rainbond/ssl
+    -v /grdata/services/offline:/grdata/services/offline
     -e DEFAULT_PORT=80
     -i goodrain.me/{{ gateway }}
     --etcd-endpoints=${ETCD_ENDPOINTS}
