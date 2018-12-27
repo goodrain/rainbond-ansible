@@ -253,6 +253,7 @@ EOF
 get_default_install_type(){
     info "Install Type" "$INSTALL_TYPE"
     sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^deploy_type: ).*/\1$DEPLOY_TYPE/" roles/rainvar/defaults/main.yml
     if [ "$INSTALL_TYPE" == "online" ];then
         online_init
     else
@@ -261,7 +262,7 @@ get_default_install_type(){
 }
 
 show_succeed(){
-    [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
+    [ "$INSTALL_TYPE" == "online" ] && [[ "$DOMAIN" == *grapps.cn ]] && up_domain_dns
     progress "Congratulations on your successful installation"
     info "查询集群状态" "grctl cluster"
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"

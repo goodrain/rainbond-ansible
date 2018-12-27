@@ -3,18 +3,12 @@
   stat: path=/opt/rainbond/.init/.offline
   register: offline_repo
 
-- name: Offline | Add Debian/Ubuntu Repository
-  apt_repository:
-    repo: deb http://repo.goodrain.me/debian/9/rainbond 5.0
-    filename: local_rbd_list
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" and offline_repo.stat.isreg is not defined
-
 - name: Offline | Add CentOS Repository
   yum_repository:
     name: local
     description: rpm local
     file: rainbond
-    baseurl: http://repo.goodrain.me/centos/7/
+    baseurl: http://repo.goodrain.me/rpm/centos/7
   when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
 
 - name: Offline | yum-clean-metadata
@@ -22,9 +16,3 @@
   args:
     warn: no
   when: ansible_distribution == "CentOS"
-
-- name: Offline | apt-cache
-  command: apt update
-  args:
-    warn: no
-  when:  ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"

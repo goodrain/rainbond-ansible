@@ -8,6 +8,7 @@ docker_daemon_graph: "/var/lib/docker"
 etcd_version: v3.2.25
 calico_version: v3.3.1
 install_type: online
+deploy_type: onenode
 bin_dir: "/usr/local/bin"
 rbd_dir: "/opt/rainbond"
 base_dir: "/opt/rainbond/rainbond-ansible"
@@ -93,3 +94,11 @@ etcd_port_s1: 2380
 
 # 安装完自动上线节点
 autoreg_node: disable
+
+# base.image.tgz.url
+
+base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2018-12-27.tgz"
+
+# rainbond.image.tgz.url
+
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2018-12-27.tgz"
