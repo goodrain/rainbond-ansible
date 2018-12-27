@@ -8,6 +8,7 @@ docker_daemon_graph: "/var/lib/docker"
 etcd_version: v3.2.25
 calico_version: v3.3.1
 install_type: online
+deploy_type: onenode
 bin_dir: "/usr/local/bin"
 rbd_dir: "/opt/rainbond"
 base_dir: "/opt/rainbond/rainbond-ansible"
