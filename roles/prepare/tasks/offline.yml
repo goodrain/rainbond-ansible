@@ -8,7 +8,7 @@
     name: local
     description: rpm local
     file: rainbond
-    baseurl: http://repo.goodrain.me/rpm/centos/7/
+    baseurl: http://repo.goodrain.me/rpm/centos/7
   when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
 
 - name: Offline | yum-clean-metadata
