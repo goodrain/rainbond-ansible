@@ -44,9 +44,12 @@ fi
 
 cd /opt/rainbond/rainbond-ansible
 
-cat > /opt/rainbond/.init/node.uuid <<EOF
+cat /opt/rainbond/.init/node.uuid | grep "$node_ip" >/dev/null
+if [ "$?" -ne 0 ];then
+cat >> /opt/rainbond/.init/node.uuid <<EOF
 $node_ip:$node_uuid
 EOF
+fi
 
 [ "$(check_exist $node_hostname $node_ip)" -eq 0 ] && (
 
