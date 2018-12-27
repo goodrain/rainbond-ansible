@@ -262,7 +262,7 @@ get_default_install_type(){
 }
 
 show_succeed(){
-    [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
+    [ "$INSTALL_TYPE" == "online" ] && [[ "$DOMAIN" == *grapps.cn ]] && up_domain_dns
     progress "Congratulations on your successful installation"
     info "查询集群状态" "grctl cluster"
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
