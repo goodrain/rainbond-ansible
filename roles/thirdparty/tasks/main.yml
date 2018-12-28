@@ -39,3 +39,23 @@
     mode: '0777'
     backup: yes
   when: check_kubectl.stat.isreg is not defined
+
+- name: Thirdparty | check k8s master
+  stat: path=/etc/kubernetes/manifests/kube-apiserver.yaml
+  register: check_k8s_master
+
+- name: Thirdparty | Add Health Only Health Role
+  template:
+    src: thirdparty-k8s-master.yaml.j2
+    dest: "{{ node_role_dir }}/thirdparty_k8s_master.yaml.j2"
+  when: check_k8s_master.stat.isreg is defined
+
+- name: Thirdparty | check kubectl worker
+  stat: path=/etc/kubernetes/kubelet.conf
+  register: check_k8s_worker
+
+- name: Thirdparty | Add Health Only Health Role
+  template:
+    src: thirdparty-k8s-worker.yaml.j2
+    dest: "{{ node_role_dir }}/thirdparty_k8s_worker.yaml.j2"
+  when: check_k8s_worker.stat.isreg is defined

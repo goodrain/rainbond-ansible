@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+[[ $DEBUG ]] && set -ex
 
 node_role=$1
 node_hostname=$2
@@ -45,7 +45,7 @@ cd /opt/rainbond/rainbond-ansible
 
 deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep "deploy" | awk '{print $2}')
 
-cat /opt/rainbond/.init/node.uuid | grep "$node_ip" >/dev/null
+cat /opt/rainbond/.init/node.uuid | grep "$node_ip" 
 if [ "$?" -ne 0 ];then
 cat >> /opt/rainbond/.init/node.uuid <<EOF
 $node_ip:$node_uuid
