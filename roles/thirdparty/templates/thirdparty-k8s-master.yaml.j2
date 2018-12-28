@@ -1,0 +1,60 @@
+version: '2.1'
+services:
+- name: kube-apiserver
+  disable: false
+  endpoints:
+  - name: APISERVER_ENDPOINTS
+    protocol: http
+    port: 6443
+  health:
+    name: kube-apiserver
+    model: tcp
+    address: 127.0.0.1:6443
+    time_interval: 5
+    max_errors_num: 3
+  after:
+    - network.target
+  requires:
+    - network.target
+  only_health_check: true
+  start: none
+  restart_policy: always
+  restart_sec: 10
+- name: kube-scheduler
+  endpoints:
+  - name: SCHEDULER_ENDPOINTS
+    protocol: http
+    port:
+  health:
+    name: kube-scheduler
+    model: tcp
+    address: 127.0.0.1:10251
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - network.target
+  requires:
+    - network.target
+  only_health_check: true
+  start: none
+  restart_policy: always
+  restart_sec: 10
+- name: kube-controller-manager
+  endpoints:
+  - name: CONTROLLER_MANAGER_ENDPOINTS
+    protocol:
+    port: 10252
+  health:
+    name: kube-controller-manager
+    model: tcp
+    address: 127.0.0.1:10252
+    time_interval: 5
+    max_errors_num: 3
+  after:
+    - docker
+  requires:
+    - network.target
+  only_health_check: true
+  start: none
+  restart_policy: always
+  restart_sec: 10
