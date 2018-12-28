@@ -22,7 +22,7 @@
 - name: Ensure {{nfsmount}} directory exists
   action: file path={{nfsmount}} state=directory
 
-- shell: if [ -z "$nfsoptions" ]; then  echo rw,sync,nfsvers=3; else echo $nfsoptions; fi
+- shell: if [ -z "$nfsoptions" ]; then  echo rw; else echo $nfsoptions; fi
   register: _nfsopts
   sudo: false
   connection: local
