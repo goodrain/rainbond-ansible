@@ -1,3 +1,10 @@
 #!/bin/bash 
 
-
+INSTALL_TYPE="online"
+DEPLOY_TYPE="onenode"
+DOMAIN=""
+VERSION="5.0"
+STORAGE="nfs"
+STORAGE_ARGS="/grdata nfs rw 0 0"
+NETWORK_TYPE="calico"
+ROLE="master,worker"
