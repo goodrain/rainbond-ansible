@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+[[ $DEBUG ]] && set -ex
 
 node_role=$1
 node_hostname=$2
@@ -8,7 +8,6 @@ node_ip=$3
 login_type=$4
 login_key=$5
 node_uuid=$6
-
 
 ssh_key_copy()
 {
@@ -44,7 +43,9 @@ fi
 
 cd /opt/rainbond/rainbond-ansible
 
-cat /opt/rainbond/.init/node.uuid | grep "$node_ip" >/dev/null
+deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep "deploy" | awk '{print $2}')
+
+cat /opt/rainbond/.init/node.uuid | grep "$node_ip" 
 if [ "$?" -ne 0 ];then
 cat >> /opt/rainbond/.init/node.uuid <<EOF
 $node_ip:$node_uuid
@@ -52,24 +53,24 @@ EOF
 fi
 
 [ "$(check_exist $node_hostname $node_ip)" -eq 0 ] && (
-
 sed -i "/\[all\]/a$node_hostname ansible_host=$node_ip ip=$node_ip" inventory/hosts
-
 if [ "$node_role" == "compute" ];then
     sed -i "/\[new-worker\]/a$node_hostname" inventory/hosts
-    ansible-playbook -i inventory/hosts addnode.yml
 else
-    sed -i "/\[new-master\]/a$node_hostname" inventory/hosts
-    ansible-playbook -i inventory/hosts addmaster.yml
-fi
-) || (
-
-if [ "$node_role" == "compute" ];then
-    ansible-playbook -i inventory/hosts addnode.yml
-else
-    ansible-playbook -i inventory/hosts addmaster.yml
+    sed -i "/\[new-master\]/a$node_hostname" inventory/hosts  
 fi
 )
 
-
-
+if [ "$node_role" == "compute" ];then
+    if [ "$deploy_type" == "thirdparty" ];then
+        ansible-playbook -i inventory/hosts hack/thirdparty/addnode.yml
+    else
+        ansible-playbook -i inventory/hosts addnode.yml
+    fi
+else
+    if [ "$deploy_type" == "thirdparty" ];then
+        ansible-playbook -i inventory/hosts hack/thirdparty/addmaster.yml
+    else
+        ansible-playbook -i inventory/hosts addmaster.yml
+    fi
+fi

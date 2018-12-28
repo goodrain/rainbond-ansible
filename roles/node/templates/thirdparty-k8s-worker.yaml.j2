@@ -1,0 +1,21 @@
+version: '2.1'
+services:
+- name: kubelet
+  endpoints:
+  - name: KUBELET_ENDPOINTS
+    protocol: http
+    port: 10248
+  health:
+    name: kubelet
+    model: tcp
+    address: 127.0.0.1:10248
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - network.target
+  requires:
+    - network.target
+  only_health_check: true
+  start: none
+  restart_policy: always
+  restart_sec: 10

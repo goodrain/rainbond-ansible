@@ -22,6 +22,9 @@
     src: init.sql.j2
     dest: /tmp/init.sql
 
+- name: Notice | Next Step will update db
+  shell: echo "download"
+
 - name: Rainbond | Run update DB
   shell: "bash /tmp/updatedb.sh >> /tmp/init.log"
   register: updatedb_task_result
@@ -37,6 +40,10 @@
 - name: Rainbond | Check check_ok
   stat: path=/opt/rainbond/.init/goodrain.me.ok
   register: check_goodrainme_done
+
+- name: Notice | Pushing local images to goodrain.me
+  shell: echo "push"
+  when: check_goodrainme_done.stat.isreg is defined
 
 - name: Rainbond | Push local images to goodrain.me
   shell: "bash /tmp/pushimage.sh"
