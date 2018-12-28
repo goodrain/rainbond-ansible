@@ -1,0 +1,10 @@
+---
+- hosts: new-master
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: prepare, tags: health-thirdparty }
+    - { role: etcd, tags: etcd }
+    - { role: lb, tags: lb }
+    - { role: health, tags: health }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: node, tags: node }
