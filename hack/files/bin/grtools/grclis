@@ -53,7 +53,7 @@ del_role(){
 help(){
     echo "grclis stop <服务名>"
     echo "grclis upgrade <服务名/all>"
-    echo "grclis del role worker"
+    #echo "grclis del role worker"
 }
 
 
@@ -67,6 +67,7 @@ case $1 in
     ;;
     del)
         del_role $2 $3
+    ;;
     *)
         help        
     ;;
