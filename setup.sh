@@ -315,6 +315,11 @@ prepare(){
     get_default_config
     [ ! -z "$EIP" ] && Generate_domain $EIP || Generate_domain $IIP
     hname=$(hostname -s)
+    if [ "$ROLE" == "master" ];then 
+        cp inventory/hosts.master inventory/hosts
+    else
+        cp inventory/hosts.all inventory/hosts
+    fi
     sed -i "s#node1#$hname#g" inventory/hosts
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
 }
