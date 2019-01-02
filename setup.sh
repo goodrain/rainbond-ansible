@@ -149,13 +149,18 @@ EOF
 }
 
 up_domain_dns(){
-    uid=$(cat /opt/rainbond/.init/domain.yaml | grep uuid | awk '{print $2}')
-    iip=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk '{print $2}')
-    domain=$(cat /opt/rainbond/.init/domain.yaml | grep domain | awk '{print $2}')
-    DOMAIN_API=$(cat /opt/rainbond/.init/domain.yaml | grep api | awk '{print $2}')
-    if [[ "$domain" =~ "grapps" ]];then
-        curl -s --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain >/dev/null 
-    fi
+    [ -f "/opt/rainbond/.init/domain.yaml" ] && (
+        uid=$(cat /opt/rainbond/.init/domain.yaml | grep uuid | awk '{print $2}')
+        iip=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk '{print $2}')
+        domain=$(cat /opt/rainbond/.init/domain.yaml | grep domain | awk '{print $2}')
+        DOMAIN_API=$(cat /opt/rainbond/.init/domain.yaml | grep api | awk '{print $2}')
+        if [[ "$domain" =~ "grapps" ]];then
+            curl -s --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain >/dev/null 
+        fi
+    ) || (
+        # todo
+        echo ""
+    )
 }
 
 copy_from_centos(){
@@ -262,7 +267,7 @@ get_default_install_type(){
 }
 
 show_succeed(){
-    [ "$INSTALL_TYPE" == "online" ] && [[ "$DOMAIN" == *grapps.cn ]] && up_domain_dns
+    [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
     progress "Congratulations on your successful installation"
     info "查询集群状态" "grctl cluster"
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
