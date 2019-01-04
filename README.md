@@ -8,9 +8,28 @@
 
 ## Tutorial
 
-- [使用文档](https://www.rainbond.com)
-- [配置开发文档](./docs/)
-- [安装FAQ](https://github.com/goodrain/rainbond-ansible/wiki/Install-FAQ)
+#### Stable version installation
+
+current version: 5.0
+
+```bash
+wget https://pkg.rainbond.com/releases/common/v5.0/grctl
+chmod +x ./grctl
+./grctl init  --iip <内网ip/Internal IP> --eip <外网ip/External IP>
+```
+
+Refer to the documentation for more information [online installation](https://www.rainbond.com/docs/stable/getting-started/online-installation.html)
+
+
+#### Development version installation
+
+current version: devel
+
+```bash
+wget https://pkg.rainbond.com/releases/common/v5.0/grctl
+chmod +x ./grctl
+./grctl init --iip <内网ip/Internal IP> --eip <外网ip/External IP> --rainbond-version devel
+```
 
 ## License
 

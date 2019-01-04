@@ -12,6 +12,7 @@
 
 - name: PKG| add EPEL repo
   yum: name=epel-release state=latest
+  when: install_type == "online"
 
 - name: PKG| install centos package
   yum: 
