@@ -28,7 +28,7 @@
     mode: 0777
   tags: health
 
-- name: Health | Add Dns Health Check
+- name: Health | Add Storage Health Check
   template:
     src: "{{ base_dir }}/hack/files/health/storage.sh"
     dest: "{{ rbd_dir }}/health/storage.sh"
