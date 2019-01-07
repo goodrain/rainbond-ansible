@@ -322,6 +322,9 @@ prepare(){
     fi
     sed -i "s#node1#$hname#g" inventory/hosts
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
+
+    [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
+
 }
 
 update_etcd(){

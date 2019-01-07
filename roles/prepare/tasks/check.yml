@@ -19,13 +19,13 @@
   assert:
     that: ansible_memtotal_mb >= 3500
   ignore_errors: false
-  when: inventory_hostname in groups['master']
+  when: inventory_hostname in groups['master'] and enable_check == "enable"
 
 - name: Check | Stop if memory is too small for workers
   assert:
     that: ansible_memtotal_mb >= 3500
   ignore_errors: false
-  when: inventory_hostname in groups['worker']
+  when: inventory_hostname in groups['worker'] and enable_check == "enable"
 
 - name: Check | minimum kernel version
   fail:
