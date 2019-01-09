@@ -131,13 +131,6 @@ EOF
         [ ! -d "/opt/rainbond/bin" ] && mkdir -p /opt/rainbond/bin
         cp -a hack/tools/update-domain.sh /opt/rainbond/bin/.domain.sh
         chmod +x /opt/rainbond/bin/.domain.sh
-        cat > /opt/rainbond/.init/domain.yaml <<EOF
-iip: $DOMAIN_IP
-domain: $wilddomain
-uuid: $DOMAIN_UUID
-secretkey: $AUTH
-api: $DOMAIN_API
-EOF
     else
         info "not generate rainbond domain, will use example" "pass.example.com"
         sed -i -r  "s/(^app_domain: ).*/\1paas.example.com/" roles/rainvar/defaults/main.yml
@@ -146,6 +139,14 @@ EOF
         info "custom domain:" "$DOMAIN"
         sed -i -r  "s/(^app_domain: ).*/\1$DOMAIN/" roles/rainvar/defaults/main.yml
     fi
+    cat > /opt/rainbond/.init/domain.yaml <<EOF
+iip: $DOMAIN_IP
+domain: $wilddomain
+uuid: $DOMAIN_UUID
+secretkey: $AUTH
+api: $DOMAIN_API
+EOF
+
 }
 
 up_domain_dns(){
@@ -177,6 +178,12 @@ copy_from_ubuntu(){
     cp -a ./hack/chinaos/ubuntu-lsb-release /etc/lsb-release
     cp -a /etc/apt/sources.list /etc/apt/sources.list.old
     cp -a ./hack/chinaos/sources.list /etc/apt/sources.list
+}
+
+centos_offline(){
+    info "Remove default CentOS source"
+    [ ! -d "/etc/yum.repos.d/backup" ] && mkdir -p /etc/yum.repos.d/backup
+    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
 }
 
 other_type_linux(){
@@ -237,6 +244,7 @@ EOF
             #yum makecache fast
             #yum install -y sshpass python-pip uuidgen pwgen
             #pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
+            centos_offline
             cat > /etc/yum.repos.d/rainbond.repo << EOF
 [rainbond]
 name=rainbond_offline_install_repo
