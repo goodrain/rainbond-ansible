@@ -50,13 +50,23 @@ del_role(){
     systemctl restart node
 }
 
+reset(){
+    systemctl stop node
+    systemctl stop kubelet
+    dps | grep goodrain.me | awk '{print $NF}' | xargs -I {} systemctl stop {}
+    cclear
+    rm -rf /opt/rainbond/
+    rm -rf /tmp/*
+    rm -rf /usr/local/bin/grctl
+    rm -rf /usr/local/bin/node
+}
+
 help(){
     echo "grclis stop <服务名>"
     echo "grclis upgrade <服务名/all>"
+    echo "grclis reset"
     #echo "grclis del role worker"
 }
-
-
 
 case $1 in
     upgrade)
@@ -67,6 +77,9 @@ case $1 in
     ;;
     del)
         del_role $2 $3
+    ;;
+    reset)
+        reset
     ;;
     *)
         help        
