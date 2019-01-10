@@ -10,3 +10,28 @@
   register: upgrade_task_result
   until: upgrade_task_result is succeeded
   retries: 5
+
+- name: Upgrade | Copy grctl binary from deploy
+  copy: 
+    src: "{{ local_tools }}/bin/grctl"
+    dest: "{{ bin_dir }}/grctl"
+    mode: 0755
+
+- name: Upgrade | stop node service
+  systemd:
+    state: stopped
+    name: node
+
+- name: Upgrade | Copy node binary from deploy
+  copy: 
+    src: "{{ local_tools }}/bin/node"
+    dest: "{{ bin_dir }}/node"
+    mode: 0755
+
+- name: Upgrade | start node service
+  systemd:
+    state: started
+    name: node
+
+- name: Upgrade | update node service
+  shell: node service update
