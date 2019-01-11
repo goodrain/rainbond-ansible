@@ -1,4 +1,14 @@
 ---
+- name: Hosts | populate rainbond into hosts file
+  blockinfile:
+    dest: /etc/hosts
+    block: |-
+      {{hostvars[groups['master'][0]]['ip']}}  {{ rainbond_domain }}
+    state: present
+    create: yes
+    backup: yes
+    marker: "# Rainbond hosts {mark}"
+
 - import_tasks: offline.yml
   when: install_type == "offline"
 

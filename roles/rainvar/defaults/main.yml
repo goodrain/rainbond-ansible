@@ -9,6 +9,7 @@ etcd_version: v3.2.25
 calico_version: v3.3.1
 install_type: online
 deploy_type: onenode
+enable_check: enable
 bin_dir: "/usr/local/bin"
 rbd_dir: "/opt/rainbond"
 base_dir: "/opt/rainbond/rainbond-ansible"
@@ -101,4 +102,4 @@ base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/b
 
 # rainbond.image.tgz.url
 
-rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2018-12-29-5.0.tgz"
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-11-5.0.1.tgz"
