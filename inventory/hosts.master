@@ -1,5 +1,5 @@
 [all]
-node1 ansible_host=10.10.10.13 ip=10.10.10.13 ansible_user=root ansible_ssh_pass=12345678 ansible_become=true
+node1 ansible_host=10.10.10.13 ip=10.10.10.13 
 
 [deploy]
 node1 NTP_ENABLED=no
