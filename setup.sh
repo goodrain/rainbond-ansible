@@ -274,9 +274,29 @@ get_default_install_type(){
     fi
 }
 
+check_port(){
+    local portlist=(53 80 443 3306)
+    local check_fail_num=0
+    for port in ${portlist[@]}
+    do
+        netstat -pantu | awk '{print $4}' | grep "\b$port\b" >> /tmp/check_port_log && ((check_fail_num+=1)) || echo ""
+    done
+    if [ "$check_fail_num" == 0 ];then
+	    touch /opt/rainbond/.init/.port_check
+    else
+        notice "port is already used, please check port in: ${portlist[@]}"
+    fi
+}
+
+precheck(){
+    progress "Prepare check"
+    if [ ! -f "/opt/rainbond/.init/.port_check" ];then
+        check_port
+    fi
+}
+
 show_succeed(){
     [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
-    progress "Congratulations on your successful installation"
     info "查询集群状态" "grctl cluster"
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
     info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
@@ -288,6 +308,7 @@ onenode(){
     progress "Initialize the data center"
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
+        curl -Is 127.0.0.1:7070 | head -1 | grep 200 && progress "Congratulations on your successful installation" || echo ""
         show_succeed
     else
         notice "The installation did not succeed, please redo it or ask for help"
@@ -310,11 +331,11 @@ thirdparty(){
 }
 
 prepare(){
+    precheck
     progress "Prepare Init..."
     info "internal ip" $IIP
     [ ! -z "$EIP" ] && info "external ip" $EIP
     [ ! -z "$VIP" ] && info "virtual ip" $VIP
-
     other_type_linux
     get_default_dns
     [ "$DEPLOY_TYPE" != "thirdparty" ] && get_default_netwrok_type

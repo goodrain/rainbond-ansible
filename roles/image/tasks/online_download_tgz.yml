@@ -3,9 +3,7 @@
   stat: path=/grdata/services/offline/base.images.tgz
   register: check_image_base_tgz_download
 
-- name: Notice | Downloading base.images.tgz (1.5GB)
-  pause:
-    seconds: 10
+- pause:
     prompt: "Waiting downloading base.images.tgz (1.5GB)"
   when: check_image_base_tgz_download.stat.isreg is not defined
 
@@ -19,9 +17,7 @@
   stat: path=/grdata/services/offline/rainbond.images.tgz
   register: check_image_rainbond_tgz_download
 
-- name: Notice | Downloading rainbond.images.tgz (300MB)
-  pause:
-    seconds: 10
+- pause:
     prompt: "Waiting downloading rainbond.images.tgz (300MB)"
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
 

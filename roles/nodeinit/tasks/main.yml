@@ -22,9 +22,7 @@
     src: init.sql.j2
     dest: /tmp/init.sql
 
-- name: Notice | Waiting init db
-  pause:
-    seconds: 10
+- pause:
     prompt: "Waiting init db"
 
 - name: Rainbond | Run init db
@@ -43,9 +41,7 @@
   stat: path=/opt/rainbond/.init/goodrain.me.ok
   register: check_goodrainme_done
 
-- name: Notice | Pushing local images to goodrain.me
-  pause:
-    seconds: 10
+- pause:
     prompt: "Waiting Pushing local images to goodrain.me"
   when: check_goodrainme_done.stat.isreg is defined
 

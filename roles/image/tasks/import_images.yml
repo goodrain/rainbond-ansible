@@ -3,10 +3,8 @@
   stat: path=/grdata/services/offline/images/etcd.tgz
   register: check_base_image_tgz_unarchive
 
-- name: Notice | pause while Unzip base image
-  pause:
-    seconds: 10
-    prompt: "Waiting Unzip base image Ok"
+- pause:
+    prompt: "Waiting Unzip base image "
 
 - name: Rainbond | Unzip base image Ok
   unarchive:
@@ -18,10 +16,8 @@
   stat: path=/grdata/services/offline/images/mq.tgz
   register: check_rainbond_image_tgz_unarchive
 
-- name: Notice | pause while Unzip rainbond image
-  pause:
-    seconds: 10
-    prompt: "Waiting Unzip rainbond image Ok"
+- pause:
+    prompt: "Waiting Unzip rainbond image"
 
 - name: Rainbond | Unzip rainbond image Ok
   unarchive:
@@ -29,9 +25,7 @@
     dest: /grdata/services/offline/images
   when: check_rainbond_image_tgz_unarchive.stat.isreg is not defined
 
-- name: Notice | pause while load image
-  pause:
-    seconds: 10
+- pause:
     prompt: "Waiting load image Ok"
 
 - name: Rainbond | load image from local ok
