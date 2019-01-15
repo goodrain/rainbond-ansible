@@ -22,10 +22,12 @@
     src: init.sql.j2
     dest: /tmp/init.sql
 
-- name: Notice | Next Step will update db
-  shell: echo "download"
+- name: Notice | Waiting init db
+  pause:
+    seconds: 10
+    prompt: "Waiting init db"
 
-- name: Rainbond | Run update DB
+- name: Rainbond | Run init db
   shell: "bash /tmp/updatedb.sh >> /tmp/init.log"
   register: updatedb_task_result
   until: updatedb_task_result is succeeded
@@ -42,7 +44,9 @@
   register: check_goodrainme_done
 
 - name: Notice | Pushing local images to goodrain.me
-  shell: echo "push"
+  pause:
+    seconds: 10
+    prompt: "Waiting Pushing local images to goodrain.me"
   when: check_goodrainme_done.stat.isreg is defined
 
 - name: Rainbond | Push local images to goodrain.me

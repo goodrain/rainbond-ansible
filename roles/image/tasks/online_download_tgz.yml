@@ -4,7 +4,9 @@
   register: check_image_base_tgz_download
 
 - name: Notice | Downloading base.images.tgz (1.5GB)
-  shell: echo "download"
+  pause:
+    seconds: 10
+    prompt: "Waiting downloading base.images.tgz (1.5GB)"
   when: check_image_base_tgz_download.stat.isreg is not defined
 
 - name: Rainbond | Download base image tgz ok
@@ -18,7 +20,9 @@
   register: check_image_rainbond_tgz_download
 
 - name: Notice | Downloading rainbond.images.tgz (300MB)
-  shell: echo "download"
+  pause:
+    seconds: 10
+    prompt: "Waiting downloading rainbond.images.tgz (300MB)"
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
 
 - name: Rainbond | Download rainbond image tgz ok
@@ -26,7 +30,3 @@
     url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-11-5.0.1.tgz
     dest: /grdata/services/offline/rainbond.images.tgz
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
-
-#- name: Rainbond | write download image.tgz done
-#  file: path=/opt/rainbond/.init/tgz.download state=touch
-#  when: check_image_tgz_download.stat.isreg is not defined

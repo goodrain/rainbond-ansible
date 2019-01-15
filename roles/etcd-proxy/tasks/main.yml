@@ -41,6 +41,6 @@
   when: etcd_is_on_worker.stat.isreg is not defined
 
 - name: Etcd-proxy | start etcd-proxy
-  shell: "systemctl daemon-reload && systemctl start etcd-proxy"
+  shell: "systemctl daemon-reload && systemctl enable etcd-proxy && systemctl start etcd-proxy"
   when: etcd_is_on_worker.stat.isreg is not defined
 
