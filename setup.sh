@@ -293,6 +293,7 @@ precheck(){
     if [ ! -f "/opt/rainbond/.init/.port_check" ];then
         check_port
     fi
+    info "prepare check" "passed"
 }
 
 show_succeed(){
