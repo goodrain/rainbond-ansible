@@ -39,7 +39,7 @@ kube_apiserver_ip: "{{ kube_service_addresses|ipaddr(1)|ipaddr('address') }}"
 kube_dns_server: "{{ kube_service_addresses|ipaddr(10)|ipaddr('address') }}"
 rainbond_domain: "kubeapi.goodrain.me goodrain.me repo.goodrain.me lang.goodrain.me maven.goodrain.me region.goodrain.me"
 
-MASTER_IP: "{{hostvars[groups['master'][0]]['ip']|default(hostvars[groups['master'][0]]['ansible_default_ipv4']['address'])}}"
+MASTER_IP: "{{hostvars[groups['master'][0]]['ip']}}"
 
 KUBE_APISERVER: "https://kubeapi.goodrain.me:6443"
 
