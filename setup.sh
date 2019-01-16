@@ -279,7 +279,7 @@ check_port(){
     local check_fail_num=0
     for port in ${portlist[@]}
     do
-        netstat -pantu | awk '{print $4}' | grep "\b$port\b" >> /tmp/check_port_log && ((check_fail_num+=1)) || echo ""
+        netstat -pantu | awk '{print $4}' | grep "\b$port\b" >> /tmp/check_port_log && ((check_fail_num+=1)) || sleep 1
     done
     if [ "$check_fail_num" == 0 ];then
 	    touch /opt/rainbond/.init/.port_check
@@ -288,12 +288,29 @@ check_port(){
     fi
 }
 
+check_disk(){
+    local disk=$(df -h | grep "/$" | awk '{print $2}' | tr 'G' ' ')
+    DISK_LIMIT=40
+    DISK_STATUS=$(awk -v num1=$disk -v num2=$DISK_LIMIT 'BEGIN{print(num1>=num2)?"0":"1"}')
+    if [ "$DISK_STATUS" == '0' ];then
+        info "prepare check disk" "passed"
+    else
+        if [ "$ENABLE_CHECK" == "enable" ];then
+            notice "The disk is recommended to be at least 40GB"
+        else
+            info "!!! Skip disk check.The disk is recommended to be at least 40GB(now $disk)"
+        fi
+    fi
+
+}
+
 precheck(){
     progress "Prepare check"
     if [ ! -f "/opt/rainbond/.init/.port_check" ];then
         check_port
     fi
-    info "prepare check" "passed"
+    info "prepare check port" "passed"
+    check_disk
 }
 
 show_succeed(){
@@ -309,7 +326,7 @@ onenode(){
     progress "Initialize the data center"
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
-        curl -Is 127.0.0.1:7070 | head -1 | grep 200 && progress "Congratulations on your successful installation" || echo ""
+        curl -Is 127.0.0.1:7070 | head -1 | grep 200 && progress "Congratulations on your successful installation" || sleep 1
         show_succeed
     else
         notice "The installation did not succeed, please redo it or ask for help"
