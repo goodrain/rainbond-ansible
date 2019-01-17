@@ -32,8 +32,11 @@
   until: updatedb_task_result is succeeded
   retries: 5
 
-#- name: show updatedb_task_result debug info
-#  debug: var=updatedb_task_result
+- name: Rainbond | Check init db
+  shell: "bash -x /tmp/updatedb.sh >> /tmp/check.log"
+  register: checkdb_task_result
+  until: checkdb_task_result is succeeded
+  retries: 2
 
 - name: Rainbond | Check goodrain.me
   shell: "bash /tmp/check_registries.sh"
