@@ -1,7 +1,7 @@
 ---
 - name: Rainbond | Copy DB Script
   template:
-    src: updatedb.sh.j2
+    src: donedb.sh.j2
     dest: /tmp/updatedb.sh
     mode: 0777
 
@@ -27,16 +27,16 @@
     msg: "The next task may take some time to execute: Waiting init db"
 
 - name: Rainbond | Run init db
-  shell: "bash /tmp/updatedb.sh >> /tmp/init.log"
+  shell: "bash /tmp/updatedb.sh init >> /tmp/init.log"
   register: updatedb_task_result
   until: updatedb_task_result is succeeded
   retries: 5
 
 - name: Rainbond | Check init db
-  shell: "bash -x /tmp/updatedb.sh >> /tmp/check.log"
+  shell: "bash /tmp/updatedb.sh check > /tmp/check.log"
   register: checkdb_task_result
   until: checkdb_task_result is succeeded
-  retries: 2
+  retries: 3
 
 - name: Rainbond | Check goodrain.me
   shell: "bash /tmp/check_registries.sh"

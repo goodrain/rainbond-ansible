@@ -309,7 +309,7 @@ check_disk(){
         if [ "$ENABLE_CHECK" == "enable" ];then
             notice "The disk is recommended to be at least 40GB"
         else
-            info "!!! Skip disk check.The disk is recommended to be at least 40GB(now $disk)"
+            info "!!! Skip disk check.The disk is recommended to be at least 40GB(now ${disk}GB)"
         fi
     fi
 
