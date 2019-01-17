@@ -25,6 +25,6 @@
 
 - name: Rainbond | Download rainbond image tgz ok
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-16.tgz
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-17.tgz
     dest: /grdata/services/offline/rainbond.images.tgz
   when: check_image_rainbond_tgz_download.stat.isreg is not defined

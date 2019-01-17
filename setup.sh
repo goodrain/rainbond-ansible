@@ -112,6 +112,7 @@ command_exists() {
 
 Generate_domain(){
     DOMAIN_IP=$1
+    DOMAIN_VIP=$2
     DOMAIN_UUID=$(cat /opt/rainbond/.init/uuid)
     DOMAIN_TYPE=False
     DOMAIN_LOG="/opt/rainbond/.domain.log"
@@ -141,6 +142,7 @@ EOF
     fi
     cat > /opt/rainbond/.init/domain.yaml <<EOF
 iip: $DOMAIN_IP
+vip: $DOMAIN_VIP
 domain: $wilddomain
 uuid: $DOMAIN_UUID
 secretkey: $AUTH
@@ -315,18 +317,19 @@ precheck(){
 
 show_succeed(){
     [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
-    info "查询集群状态" "grctl cluster"
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
     info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
     info "操作文档" "https://www.rainbond.com/docs/dev/getting-started/rainbond-overview.html"
     info "社区" "https://t.goodrain.com"
+    info "查询集群状态" "grctl cluster"
+    grctl cluster
 }
 
 onenode(){
     progress "Initialize the data center"
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
-        curl -Is 127.0.0.1:7070 | head -1 | grep 200 && progress "Congratulations on your successful installation" || sleep 1
+        curl -Is 127.0.0.1:7070 | head -1 | grep 200 > /dev/null && progress "Congratulations on your successful installation" || sleep 1
         show_succeed
     else
         notice "The installation did not succeed, please redo it or ask for help"
@@ -360,7 +363,7 @@ prepare(){
     get_default_install_type
     info "Deploy Type" $DEPLOY_TYPE
     get_default_config
-    [ ! -z "$EIP" ] && Generate_domain $EIP || Generate_domain $IIP
+    [ ! -z "$EIP" ] && Generate_domain $EIP $VIP || Generate_domain $IIP $VIP
     hname=$(hostname -s)
     if [ "$ROLE" == "master" ];then 
         cp inventory/hosts.master inventory/hosts
