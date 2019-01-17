@@ -201,6 +201,14 @@ other_type_linux(){
     esac
 }
 
+online_init_docker_version(){
+
+    [ ! -z "$DOCKER_VERSION" ] && (
+        info "docker version" "$DOCKER_VERSION"
+        sed -i -r  "s/(^docker_version: ).*/\1$DOCKER_VERSION/" roles/rainvar/defaults/main.yml
+    ) || info "docker version" "17.06.2.ce"
+}
+
 online_init(){
     lsb_dist=$( get_distribution )
     lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
@@ -270,6 +278,7 @@ get_default_install_type(){
     sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^deploy_type: ).*/\1$DEPLOY_TYPE/" roles/rainvar/defaults/main.yml
     if [ "$INSTALL_TYPE" == "online" ];then
+        online_init_docker_version
         online_init
     else
         offline_init
