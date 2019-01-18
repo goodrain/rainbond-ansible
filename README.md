@@ -10,7 +10,7 @@
 
 #### Stable version installation
 
-current version: 5.0
+current version: 5.0.2
 
 ```bash
 wget https://pkg.rainbond.com/releases/common/v5.0/grctl
