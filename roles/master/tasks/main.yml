@@ -1,0 +1,31 @@
+---
+- name: Rainbond | Copy ssh PrimaryKey
+  copy:
+    src: /grdata/services/ssh/id_rsa
+    dest: /root/.ssh/id_rsa
+    mode: 600
+    backup: yes
+
+- name: Rainbond | Copy ssh PublicKey
+  copy:
+    src: /grdata/services/ssh/id_rsa.pub
+    dest: /root/.ssh/id_rsa.pub
+    mode: 644
+    backup: yes
+
+- name: Rainbond | Install ansible Online
+  shell: "pip install ansible"
+  when: install_type == "online"
+
+- name: Rainbond | Install ansible Offline
+  shell: "yum install -y sshpass python-pip ansible"
+  when: install_type != "online"
+
+- name: Rainbond | Add share
+  template:
+    src: share.sh.j2
+    dest: /tmp/share.sh
+    mode: 0777
+
+- name: Rainbond | Run share
+  shell: bash /tmp/share.sh
