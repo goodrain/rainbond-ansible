@@ -79,7 +79,13 @@ case $1 in
         del_role $2 $3
     ;;
     reset)
-        reset
+        read -n1 -p "Are you sure you want to continue resetting node [Y/N]?" answer
+        case $answer in
+        Y | y)
+            reset;;
+        *)
+            echo "";;
+        esac
     ;;
     *)
         help        

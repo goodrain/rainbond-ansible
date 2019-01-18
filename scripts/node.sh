@@ -44,13 +44,14 @@ fi
 cd /opt/rainbond/rainbond-ansible
 
 deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep "deploy" | awk '{print $2}')
-
+[ ! -z "$node_uuid" ] && (
 cat /opt/rainbond/.init/node.uuid | grep "$node_ip" 
 if [ "$?" -ne 0 ];then
 cat >> /opt/rainbond/.init/node.uuid <<EOF
 $node_ip:$node_uuid
 EOF
 fi
+)
 
 [ "$(check_exist $node_hostname $node_ip)" -eq 0 ] && (
 sed -i "/\[all\]/a$node_hostname ansible_host=$node_ip ip=$node_ip" inventory/hosts
@@ -63,14 +64,14 @@ fi
 
 if [ "$node_role" == "compute" ];then
     if [ "$deploy_type" == "thirdparty" ];then
-        ansible-playbook -i inventory/hosts hack/thirdparty/addnode.yml
+        ansible-playbook -i inventory/hosts hack/thirdparty/addnode.yml --limit $node_hostname
     else
-        ansible-playbook -i inventory/hosts addnode.yml
+        ansible-playbook -i inventory/hosts addnode.yml --limit $node_hostname
     fi
 else
     if [ "$deploy_type" == "thirdparty" ];then
-        ansible-playbook -i inventory/hosts hack/thirdparty/addmaster.yml
+        ansible-playbook -i inventory/hosts hack/thirdparty/addmaster.yml --limit $node_hostname
     else
-        ansible-playbook -i inventory/hosts addmaster.yml
+        ansible-playbook -i inventory/hosts addmaster.yml --limit $node_hostname
     fi
 fi

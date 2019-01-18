@@ -3,7 +3,11 @@
   stat: path=/grdata/services/offline/images/etcd.tgz
   register: check_base_image_tgz_unarchive
 
-- name: Rainbond | Unzip base image
+- name: The next task may take some time to execute
+  debug:
+    msg: "The next task may take some time to execute: Waiting Unzip base image "
+
+- name: Rainbond | Unzip base image Ok
   unarchive:
     src: /grdata/services/offline/base.images.tgz
     dest: /grdata/services/offline/images
@@ -13,13 +17,21 @@
   stat: path=/grdata/services/offline/images/mq.tgz
   register: check_rainbond_image_tgz_unarchive
 
-- name: Rainbond | Unzip rainbond image
+- name: The next task may take some time to execute
+  debug:
+    msg: "The next task may take some time to execute: Waiting Unzip rainbond image"
+
+- name: Rainbond | Unzip rainbond image Ok
   unarchive:
     src: /grdata/services/offline/rainbond.images.tgz
     dest: /grdata/services/offline/images
   when: check_rainbond_image_tgz_unarchive.stat.isreg is not defined
 
-- name: Rainbond | load image from local
+- name: The next task may take some time to execute
+  debug:
+    msg: "The next task may take some time to execute:Waiting load image Ok"
+
+- name: Rainbond | load image from local ok
   shell: "bash {{ base_dir }}/offline/images/load.sh > /tmp/local.image.log"
   register: load_task_result
   until: load_task_result is succeeded

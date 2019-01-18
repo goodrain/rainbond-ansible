@@ -112,6 +112,7 @@ command_exists() {
 
 Generate_domain(){
     DOMAIN_IP=$1
+    DOMAIN_VIP=$2
     DOMAIN_UUID=$(cat /opt/rainbond/.init/uuid)
     DOMAIN_TYPE=False
     DOMAIN_LOG="/opt/rainbond/.domain.log"
@@ -141,6 +142,7 @@ EOF
     fi
     cat > /opt/rainbond/.init/domain.yaml <<EOF
 iip: $DOMAIN_IP
+vip: $DOMAIN_VIP
 domain: $wilddomain
 uuid: $DOMAIN_UUID
 secretkey: $AUTH
@@ -197,6 +199,14 @@ other_type_linux(){
             copy_from_ubuntu $lsb_dist
         ;;    
     esac
+}
+
+online_init_docker_version(){
+
+    [ ! -z "$DOCKER_VERSION" ] && (
+        info "docker version" "$DOCKER_VERSION"
+        sed -i -r  "s/(^docker_version: ).*/\1$DOCKER_VERSION/" roles/rainvar/defaults/main.yml
+    ) || info "docker version" "17.06.2.ce"
 }
 
 online_init(){
@@ -268,26 +278,67 @@ get_default_install_type(){
     sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^deploy_type: ).*/\1$DEPLOY_TYPE/" roles/rainvar/defaults/main.yml
     if [ "$INSTALL_TYPE" == "online" ];then
+        online_init_docker_version
         online_init
     else
         offline_init
     fi
 }
 
+check_port(){
+    local portlist=(53 80 443 3306)
+    local check_fail_num=0
+    for port in ${portlist[@]}
+    do
+        netstat -pantu | awk '{print $4}' | grep "\b$port\b" >> /tmp/check_port_log && ((check_fail_num+=1)) || sleep 1
+    done
+    if [ "$check_fail_num" == 0 ];then
+	    touch /opt/rainbond/.init/.port_check
+    else
+        notice "port is already used, please check port in: ${portlist[@]}"
+    fi
+}
+
+check_disk(){
+    local disk=$(df -h | grep "/$" | awk '{print $2}' | tr 'G' ' ')
+    DISK_LIMIT=40
+    DISK_STATUS=$(awk -v num1=$disk -v num2=$DISK_LIMIT 'BEGIN{print(num1>=num2)?"0":"1"}')
+    if [ "$DISK_STATUS" == '0' ];then
+        info "prepare check disk" "passed"
+    else
+        if [ "$ENABLE_CHECK" == "enable" ];then
+            notice "The disk is recommended to be at least 40GB"
+        else
+            info "!!! Skip disk check.The disk is recommended to be at least 40GB(now ${disk}GB)"
+        fi
+    fi
+
+}
+
+precheck(){
+    progress "Prepare check"
+    if [ ! -f "/opt/rainbond/.init/.port_check" ];then
+        check_port
+    fi
+    info "prepare check port" "passed"
+    check_disk
+}
+
 show_succeed(){
     [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
-    progress "Congratulations on your successful installation"
-    info "查询集群状态" "grctl cluster"
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
     info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
     info "操作文档" "https://www.rainbond.com/docs/dev/getting-started/rainbond-overview.html"
     info "社区" "https://t.goodrain.com"
+    info "查询集群状态" "grctl cluster"
+    grctl cluster
 }
 
 onenode(){
     progress "Initialize the data center"
     ansible-playbook -i inventory/hosts setup.yml
     if [ "$?" -eq 0 ];then
+        curl -Is 127.0.0.1:7070 | head -1 | grep 200 > /dev/null && progress "Congratulations on your successful installation" || sleep 1
         show_succeed
     else
         notice "The installation did not succeed, please redo it or ask for help"
@@ -310,18 +361,18 @@ thirdparty(){
 }
 
 prepare(){
+    precheck
     progress "Prepare Init..."
     info "internal ip" $IIP
     [ ! -z "$EIP" ] && info "external ip" $EIP
     [ ! -z "$VIP" ] && info "virtual ip" $VIP
-
     other_type_linux
     get_default_dns
     [ "$DEPLOY_TYPE" != "thirdparty" ] && get_default_netwrok_type
     get_default_install_type
     info "Deploy Type" $DEPLOY_TYPE
     get_default_config
-    [ ! -z "$EIP" ] && Generate_domain $EIP || Generate_domain $IIP
+    [ ! -z "$EIP" ] && Generate_domain $EIP $VIP || Generate_domain $IIP $VIP
     hname=$(hostname -s)
     if [ "$ROLE" == "master" ];then 
         cp inventory/hosts.master inventory/hosts

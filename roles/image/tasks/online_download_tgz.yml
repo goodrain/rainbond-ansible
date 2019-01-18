@@ -3,13 +3,14 @@
   stat: path=/grdata/services/offline/base.images.tgz
   register: check_image_base_tgz_download
 
-- name: Notice | Downloading base.images.tgz (1.5GB)
-  shell: echo "download"
+- name: The next task may take some time to execute
+  debug:
+    msg: "The next task may take some time to execute: Waiting downloading base.images.tgz (1.5GB)"
   when: check_image_base_tgz_download.stat.isreg is not defined
 
 - name: Rainbond | Download base image tgz ok
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2018-12-29-5.0.tgz
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2019-01-18-5.0.2.tgz
     dest: /grdata/services/offline/base.images.tgz
   when: check_image_base_tgz_download.stat.isreg is not defined
 
@@ -17,16 +18,13 @@
   stat: path=/grdata/services/offline/rainbond.images.tgz
   register: check_image_rainbond_tgz_download
 
-- name: Notice | Downloading rainbond.images.tgz (300MB)
-  shell: echo "download"
+- name: The next task may take some time to execute
+  debug:
+    msg: "The next task may take some time to execute: Waiting downloading rainbond.images.tgz (300MB)"
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
 
 - name: Rainbond | Download rainbond image tgz ok
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-11-5.0.1.tgz
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-18-5.0.2.tgz
     dest: /grdata/services/offline/rainbond.images.tgz
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
-
-#- name: Rainbond | write download image.tgz done
-#  file: path=/opt/rainbond/.init/tgz.download state=touch
-#  when: check_image_tgz_download.stat.isreg is not defined

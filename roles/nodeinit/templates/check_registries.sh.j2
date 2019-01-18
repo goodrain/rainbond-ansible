@@ -4,3 +4,7 @@ docker info | grep "goodrain.me"
 if [ "$?" -eq 0 ];then
     echo "ok" > /opt/rainbond/.init/goodrain.me.ok
 fi
+
+if [ -f "/etc/docker/certs.d/goodrain.me/server.crt" ];then
+    echo "ok" > /opt/rainbond/.init/goodrain.me.ok
+fi

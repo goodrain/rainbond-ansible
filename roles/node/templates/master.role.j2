@@ -199,6 +199,7 @@ services:
     -e K8S_MASTER=http://127.0.0.1:8181
     -v {{ rbd_dir }}/logs/rbd-eventlog:/var/log
     -v /grdata/downloads/log:/grdata/logs
+    -v /opt/rainbond/etc/node:/opt/rainbond/etc/node
     -i goodrain.me/{{ eventlog }}
     --cluster.bind.ip={{ nodeip }} --cluster.instance.ip={{ nodeip }} --db.type=mysql --db.url="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ nodeip }} --websocket.bind.ip={{ nodeip }}
   stop: docker stop rbd-eventlog

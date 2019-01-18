@@ -1,18 +1,16 @@
 ---
+- name: Offline | Creates init directory
+  file: path=/opt/rainbond/.init state=directory
+
+- name: Offline | Creates backup directory
+  file: path=/etc/yum.repos.d/backup state=directory
+
 - name: Offline | Check offline repo
   stat: path=/opt/rainbond/.init/.offline
   register: offline_repo
 
-#- name: Offline | Add CentOS Repository
-#  yum_repository:
-#    name: local
-#    description: rpm local
-#    file: rainbond
-#    baseurl: http://repo.goodrain.me/rpm/centos/7
-#  when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
-
 - name: Offline | Clean old Repository
-  shell: mkdir /etc/yum.repos.d/backup && mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
+  shell: mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup && touch /opt/rainbond/.init/.offline
   when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
 
 - name:  Offline | Add CentOS Repository

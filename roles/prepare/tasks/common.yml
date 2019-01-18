@@ -18,6 +18,9 @@
     - "{{ rbd_dir }}/etc/cni"
     - "{{ rbd_dir }}/bin"
     - "{{ rbd_dir }}/etc/node"
+    - "{{ rbd_dir }}/.init"
+    - "{{ rbd_dir }}/etc/tools"
+    - "{{ rbd_dir }}/rainbond-ansible"
     - /root/.kube
     - /etc/docker
     - /root/.rbd
@@ -154,21 +157,21 @@
     src: /root/.ssh/id_rsa.pub
     dest: /grdata/services/ssh/builder_rsa.pub
     mode: 0600
-  when: deploy_check_ssh.stat.isreg is not defined
+  when: deploy_check_ssh.stat.isreg is defined
 
 - name: System | Copy ssh key as builder key
   copy:
     src: /root/.ssh/id_rsa
     dest: /grdata/services/ssh/builder_rsa
     mode: 0600
-  when: deploy_check_ssh.stat.isreg is not defined
+  when: deploy_check_ssh.stat.isreg is defined
 
 - name: System | Copy ssh config 
   copy:
     src: "{{ base_dir }}/hack/files/ssh/config"
     dest: /grdata/services/ssh/config
     mode: 0600
-  when: deploy_check_ssh.stat.isreg is not defined
+  when: deploy_check_ssh.stat.isreg is defined
 
 - name: System | Copy goodrain.me certificate
   copy:
