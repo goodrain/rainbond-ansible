@@ -51,9 +51,3 @@
     src: "{{ local_tools }}/bin/hyperkube"
     dest: "{{ bin_dir }}/kubectl"
     mode: 0755
-
-- name: Rainbond | Copy kubeconfig from deploy
-  copy:
-    src: "{{  kubecfg_dir }}/admin.kubeconfig"
-    dest: "/root/.kube/config"
-    mode: 0755
