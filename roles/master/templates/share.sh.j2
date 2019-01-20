@@ -5,3 +5,9 @@ echo "{{ MASTER_IP }}:/opt/rainbond/.init /opt/rainbond/.init nfs rw 0 0" >> /et
 echo "{{ MASTER_IP }}:/opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible nfs rw 0 0">> /etc/fstab
 
 mount -a
+
+df -h | grep "/opt/rainbond/rainbond-ansible"
+
+if [ "$?" -eq 0 ];then
+    touch /tmp/.grdata.share
+fi

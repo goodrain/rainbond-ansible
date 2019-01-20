@@ -6,7 +6,7 @@ KUBE_ALLOW_PRIV="--allow-privileged=true"
 KUBE_MASTER="--master=http://127.0.0.1:8080"
 KUBE_API_ADDRESS="--advertise-address={{ master_access_address }} --bind-address={{ master_access_address }}"
 KUBE_ETCD_SERVERS="--etcd-servers={{ etcd_endpoints }}"
-KUBE_API_PORT="--secure-port=6443"
+KUBE_API_PORT="--secure-port=6442"
 KUBE_ADMISSION_CONTROL="--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
 KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range={{ service_cidr }}"
 

@@ -12,8 +12,34 @@
   stat: path=/tmp/.grdata.init
   register: check_grdata_server
 
+- name: Storage | check init 
+  stat: path=/tmp/.grdata.init
+  register: check_grdata_server
+
 - import_tasks: config.yml
+
+- name: Copy exports file.
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload nfs
   when: check_grdata_server.stat.isreg is not defined
+
+- name: Copy exports file.
+  template:
+    src: exports.only.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload nfs
+  when: check_grdata_server.stat.isreg is defined
+
+- name: Update exports
+  shell: "exportfs -ra"
 
 - name: Health | Copy health storage check
   template:
