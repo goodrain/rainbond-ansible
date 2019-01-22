@@ -36,7 +36,7 @@ do
         [ ! -f "/opt/rainbond/.init/.ui.init" ] && (
             prepare
             docker exec rbd-app-ui python /app/ui/manage.py migrate
-            [ "$?" -eq 0 ] && touch /opt/rainbond/.init/.ui.init 
+            [ "$?" -eq 0 ] && touch /opt/rainbond/.init/.ui.init || docker exec rbd-db mysql -e "drop database if exists console;"
         )
         [ -f "/opt/rainbond/.init/.ui.init" ] && (
             docker cp /tmp/init.sql rbd-db:/root
@@ -58,11 +58,17 @@ done
 }
 
 check(){
-    check=$(docker exec rbd-db mysql -e "select wsurl from console.region_info where region_id='asdasdasdasdasdasdasdasdas';")
-    if [ -z "$check" ];then
-        init
-        exit 1
-    fi
+    local check_status=1
+    for ((i=1;i<=6;i++))
+    do
+        sleep 20
+        check=$(docker exec rbd-db mysql -e "select wsurl from console.region_info where region_id='asdasdasdasdasdasdasdasdas';")
+        if [ ! -z "$check" ];then
+            check_status=0
+            break
+        fi
+    done
+    exit $check_status
 }
 
 case $1 in
