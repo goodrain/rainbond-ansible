@@ -6,21 +6,15 @@
 Install-WindowsFeature NFS-Client
 ```
 
-#### 1.1 nfs 存储
+#### 1.1 smb 存储
 
 ```
 net use z: \\<管理节点ip>\grdata
 ```
 
-修改windows挂载nfs权限问题，可参考docs部分，需要修改注册表
-
-#### 1.2 smb 存储
-
-挂载方式同nfs
-
 ## 2. 安装docker
 
-可参考官方安装，配置docker,daemon.json文件
+可参考[安装](http://t.goodrain.com/t/windows-docker/656)，配置docker,daemon.json文件
 
 ```
 {
@@ -34,7 +28,7 @@ net use z: \\<管理节点ip>\grdata
 }
 ```
 
-拉取镜像
+windows上拉取镜像
 
 ```
 docker pull microsoft/nanoserver:1803
@@ -66,10 +60,13 @@ scripts/helper.psm1
 scripts/hns.psm1
 start-flannel.ps1
 start-kubelet.ps1
+# 手动编译rainbond项目
 rainbond-node.exe
 rainbond-chaos.exe
 rainbond-windowsutil.exe
-flanneld.exe
+# 对象存储下载
+flanneld.exe http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/win/flanneld.exe
+# 可下载官方相关二进制
 etcdctl.exe
 etcd.exe
 kubelet.exe
