@@ -2,6 +2,10 @@
 
 DOMAIN_API="http://domain.grapps.cn"
 
+# network pod cidr
+pod_network_cidr_192="192.168.0.0/16"
+pod_network_cidr_172="172.16.0.0/16"
+pod_network_cidr_10="10.0.0.0/16"
 # calico pod-network-cidr
 calico_pod_network_cidr="192.168.0.0/16"
 # calico & flannel (canal) pod-network-cidr

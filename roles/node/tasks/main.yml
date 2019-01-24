@@ -103,3 +103,7 @@
 - name: Rainbond | Start Node
   shell: "systemctl daemon-reload && systemctl enable node && systemctl start node"
 
+- name: Rainbond | Restart Node
+  service:
+    name: node
+    state: restarted

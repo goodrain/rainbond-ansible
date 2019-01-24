@@ -81,10 +81,17 @@ get_default_netwrok_type() {
     fi
     info "Pod Network Provider" "${network}"
     if [ -z "$POD_NETWORK_CIDR" ];then
+        IP_INFO=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1')
+        IP_ITEMS=($IP_INFO)
+        INET_IP=${IP_ITEMS%%.*}
         if [ "$NETWORK_TYPE" == "flannel" ];then
             pod_network_cidr="${flannel_pod_network_cidr}"
         else
-            pod_network_cidr="${calico_pod_network_cidr}"
+            if [ "$INET_IP" != "192" ];then
+                pod_network_cidr="${calico_pod_network_cidr}"
+            else
+                pod_network_cidr="${pod_network_cidr_10}"
+            fi
         fi
     else
         pod_network_cidr="${POD_NETWORK_CIDR}"
