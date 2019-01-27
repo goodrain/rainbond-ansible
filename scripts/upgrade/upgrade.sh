@@ -43,6 +43,11 @@ done
 
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
+echo "patch 5.0.1"
+docker pull rainbond/rbd-builder:5.0
+docker tag rainbond/rbd-builder:5.0 goodrain.me/builder
+docker push goodrain.me/builder
+echo "patch 5.0.2"
 docker pull rainbond/plugins:tcm
 docker tag rainbond/plugins:tcm goodrain.me/tcm
 docker push goodrain.me/tcm
