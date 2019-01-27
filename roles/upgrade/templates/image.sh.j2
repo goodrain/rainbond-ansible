@@ -12,8 +12,8 @@ upgrade_rainbond(){
 }
 
 upgrade_db(){
-    docker cp /tmp/5.0.1.sql rbd-db:/root/5.0.1.sql
-    docker exec rbd-db mysql -e "use console;source /root/5.0.1.sql;"
+    docker cp /tmp/5.0.2.sql rbd-db:/root/5.0.2.sql
+    docker exec rbd-db mysql -e "use console;source /root/5.0.2.sql;"
 }
 
 case $1 in
