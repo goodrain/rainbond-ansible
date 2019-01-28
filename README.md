@@ -10,9 +10,10 @@
 
 #### Stable version installation
 
-current version: 5.0.2
+current version: 5.0.3
 
 ```bash
+#export DOCKER_VERSION=18.06
 wget https://pkg.rainbond.com/releases/common/v5.0/grctl
 chmod +x ./grctl
 ./grctl init  --iip <内网ip/Internal IP> --eip <外网ip/External IP>

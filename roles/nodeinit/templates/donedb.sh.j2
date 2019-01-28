@@ -62,6 +62,8 @@ check(){
     for ((i=1;i<=6;i++))
     do
         sleep 20
+        echo "check db init ${i} time"
+        dps
         check=$(docker exec rbd-db mysql -e "select wsurl from console.region_info where region_id='asdasdasdasdasdasdasdasdas';")
         if [ ! -z "$check" ];then
             check_status=0

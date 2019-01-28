@@ -33,7 +33,7 @@
   retries: 5
 
 - name: Rainbond | Check init db
-  shell: "bash /tmp/updatedb.sh check > /tmp/check.log"
+  shell: "bash /tmp/updatedb.sh check >> /tmp/check.log"
   register: checkdb_task_result
   until: checkdb_task_result is succeeded
   retries: 3
