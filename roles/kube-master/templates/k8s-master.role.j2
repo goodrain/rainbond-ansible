@@ -4,8 +4,8 @@ services:
   disable: false
   endpoints:
   - name: APISERVER_ENDPOINTS
-    protocol: http
-    port: 6443
+    protocol: 
+    port: 6442
   health:
     name: kube-apiserver
     model: http
@@ -27,6 +27,7 @@ services:
     goodrain.me/{{ kube_apiserver_image }}
     --insecure-bind-address=127.0.0.1
     --insecure-port=8181
+    --secure-port=6442
     --advertise-address={{ master_access_address }} --bind-address={{ master_access_address }}
     --etcd-servers=${ETCD_ENDPOINTS}
     --enable-admission-plugins=ServiceAccount,NamespaceLifecycle,LimitRanger,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota

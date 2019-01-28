@@ -1,18 +1,4 @@
 ---
-- name: Rainbond | Copy ssh PrimaryKey
-  copy:
-    src: /grdata/services/ssh/id_rsa
-    dest: /root/.ssh/id_rsa
-    mode: 600
-    backup: yes
-
-- name: Rainbond | Copy ssh PublicKey
-  copy:
-    src: /grdata/services/ssh/id_rsa.pub
-    dest: /root/.ssh/id_rsa.pub
-    mode: 644
-    backup: yes
-
 - name: Rainbond | Install ansible Online
   shell: "pip install ansible"
   when: install_type == "online"
@@ -21,11 +7,17 @@
   shell: "yum install -y sshpass python-pip ansible"
   when: install_type != "online"
 
+- name: Storage | check init 
+  stat: path=/tmp/.grdata.share
+  register: check_manage_share
+
 - name: Rainbond | Add share
   template:
     src: share.sh.j2
     dest: /tmp/share.sh
     mode: 0777
+  when: check_manage_share.stat.isreg is not defined
 
 - name: Rainbond | Run share
   shell: bash /tmp/share.sh
+  when: check_manage_share.stat.isreg is not defined

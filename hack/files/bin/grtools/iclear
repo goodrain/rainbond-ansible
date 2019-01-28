@@ -9,9 +9,7 @@ cclear
 ilist=`docker images --filter "dangling=true" -q`
 
 if [ "$ilist" != "" ];then
-
-docker rmi $ilist
-
+    docker rmi $ilist
 else
-  echo -e "\nThere is no images of <none>"
+    docker images | grep none | awk '{print $3}' | sort -ru | xargs -I {} docker rmi -f {}
 fi

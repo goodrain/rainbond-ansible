@@ -10,7 +10,7 @@
 
 - name: Rainbond | Download base image tgz ok
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2019-01-18-5.0.2.tgz
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2019-01-25-5.0.3.tgz
     dest: /grdata/services/offline/base.images.tgz
   when: check_image_base_tgz_download.stat.isreg is not defined
 
@@ -25,6 +25,6 @@
 
 - name: Rainbond | Download rainbond image tgz ok
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-18-5.0.2.tgz
+    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-25-5.0.3.tgz
     dest: /grdata/services/offline/rainbond.images.tgz
   when: check_image_rainbond_tgz_download.stat.isreg is not defined

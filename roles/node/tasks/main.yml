@@ -1,4 +1,24 @@
 ---
+- name: Rainbond | Copy private key
+  copy:
+    src: /grdata/services/ssh/builder_rsa
+    dest: /root/.ssh/id_rsa
+    mode: 0600
+    backup: yes
+
+- name: Rainbond | Copy public key
+  copy:
+    src: /grdata/services/ssh/builder_rsa.pub
+    dest: /root/.ssh/id_rsa.pub
+    mode: 0644
+    backup: yes
+
+- name: Rainbond | Copy kubeconfig from deploy
+  copy:
+    src: "{{  kubecfg_dir }}/admin.kubeconfig"
+    dest: "/root/.kube/config"
+    mode: 0755
+
 - name: Rainbond | Copy node binary from deploy
   copy:
     src: "{{ local_tools }}/bin/node"
@@ -83,3 +103,7 @@
 - name: Rainbond | Start Node
   shell: "systemctl daemon-reload && systemctl enable node && systemctl start node"
 
+- name: Rainbond | Restart Node
+  service:
+    name: node
+    state: restarted

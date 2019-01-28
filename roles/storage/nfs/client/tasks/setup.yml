@@ -1,0 +1,19 @@
+---
+- name: install nfs client debian
+  action: apt pkg=nfs-common state=present
+  when: ansible_os_family == 'Debian'
+
+- name: install nfs client centos
+  action: yum pkg=nfs-utils state=present
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure rpcbind is running (CentOS)
+  action: service name=rpcbind state=started enabled=yes
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure rpcbind is running (Debian)
+  action: service name=rpcbind state=started enabled=yes
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure {{nfsmount}} directory exists
+  action: file path={{nfsmount}} state=directory

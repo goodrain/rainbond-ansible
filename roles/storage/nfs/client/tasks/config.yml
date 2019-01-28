@@ -3,25 +3,6 @@
   stat: path="/grdata/kubernetes/kube-proxy.kubeconfig"
   register: check_server
 
-- name: install nfs client debian
-  action: apt pkg=nfs-common state=present
-  when: ansible_os_family == 'Debian' and check_server.stat.isreg is not defined
-
-- name: install nfs client centos
-  action: yum pkg=nfs-utils state=present
-  when: ansible_os_family == 'RedHat' and check_server.stat.isreg is not defined
-
-- name: Ensure rpcbind is running (CentOS)
-  action: service name=rpcbind state=started enabled=yes
-  when: ansible_os_family == 'RedHat' and check_server.stat.isreg is not defined
-
-- name: Ensure rpcbind is running (Debian)
-  action: service name=rpcbind state=started enabled=yes
-  when: ansible_os_family == 'Debian' and check_server.stat.isreg is not defined
-
-- name: Ensure {{nfsmount}} directory exists
-  action: file path={{nfsmount}} state=directory
-
 - shell: if [ -z "$nfsoptions" ]; then  echo rw; else echo $nfsoptions; fi
   register: _nfsopts
   sudo: false

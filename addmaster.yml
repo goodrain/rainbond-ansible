@@ -11,4 +11,5 @@
     - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: master, tags: master }
     - { role: node, tags: node }

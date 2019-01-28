@@ -29,6 +29,7 @@
     - /grdata/services/offline/images
     - /grdata/kubernetes
     - /etc/NetworkManager/conf.d
+    - /etc/calico
     - /etc/docker/certs.d/goodrain.me
   tags:
     - master

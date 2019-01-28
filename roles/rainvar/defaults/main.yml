@@ -98,8 +98,8 @@ autoreg_node: disable
 
 # base.image.tgz.url
 
-base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2019-01-18-5.0.2.tgz"
+base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2019-01-25-5.0.3.tgz"
 
 # rainbond.image.tgz.url
 
-rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-18-5.0.2.tgz"
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-25-5.0.3.tgz"

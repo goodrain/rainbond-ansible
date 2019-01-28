@@ -12,5 +12,7 @@
   stat: path=/tmp/.grdata.init
   register: check_grdata
 
+- import_tasks: setup.yml
+
 - import_tasks: config.yml
   when: check_grdata.stat.isreg is not defined

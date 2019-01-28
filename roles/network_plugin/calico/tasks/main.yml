@@ -26,5 +26,10 @@
     dest: "{{ bin_dir }}/calicoctl"
     mode: 0755
 
+- name: Network | Copy calicoctl cfg
+  template:
+    src: calicoctl.cfg.j2
+    dest: /etc/calico/calicoctl.cfg
+
 #- name: Network | start calico
 #  shell: "systemctl daemon-reload && systemctl enable calico && systemctl start calico"

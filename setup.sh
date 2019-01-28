@@ -81,10 +81,17 @@ get_default_netwrok_type() {
     fi
     info "Pod Network Provider" "${network}"
     if [ -z "$POD_NETWORK_CIDR" ];then
+        IP_INFO=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1')
+        IP_ITEMS=($IP_INFO)
+        INET_IP=${IP_ITEMS%%.*}
         if [ "$NETWORK_TYPE" == "flannel" ];then
             pod_network_cidr="${flannel_pod_network_cidr}"
         else
-            pod_network_cidr="${calico_pod_network_cidr}"
+            if [ "$INET_IP" != "192" ];then
+                pod_network_cidr="${calico_pod_network_cidr}"
+            else
+                pod_network_cidr="${pod_network_cidr_10}"
+            fi
         fi
     else
         pod_network_cidr="${POD_NETWORK_CIDR}"
@@ -170,7 +177,13 @@ copy_from_centos(){
     info "Update default to CentOS" "$1"
     cp -a ./hack/chinaos/centos-release /etc/os-release
     mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
-    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    check_repo=$(ls /etc/yum.repos.d/*.repo 2>/dev/null | wc -l)
+    if [ "$check_repo" != 0 ];then
+        mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    else
+        #todo
+        echo ""
+    fi
     cp -a ./hack/chinaos/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 }
 
@@ -185,7 +198,13 @@ copy_from_ubuntu(){
 centos_offline(){
     info "Remove default CentOS source"
     [ ! -d "/etc/yum.repos.d/backup" ] && mkdir -p /etc/yum.repos.d/backup
-    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
+    check_repo=$(ls /etc/yum.repos.d/*.repo 2>/dev/null | wc -l)
+    if [ "$check_repo" != 0 ];then
+        mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    else
+        #todo
+        echo ""
+    fi
 }
 
 other_type_linux(){
@@ -290,7 +309,7 @@ check_port(){
     local check_fail_num=0
     for port in ${portlist[@]}
     do
-        netstat -pantu | awk '{print $4}' | grep "\b$port\b" >> /tmp/check_port_log && ((check_fail_num+=1)) || sleep 1
+        netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" >> /tmp/check_port_log && ((check_fail_num+=1)) || sleep 1
     done
     if [ "$check_fail_num" == 0 ];then
 	    touch /opt/rainbond/.init/.port_check
