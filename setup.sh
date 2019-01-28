@@ -177,7 +177,13 @@ copy_from_centos(){
     info "Update default to CentOS" "$1"
     cp -a ./hack/chinaos/centos-release /etc/os-release
     mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
-    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    check_repo=$(ls /etc/yum.repos.d/*.repo 2>/dev/null | wc -l)
+    if [ "$check_repo" != 0 ];then
+        mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    else
+        #todo
+        echo ""
+    fi
     cp -a ./hack/chinaos/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 }
 
@@ -192,7 +198,13 @@ copy_from_ubuntu(){
 centos_offline(){
     info "Remove default CentOS source"
     [ ! -d "/etc/yum.repos.d/backup" ] && mkdir -p /etc/yum.repos.d/backup
-    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
+    check_repo=$(ls /etc/yum.repos.d/*.repo 2>/dev/null | wc -l)
+    if [ "$check_repo" != 0 ];then
+        mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    else
+        #todo
+        echo ""
+    fi
 }
 
 other_type_linux(){
