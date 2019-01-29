@@ -221,11 +221,10 @@ other_type_linux(){
 }
 
 online_init_docker_version(){
-
     [ ! -z "$DOCKER_VERSION" ] && (
         info "docker version" "$DOCKER_VERSION"
         sed -i -r  "s/(^docker_version: ).*/\1$DOCKER_VERSION/" roles/rainvar/defaults/main.yml
-    ) || info "docker version" "17.06.2.ce"
+    ) || echo ""
 }
 
 online_init(){

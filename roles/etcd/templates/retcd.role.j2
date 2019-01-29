@@ -1,0 +1,21 @@
+version: '2.1'
+services:
+- name: retcd
+  endpoints:
+  - name: ETCD_ENDPOINTS
+    protocol: http
+    port: {{ etcd_port_c1 }}
+  health:
+    name: retcd
+    model: tcp
+    address: 127.0.0.1:{{ etcd_port_c1 }}
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm retcd
+  start: {{ rbd_dir }}/scripts/start-retcd.sh
+  stop: docker stop retcd
+  restart_policy: always
+  restart_sec: 10
