@@ -1,0 +1,19 @@
+[Unit]
+Description=Goodrain Rainbond node
+After=network.target
+
+[Service]
+Type=simple
+User=root
+LimitCORE=infinity
+LimitNOFILE=102400
+LimitNPROC=102400
+PermissionsStartOnly=true
+ExecStartPre=-/bin/bash -c 'docker rm retcd'
+ExecStart={{ rbd_dir }}/scripts/start-retcd.sh
+ExecStop=/bin/bash -c 'docker stop retcd'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
