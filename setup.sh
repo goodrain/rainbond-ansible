@@ -20,15 +20,15 @@ installer_dir="$(dirname "${0}")"
 [ ! -d "/opt/rainbond/.init" ] && mkdir -p /opt/rainbond/.init
 
 if [ -f "${installer_dir}/scripts/installer/functions.sh" ]; then
-	source "${installer_dir}/scripts/installer/functions.sh" || exit 1
+	source "${installer_dir}/scripts/installer/functions.sh" || notice "not found functions.sh"
 fi
 
 if [ -f "${installer_dir}/scripts/installer/default.sh" ]; then
-	source "${installer_dir}/scripts/installer/default.sh" || exit 1
+	source "${installer_dir}/scripts/installer/default.sh" || notice "not found default.sh"
 fi
 
 if [ -f "${installer_dir}/scripts/installer/global.sh" ]; then
-	source "${installer_dir}/scripts/installer/global.sh" || exit 1
+	source "${installer_dir}/scripts/installer/global.sh" || notice "not found global.sh"
 fi
 
 [ -z "$IIP" ] && IIP=$1
@@ -67,7 +67,7 @@ get_default_config(){
 }
 
 get_default_dns() {
-    dns=$(cat /etc/resolv.conf | grep "^nameserver" | head -1 | awk '{print $2}')
+    dns=$(cat /etc/resolv.conf | grep "^nameserver" | grep -v "$IIP" | head -1 | awk '{print $2}')
     [ -z "$dns" ] && dns="114.114.114.114"
     info "nameserver" "$dns"
     sed -i -r  "s/(^default_dns_local: ).*/\1$dns/" roles/rainvar/defaults/main.yml
