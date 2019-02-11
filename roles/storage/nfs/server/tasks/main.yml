@@ -8,10 +8,6 @@
 - name: Storage | run check storage
   shell: "bash /tmp/check_storage.sh"
 
-- name: Storage | check grdata
-  stat: path=/tmp/.grdata.init
-  register: check_grdata_server
-
 - name: Storage | check init 
   stat: path=/tmp/.grdata.init
   register: check_grdata_server
