@@ -392,7 +392,7 @@ prepare(){
     get_default_config
     [ ! -z "$EIP" ] && Generate_domain $EIP $VIP || Generate_domain $IIP $VIP
     hname=$(hostname -s)
-    if [ "$ROLE" == "master" ];then 
+    if [ "$ROLE" == "master" -o "$ROLE" == "manage" ];then 
         cp inventory/hosts.master inventory/hosts
     else
         cp inventory/hosts.all inventory/hosts
