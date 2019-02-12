@@ -1,17 +1,18 @@
-#!/bin/bash
-#======================================================================================================================
+#!/usr/bin/env bash
+
+# Copyright 2019 The Goodrain Authors.
 #
-#          FILE: setup.sh
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#   DESCRIPTION: Deploy Rainbond Cluster
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#          BUGS: https://github.com/goodrain/rainbond-ansible/issues
-#
-#     COPYRIGHT: (c) 2018 by the Goodrain Delivery Team.
-#
-#       LICENSE: Apache 2.0
-#       CREATED: 08/03/2018 11:38:02 AM
-#======================================================================================================================
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 [[ $DEBUG ]] && set -ex || set -e
 

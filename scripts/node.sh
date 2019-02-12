@@ -1,4 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Copyright 2019 The Goodrain Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 [[ $DEBUG ]] && set -ex
 
@@ -29,7 +43,14 @@ ssh_key_copy()
     "
 }
 
-if [ "$login_type" == "pass" ];then
+check_ip_reachable(){
+    ping -c2 $1 >/dev/null 2>&1 
+    echo $?
+}
+
+[ "$(check_ip_reachable $node_ip)" -ne 0 ] && echo "Destination Host ${node_ip} Unreachable..." && exit 1
+
+if [ "$login_type" == "pass" ]; then
     echo "configure ssh for secure login"
     ssh_key_copy $node_ip $login_key
 fi
@@ -49,7 +70,7 @@ check_exist(){
 new_node(){
     echo "add new node: ${node_ip} ---> ${node_uuid}"
     sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ip=$node_ip" inventory/hosts
-    if [ "$node_role" == "compute" ];then
+    if [ "$node_role" == "compute" ]; then
         sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
     else
         sed -i "/\[new-master\]/a$node_uuid" inventory/hosts  
@@ -73,14 +94,14 @@ deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
 
 [ "$(check_exist $node_uuid $node_ip)" -eq 0 ] && new_node || exist_node
 
-if [ "$node_role" == "compute" ];then
-    if [ "$deploy_type" == "thirdparty" ];then
+if [ "$node_role" == "compute" ]; then
+    if [ "$deploy_type" == "thirdparty" ]; then
         ansible-playbook -i inventory/hosts hack/thirdparty/addnode.yml --limit $node_uuid
     else
         ansible-playbook -i inventory/hosts addnode.yml --limit $node_uuid
     fi
 else
-    if [ "$deploy_type" == "thirdparty" ];then
+    if [ "$deploy_type" == "thirdparty" ]; then
         ansible-playbook -i inventory/hosts hack/thirdparty/addmaster.yml --limit $node_uuid
     else
         ansible-playbook -i inventory/hosts addmaster.yml --limit $node_uuid
