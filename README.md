@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/goodrain/rainbond-ansible.svg?branch=devel)](https://travis-ci.org/goodrain/rainbond-ansible)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgoodrain%2Frainbond-ansible.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgoodrain%2Frainbond-ansible?ref=badge_shield)
 
 # Ansible Playbook For Rainbond
 
@@ -36,3 +37,6 @@ chmod +x ./grctl
 
 Rainbond-Ansible is under the Apache 2.0 license.
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgoodrain%2Frainbond-ansible.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgoodrain%2Frainbond-ansible?ref=badge_large)
