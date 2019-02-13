@@ -38,8 +38,12 @@ fi
 
 get_default_config(){
     [ ! -f "/opt/rainbond/.init/uuid" ] && (
-        uuid=$(uuidgen)
-        [ ! -z "$uuid" ] && echo "$uuid" > /opt/rainbond/.init/uuid
+        if [ -f "/sys/class/dmi/id/product_uuid" ]; then
+            uuid=$(cat /sys/class/dmi/id/product_uuid | tr 'A-Z' 'a-z')
+        else
+            uuid=$(uuidgen)
+        fi
+        [ ! -z "$uuid" ] && echo "$uuid" > /opt/rainbond/.init/uuid || notice "uuid is null"
     )
     [ ! -f "/opt/rainbond/.init/secretkey" ] && (
         secretkey=$(pwgen 32 1)
