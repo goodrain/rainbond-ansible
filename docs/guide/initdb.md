@@ -7,7 +7,7 @@ systemctl stop rbd-db
 rm -rf /opt/rainbond/data/rbd-db
 
 systemctl restart rbd-db
-bash -x /tmp/updatedb.sh
+bash -x /tmp/install/updatedb.sh
 
 # 手动push镜像，确保
 

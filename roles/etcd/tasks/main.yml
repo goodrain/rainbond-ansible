@@ -3,7 +3,7 @@
   command: /usr/local/bin/check_img etcd
 
 - name: Etcd | check if image is pulled
-  stat: path="/tmp/check_etcd_img"
+  stat: path="/tmp/install/check_etcd_img"
   register: check_etcd_img
 
 - name: Etcd | pull etcd from goodrain.me
@@ -67,7 +67,7 @@
     mode: 0755
 
 - name: Etcd | Run add etcd cluster
-  shell: "bash {{ script_dir }}/add-cluster.sh > /tmp/etcd.cluster.log"
+  shell: "bash {{ script_dir }}/add-cluster.sh > /tmp/install/etcd.cluster.log"
   register: add_etcd_cluster_task_result
   until: add_etcd_cluster_task_result is succeeded
   retries: 3

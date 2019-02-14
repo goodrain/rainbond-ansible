@@ -19,6 +19,7 @@
 INSTALLER_DIR="$(dirname "${0}")"
 
 [ ! -d "/opt/rainbond/.init" ] && mkdir -p /opt/rainbond/.init
+[ ! -d "/tmp/install" ] && mkdir -p /tmp/install || rm -rf /tmp/install/*
 
 if [ -f "${INSTALLER_DIR}/scripts/installer/functions.sh" ]; then
 	source "${INSTALLER_DIR}/scripts/installer/functions.sh" || notice "not found functions.sh"
@@ -308,7 +309,7 @@ check_port(){
     local portlist=(53 80 443 3306)
     local check_fail_num=0
     for port in ${portlist[@]}; do
-        netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" >> /tmp/check_port_log && ((check_fail_num+=1)) || sleep 1
+        netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" >> /tmp/install/check_port_log && ((check_fail_num+=1)) || sleep 1
     done
     if [ "$check_fail_num" == 0 ]; then
 	    touch /opt/rainbond/.init/.port_check

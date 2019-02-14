@@ -2,44 +2,44 @@
 - name: Rainbond | Copy DB Script
   template:
     src: donedb.sh.j2
-    dest: /tmp/updatedb.sh
+    dest: /tmp/install/updatedb.sh
     mode: 0777
 
 - name: Rainbond | Copy Image Push Script
   template:
     src: pushimage.sh.j2
-    dest: /tmp/pushimage.sh
+    dest: /tmp/install/pushimage.sh
     mode: 0777
 
 - name: Rainbond | Copy check Insecure Registries
   template:
     src: check_registries.sh.j2
-    dest: /tmp/check_registries.sh
+    dest: /tmp/install/check_registries.sh
     mode: 0777
 
 - name: Rainbond | Copy init db script
   template:
     src: init.sql.j2
-    dest: /tmp/init.sql
+    dest: /tmp/install/init.sql
 
 - name: The next task may take some time to execute
   debug:
     msg: "The next task may take some time to execute: Waiting init db"
 
 - name: Rainbond | Run init db
-  shell: "bash /tmp/updatedb.sh init >> /tmp/init.log"
+  shell: "bash /tmp/install/updatedb.sh init >> /tmp/install/init.log"
   register: updatedb_task_result
   until: updatedb_task_result is succeeded
   retries: 5
 
 - name: Rainbond | Check init db
-  shell: "bash /tmp/updatedb.sh check >> /tmp/check.log"
+  shell: "bash /tmp/install/updatedb.sh check >> /tmp/install/check.log"
   register: checkdb_task_result
   until: checkdb_task_result is succeeded
   retries: 3
 
 - name: Rainbond | Check goodrain.me
-  shell: "bash /tmp/check_registries.sh"
+  shell: "bash /tmp/install/check_registries.sh"
 
 - name: Rainbond | Check check_ok
   stat: path=/opt/rainbond/.init/goodrain.me.ok
@@ -51,7 +51,7 @@
   when: check_goodrainme_done.stat.isreg is defined
 
 - name: Rainbond | Push local images to goodrain.me
-  shell: "bash /tmp/pushimage.sh"
+  shell: "bash /tmp/install/pushimage.sh"
   register: pushimage_task_result
   until: pushimage_task_result is succeeded
   retries: 5

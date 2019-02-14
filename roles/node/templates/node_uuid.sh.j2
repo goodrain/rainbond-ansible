@@ -2,15 +2,15 @@
 
 nodeip={{ nodeip }}
 
-[ ! -f "/tmp/node.uuid" ] && exit 0
+[ ! -f "/tmp/install/node.uuid" ] && exit 0
 
 [ -f "/opt/rainbond/etc/node/node_host_uuid.conf" ] && rm -rf /opt/rainbond/etc/node/node_host_uuid.conf
 
-cat /tmp/node.uuid | grep $nodeip
+cat /tmp/install/node.uuid | grep $nodeip
 
 [ "$?" -ne 0 ] && (
     echo "host_uuid=959eba4b-6bbe-4ad5-ba0f-ecfad17d378d" > /opt/rainbond/etc/node/node_host_uuid.conf
 ) || (
-    uuid=$(cat /tmp/node.uuid | grep $nodeip | awk -F: '{print $2}')
+    uuid=$(cat /tmp/install/node.uuid | grep $nodeip | awk -F: '{print $2}')
     [ ! -z "$uuid" ] && echo "host_uuid=$uuid" > /opt/rainbond/etc/node/node_host_uuid.conf
 )
