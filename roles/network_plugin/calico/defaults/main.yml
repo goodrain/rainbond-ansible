@@ -9,6 +9,6 @@ NODE_WITH_MULTIPLE_NETWORKS: "true"
 
 NODEIP: "{{hostvars[inventory_hostname]['ip']}}"
 ETCD_ENDPOINTS: |-
-  {% for item in groups['etcd'] -%}
-    http://{{hostvars[item]['ip']}}:{{ etcd_port_c1 }}{% if not loop.last %},{% endif %}
-  {%- endfor %}
+  {%- for item in groups['etcd'] -%}
+    http://{{hostvars[item]['ip']}}:{{ etcd_port_c1 }}{%- if not loop.last -%},{%- endif -%}
+  {%- endfor -%}

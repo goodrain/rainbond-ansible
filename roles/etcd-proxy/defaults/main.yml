@@ -2,9 +2,9 @@
 is_etcd_master: "{{ inventory_hostname in groups['etcd'] }}"
 
 etcd_member_name: |-
-  {% for host in groups['etcd'] %}
-  {%   if inventory_hostname == host %}{{"etcd"+loop.index|string }}{% endif %}
-  {% endfor %}
+  {%- for host in groups['etcd'] -%}
+  {%- if inventory_hostname == host -%}{{"etcd"+loop.index|string }}{%- endif -%}
+  {%- endfor -%}
 etcd_access_address: "{{ hostvars[inventory_hostname]['ip'] }}"
 
 etcd_peer_url: "http://{{ etcd_access_address }}:{{ etcd_port_s1 }}"
@@ -12,10 +12,10 @@ etcd_peer_url: "http://{{ etcd_access_address }}:{{ etcd_port_s1 }}"
 etcd_client_url: "http://{{ etcd_access_address }}:{{ etcd_port_c1 }},http://{{ etcd_access_address }}:{{ etcd_port_c2 }}"
 
 etcd_peer_addresses: |-
-  {% for item in groups['etcd'] -%}
-    {{ "etcd"+loop.index|string }}=http://{{ hostvars[item]['ip'] }}:{{ etcd_port_s1 }}{% if not loop.last %},{% endif %}
-  {%- endfor %}
+  {%- for item in groups['etcd'] -%}
+    {{ "etcd"+loop.index|string }}=http://{{ hostvars[item]['ip'] }}:{{ etcd_port_s1 }}{%- if not loop.last -%},{%- endif -%}
+  {%- endfor -%}
 etcd_access_addresses: |-
-  {% for item in groups['etcd'] -%}
-  http://{{ hostvars[item]['ip'] }}:{{ etcd_port_c1 }}{% if not loop.last %},{% endif %}
-  {%- endfor %}
+  {%- for item in groups['etcd'] -%}
+  http://{{ hostvars[item]['ip'] }}:{{ etcd_port_c1 }}{%- if not loop.last -%},{%- endif -%}
+  {%- endfor -%}

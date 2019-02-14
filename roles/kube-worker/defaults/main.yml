@@ -1,6 +1,6 @@
 ---
 worker_access_address: "{{hostvars[inventory_hostname]['ip']}}"
 etcd_endpoints: |-
-  {% for item in groups['etcd'] -%}
-    {{ "etcd"+loop.index|string }}=http://{{hostvars[item]['ip']}}:{{ etcd_port_c1 }}{% if not loop.last %},{% endif %}
-  {%- endfor %}
+  {%- for item in groups['etcd'] -%}
+    {{ "etcd"+loop.index|string }}=http://{{hostvars[item]['ip']}}:{{ etcd_port_c1 }}{%- if not loop.last -%},{%- endif -%}
+  {%- endfor -%}

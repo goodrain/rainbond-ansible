@@ -14,9 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-docker ps  | grep calico > /dev/null
-if [ "$?" -eq 0 ];then
-    exit 0
-else
-    exit 1
-fi
+func::service() {
+    if [ "$1" == "get" ];then
+        url=$2
+        cmd=$(echo $url | tr '/' ' ' | awk '{print $9" -t "$5}')
+        grctl service get ${cmd}
+    else
+        echo "not support"
+    fi
+}
+
+case $1 in
+    service)
+        func::service ${@:2}
+    ;;
+    *)
+        exit 0
+    ;;
+esac

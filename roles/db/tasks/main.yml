@@ -29,3 +29,8 @@
   template:
     src: charset.cnf.j2
     dest: "{{ rbd_dir }}/etc/rbd-db/conf.d/charset.cnf"
+
+- name: Add Reset Superadmin tools
+  template:
+    src: reset_superadmin.sh.j2
+    dest: "{{ rbd_dir }}/etc/tools/bin/reset_superadmin.sh"
