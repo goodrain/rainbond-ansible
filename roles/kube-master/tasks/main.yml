@@ -3,7 +3,7 @@
   command: /usr/local/bin/check_img k8s
 
 - name: K8S | check if image is pulled
-  stat: path="/tmp/check_k8s_img"
+  stat: path="/tmp/install/check_k8s_img"
   register: check_k8s_img
 
 - name: K8S | pull kubernetes apiserver from goodrain.me

@@ -15,34 +15,34 @@
 # limitations under the License.
 
 check_k8s(){
-    [ -f "/tmp/check_k8s_img" ] && rm /tmp/check_k8s_img
+    [ -f "/tmp/install/check_k8s_img" ] && rm /tmp/install/check_k8s_img
     num=$(docker images | grep "kube-apiserver" | grep "goodrain.me" | wc -l)
     if [ "$num" == 1 ];then
-        echo "ok" > /tmp/check_k8s_img
+        echo "ok" > /tmp/install/check_k8s_img
     fi
 }
 
 check_etcd(){
-    [ -f "/tmp/check_etcd_img" ] && rm /tmp/check_etcd_img
+    [ -f "/tmp/install/check_etcd_img" ] && rm /tmp/install/check_etcd_img
     num=$(docker images | grep "etcd" | grep "goodrain.me" | wc -l)
     if [ "$num" == 1 ];then
-        echo "ok" > /tmp/check_etcd_img
+        echo "ok" > /tmp/install/check_etcd_img
     fi
 }
 
 check_db(){
-    [ -f "/tmp/check_db_img" ] && rm /tmp/check_db_img
+    [ -f "/tmp/install/check_db_img" ] && rm /tmp/install/check_db_img
     num=$(docker images | grep "rbd-db" | grep "goodrain.me" | wc -l)
     if [ "$num" == 1 ];then
-        echo "ok" > /tmp/check_db_img
+        echo "ok" > /tmp/install/check_db_img
     fi
 }
 
 check_calico(){
-    [ -f "/tmp/check_calico_img" ] && rm /tmp/check_calico_img
+    [ -f "/tmp/install/check_calico_img" ] && rm /tmp/install/check_calico_img
     num=$(docker images | grep "calico" | grep "goodrain.me" | wc -l)
     if [ "$num" == 1 ];then
-        echo "ok" > /tmp/check_calico_img
+        echo "ok" > /tmp/install/check_calico_img
     fi
 }
 

@@ -2,11 +2,11 @@
 - name: Storage | copy check storage
   template:
     src: check_storage.sh.j2
-    dest: /tmp/check_storage.sh
+    dest: /tmp/install/check_storage.sh
     mode: 0777
 
 - name: Storage | run check storage
-  shell: "bash /tmp/check_storage.sh"
+  shell: "bash /tmp/install/check_storage.sh"
 
 - name: Storage | check init 
   stat: path=/tmp/.grdata.init
@@ -40,10 +40,10 @@
 - name: Health | Copy health storage check
   template:
     src: check.sh.j2
-    dest: /tmp/check_storage.sh
+    dest: /tmp/install/check_storage.sh
     owner: root
     group: root
     mode: 0777
 
 - name: Health | Run health storage check
-  shell: "bash /tmp/check_storage.sh"
+  shell: "bash /tmp/install/check_storage.sh"

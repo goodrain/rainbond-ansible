@@ -28,16 +28,16 @@
 - name: Rainbond | Copy node uuid
   copy:
     src: /opt/rainbond/.init/node.uuid
-    dest: /tmp/node.uuid
+    dest: /tmp/install/node.uuid
 
 - name: Rainbond | Prepare check node uuid
   template:
     src: node_uuid.sh.j2
-    dest: /tmp/node_uuid.sh
+    dest: /tmp/install/node_uuid.sh
     mode: 0777
 
 - name: Rainbond | Write node uuid
-  shell: "bash /tmp/node_uuid.sh > /tmp/write_node.log"
+  shell: "bash /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
 
 - name: Rainbond | Copy Master Node Rainbond Role 
   template:

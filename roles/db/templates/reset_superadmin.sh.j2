@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash#!/usr/bin/env bash
 
 # Copyright 2019 The Goodrain Authors.
 #
@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-docker ps  | grep calico > /dev/null
-if [ "$?" -eq 0 ];then
-    exit 0
-else
-    exit 1
-fi
+PASSWORD=${1:-12345678}
+
+docker run -it --rm  --network host -e MYSQL_HOST={{ MASTER_IP }} -e MYSQL_PORT=3306 -e MYSQL_USER={{ db_user }} -e MYSQL_PASS={{ db_pass }} -e MYSQL_DB=console -e PASSWORD=${PASSWORD} rainbond/tools:reset_password

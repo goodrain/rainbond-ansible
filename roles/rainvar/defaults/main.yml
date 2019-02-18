@@ -1,4 +1,4 @@
-rainbond_version: 5.0
+r6d_version: 5.0
 kubernetes_version: v1.10.11
 docker_version: 17.06.2.ce
 docker_selinux_version: '17.03'
@@ -22,7 +22,7 @@ env_dir: "{{ rbd_dir }}/envs"
 script_dir: "{{ rbd_dir }}/scripts"
 region_ca_dir: "{{ rbd_dir }}/etc/rbd-api/region.goodrain.me/ssl"
 secretkey: aek0yi7ro5AJaeg5ooRoMie2owu4raeT
-rbd_db_image: rbd-db:{{ rainbond_version }}
+rbd_db_image: rbd-db:{{ r6d_version }}
 db_user: write
 db_pass: 1833efe4
 
@@ -58,22 +58,22 @@ hub: rbd-registry:2.6.2
 kubecfg: kubecfg:dev
 cfssl: cfssl:dev
 
-builder: builder:{{ rainbond_version }}
-runner: runner:{{ rainbond_version }}
-adapter: adapter:{{ rainbond_version }}
+builder: builder:{{ r6d_version }}
+runner: runner:{{ r6d_version }}
+adapter: adapter:{{ r6d_version }}
 repo: rbd-repo:6.5.9
-api: rbd-api:{{ rainbond_version }}
-worker: rbd-worker:{{ rainbond_version }}
-eventlog: rbd-eventlog:{{ rainbond_version }}
-gateway: rbd-gateway:{{ rainbond_version }}
-chaos: rbd-chaos:{{ rainbond_version }}
-mq: rbd-mq:{{ rainbond_version }}
-webcli: rbd-webcli:{{ rainbond_version }}
-rbd_app_ui: rbd-app-ui:{{ rainbond_version }}
-k8s_cni: cni:k8s_{{ rainbond_version }}
-rbd_cni: cni:rbd_{{ rainbond_version }}
-dns: rbd-dns:{{ rainbond_version }}
-monitor: rbd-monitor:{{ rainbond_version }}
+api: rbd-api:{{ r6d_version }}
+worker: rbd-worker:{{ r6d_version }}
+eventlog: rbd-eventlog:{{ r6d_version }}
+gateway: rbd-gateway:{{ r6d_version }}
+chaos: rbd-chaos:{{ r6d_version }}
+mq: rbd-mq:{{ r6d_version }}
+webcli: rbd-webcli:{{ r6d_version }}
+rbd_app_ui: rbd-app-ui:{{ r6d_version }}
+k8s_cni: cni:k8s_{{ r6d_version }}
+rbd_cni: cni:rbd_{{ r6d_version }}
+dns: rbd-dns:{{ r6d_version }}
+monitor: rbd-monitor:{{ r6d_version }}
 
 CLUSTER_NETWORK: calico
 service_cidr: 11.1.0.1/12
@@ -97,9 +97,9 @@ etcd_port_s1: 2380
 autoreg_node: disable
 
 # base.image.tgz.url
-
 base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2019-01-25-5.0.3.tgz"
 
 # rainbond.image.tgz.url
-
 rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-01-25-5.0.3.tgz"
+
+install_logs_dir: "/tmp/install"

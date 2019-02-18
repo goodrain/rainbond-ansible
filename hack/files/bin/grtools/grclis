@@ -21,19 +21,24 @@ all=(node rbd-chaos rbd-worker rbd-api rbd-eventlog rbd-db rbd-repo calico kube-
 upgrade(){
     if [ "$1" == "all" ];then
         echo "will upgrade all image"
-        for img in ${rainbond[@]}
-        do
+        for img in ${rainbond[@]}; do
             docker pull rainbond/${img}:${version}
             docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
             docker push goodrain.me/${img}:${version}
             systemctl restart ${img}
             [ "$?" -eq 0 ] && echo "restart ${img} ok."
         done
+    elif [ "$1" == "node" ]; then
+            docker pull rainbond/cni:rbd_${version}
+            docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
+            systemctl stop node
+            cp -a /opt/rainbond/etc/tools/bin/node /usr/local/bin/node
+            systemctl start node
+            [ "$?" -eq 0 ] && echo "restart node ok."
     else
         echo "will upgrade $1 image"
-        for img in ${rainbond[@]}
-        do
-            if [ "$1" == "$img" ];then
+        for img in ${rainbond[@]}; do
+            if [ "$1" == "$img" ]; then
                 docker pull rainbond/${img}:${version}
                 docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
                 docker push goodrain.me/${img}:${version}

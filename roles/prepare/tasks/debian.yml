@@ -1,3 +1,42 @@
+---
+- name: Check http::proxy in /etc/apt/apt.conf
+  raw: grep -qsi 'Acquire::http::proxy' /etc/apt/apt.conf
+  register: need_http_proxy
+  failed_when: false
+  changed_when: false
+  # This command should always run, even in check mode
+  check_mode: false
+  environment: {}
+  when:
+    - http_proxy is defined
+
+- name: Add http_proxy to /etc/apt/apt.conf if http_proxy is defined
+  raw: echo 'Acquire::http::proxy "{{ http_proxy }}";' >> /etc/apt/apt.conf
+  become: true
+  environment: {}
+  when:
+    - http_proxy is defined
+    - need_http_proxy.rc != 0
+
+- name: Check https::proxy in /etc/apt/apt.conf
+  raw: grep -qsi 'Acquire::https::proxy' /etc/apt/apt.conf
+  register: need_https_proxy
+  failed_when: false
+  changed_when: false
+  # This command should always run, even in check mode
+  check_mode: false
+  environment: {}
+  when:
+    - https_proxy is defined
+
+- name: Add https_proxy to /etc/apt/apt.conf if https_proxy is defined
+  raw: echo 'Acquire::https::proxy "{{ https_proxy }}";' >> /etc/apt/apt.conf
+  become: true
+  environment: {}
+  when:
+    - https_proxy is defined
+    - need_https_proxy.rc != 0
+
 - name: PKG | rm ubuntu package
   apt: 
     name: 

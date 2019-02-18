@@ -3,7 +3,7 @@
   command: /usr/local/bin/check_img db
 
 - name: DB | check if image is pulled
-  stat: path="/tmp/check_db_img"
+  stat: path="/tmp/install/check_db_img"
   register: check_db_img
 
 - name: DB | pull db from goodrain.me
@@ -29,3 +29,8 @@
   template:
     src: charset.cnf.j2
     dest: "{{ rbd_dir }}/etc/rbd-db/conf.d/charset.cnf"
+
+- name: Add Reset Superadmin tools
+  template:
+    src: reset_superadmin.sh.j2
+    dest: "{{ rbd_dir }}/etc/tools/bin/reset_superadmin.sh"
