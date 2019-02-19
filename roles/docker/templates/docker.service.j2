@@ -18,7 +18,7 @@ Type=notify
 Environment="DOCKER_STORAGE_OPTIONS={{ docker_storage_options }}"
 {% endif %}
 Environment=GOTRACEBACK=crash
-EnvironmentFile=-{{  rbd_dir }}/envs/docker.sh
+#EnvironmentFile=-{{  rbd_dir }}/envs/docker.sh
 ExecReload=/bin/kill -s HUP $MAINPID
 Delegate=yes
 KillMode=process
