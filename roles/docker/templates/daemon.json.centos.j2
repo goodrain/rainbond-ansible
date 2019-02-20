@@ -1,6 +1,10 @@
 {
   "insecure-registries": ["{{INSECURE_REG}}"],
   "max-concurrent-downloads": 10,
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ],
   "bip": "{{ BIP }}",
   "hosts": ["{{DOCKER_HOST_TCP}}","{{DOCKER_HOST_SOCK}}"],
   "userland-proxy": false,

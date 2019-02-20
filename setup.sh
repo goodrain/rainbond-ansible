@@ -239,12 +239,12 @@ online_init(){
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
-            apt-get install -y sshpass python-pip uuid-runtime pwgen expect curl
+            apt-get install -y sshpass python-pip uuid-runtime pwgen expect curl netstat
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
-            yum install -y sshpass python-pip uuidgen pwgen expect curl
+            yum install -y sshpass python-pip uuidgen pwgen expect curl netstat
             pip install -U setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		*)
@@ -262,7 +262,7 @@ offline_init(){
 		ubuntu|debian)
             # local todo
             # apt-get update
-            # apt-get install sshpass python-pip uuid-runtime pwgen -y
+            # apt-get install sshpass python-pip uuid-runtime pwgen netstat -y
             # pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
             cat > /etc/apt/sources.list.d/local_rainbond.list <<EOF
 deb file:/grdata/services/offline/pkgs/debian/9/ rainbond 5.0
@@ -272,7 +272,7 @@ EOF
 		centos|neokylin)
             #yum install -y epel-release
             #yum makecache fast
-            #yum install -y sshpass python-pip uuidgen pwgen
+            #yum install -y sshpass python-pip uuidgen pwgen netstat
             #pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
             centos_offline
             cat > /etc/yum.repos.d/rainbond.repo << EOF
@@ -284,7 +284,7 @@ enabled=1
 EOF
             touch /opt/rainbond/.init/.offline
             yum makecache
-            yum install -y sshpass python-pip uuidgen pwgen ansible
+            yum install -y sshpass python-pip uuidgen pwgen ansible netstat
 		;;
 		*)
             notice "Not Support $lsb_dist"
@@ -331,7 +331,6 @@ check_disk(){
             info "!!! Skip disk check.The disk is recommended to be at least 40GB(now ${disk}GB)"
         fi
     fi
-
 }
 
 precheck(){
@@ -380,15 +379,15 @@ thirdparty(){
 }
 
 prepare(){
-    precheck
     progress "Prepare Init..."
+    get_default_install_type
     info "internal ip" $IIP
     [ ! -z "$EIP" ] && info "external ip" $EIP
     [ ! -z "$VIP" ] && info "virtual ip" $VIP
+    precheck
     other_type_linux
     get_default_dns
     [ "$DEPLOY_TYPE" != "thirdparty" ] && get_default_netwrok_type
-    get_default_install_type
     info "Deploy Type" $DEPLOY_TYPE
     get_default_config
     [ ! -z "$EIP" ] && Generate_domain $EIP $VIP || Generate_domain $IIP $VIP
