@@ -22,5 +22,4 @@
 
 - import_tasks: setup-pipelining.yml
 
-# General configuration
 - import_tasks: common.yml 

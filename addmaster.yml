@@ -2,6 +2,7 @@
 - hosts: new-master
   roles:
     - { role: rainvar, tags: default }
+    - { role: bootstrap, tags: bootstrap }
     - { role: prepare, tags: prepare }
     - { role: docker, tags: docker }
     - { role: kube-master, tags: kube-master }

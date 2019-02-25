@@ -1,23 +1,24 @@
 ---
-- name: Offline | Creates init directory
+- name: Configure the initialization data directory
   file: path=/opt/rainbond/.init state=directory
 
-- name: Offline | Creates backup directory
+- name: Create the yum source backup folder
   file: path=/etc/yum.repos.d/backup state=directory
+  when: ansible_distribution == "CentOS"
 
-- name: Offline | Check offline repo
+- name: Determines whether the installation type is offline
   stat: path=/opt/rainbond/.init/.offline
   register: offline_repo
 
-- name: Offline | Clean old Repository
+- name: Delete default CentOS source
   shell: mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup && touch /opt/rainbond/.init/.offline
   when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
 
-- name:  Offline | Add CentOS Repository
+- name:  Add Offline CentOS Repository
   template: src=rainbond.repo.j2 dest=/etc/yum.repos.d/rainbond.repo
   when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
 
-- name: Offline | yum-clean-metadata
+- name: Clear default cache
   command: yum clean all
   args:
     warn: no

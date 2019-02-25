@@ -2,6 +2,7 @@
 - hosts: all
   roles:
     - { role: rainvar, tags: default }
+    - { role: bootstrap, tags: bootstrap }
     - { role: prepare, tags: prepare }
 
 - hosts: deploy:master:worker:lb

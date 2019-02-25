@@ -240,12 +240,12 @@ online_init(){
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
-            apt-get install -y sshpass python-pip uuid-runtime pwgen expect curl netstat
+            apt-get install -y sshpass python-pip uuid-runtime pwgen expect curl net-tools
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
-            yum install -y sshpass python-pip uuidgen pwgen expect curl netstat
+            yum install -y sshpass python-pip uuidgen pwgen expect curl net-tools
             pip install -U setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		*)

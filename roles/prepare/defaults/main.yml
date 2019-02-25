@@ -1,0 +1,10 @@
+---
+
+# CPU
+r6d_min_cpu: 2
+
+# Mem
+r6d_min_ram: 4096
+
+# Disk
+r6d_min_disk: 40000000000
