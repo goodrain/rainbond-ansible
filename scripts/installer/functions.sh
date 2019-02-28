@@ -29,6 +29,8 @@ check_cmd() {
 	return 1
 }
 
+# -----------------------------------------------------------------------------
+
 setup_terminal() {
 	TPUT_RESET=""
 	TPUT_BLACK=""
@@ -92,11 +94,22 @@ setup_terminal() {
 
 	return 0
 }
-
 setup_terminal || echo >/dev/null
 
 progress() {
 	echo >&2 " --- ${TPUT_DIM}${TPUT_BOLD}${*}${TPUT_RESET} --- "
+}
+
+ESCAPED_PRINT_METHOD=
+printf "%q " test >/dev/null 2>&1
+[ $? -eq 0 ] && ESCAPED_PRINT_METHOD="printfq"
+escaped_print() {
+	if [ "${ESCAPED_PRINT_METHOD}" = "printfq" ]; then
+		printf "%q " "${@}"
+	else
+		printf "%s" "${*}"
+	fi
+	return 0
 }
 
 info() {

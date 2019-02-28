@@ -2,9 +2,6 @@ version: '2.1'
 services:
 - name: docker
   endpoints:
-  - name: DOCKER_ENDPOINTS
-    protocol: http
-    port: 2376
   health:
     name: docker
     model: cmd
