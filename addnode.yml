@@ -2,6 +2,7 @@
 - hosts: new-worker
   roles:
     - { role: rainvar, tags: default }
+    - { role: bootstrap, tags: bootstrap }
     - { role: prepare, tags: prepare }
     - { role: docker, tags: docker }
     - { role: kube-worker, tags: kube-worker }

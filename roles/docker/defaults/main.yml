@@ -36,3 +36,9 @@ STORAGE_DIR: "/var/lib/docker"
 INSECURE_REG: "goodrain.me"
 
 docker_min_version: 1.12.6 
+
+BIP: "172.30.42.1/16"
+
+DOCKER_HOST_TCP: "127.0.0.1:2376"
+
+DOCKER_HOST_SOCK: "unix:///var/run/docker.sock"

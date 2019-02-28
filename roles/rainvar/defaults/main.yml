@@ -1,6 +1,6 @@
 r6d_version: 5.0
 kubernetes_version: v1.10.11
-docker_version: 17.06.2.ce
+docker_version: 18.06
 docker_selinux_version: '17.03'
 docker_log_opts: "--log-opt max-size=50m --log-opt max-file=5"
 docker_kernel_min_version: '3.10'
