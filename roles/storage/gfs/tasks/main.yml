@@ -1,0 +1,37 @@
+---
+- name: Storage | copy check storage
+  template:
+    src: check_storage.sh.j2
+    dest: /tmp/install/check_storage.sh
+    mode: 0777
+
+- name: Storage | run check storage
+  shell: "bash /tmp/install/check_storage.sh"
+
+- name: Storage | check grdata
+  stat: path=/tmp/.grdata.init
+  register: check_grdata
+
+- name: install gfs repo centos
+  action: yum pkg=centos-release-gluster state=present
+  when: ansible_os_family == 'RedHat' and install_type == "online"
+
+- name: install nfs client centos
+  action: yum pkg=glusterfs-fuse state=present
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure /grdata directory exists
+  action: file path=/grdata state=directory
+
+- name: write /etc/fstab
+  blockinfile:
+    dest: /etc/fstab
+    block: |-
+        {{ storage_cmd }}
+    state: present
+    create: yes
+    backup: yes
+  when: check_grdata.stat.isreg is not defined
+
+- name: mount /grdata
+  shell: mount -a

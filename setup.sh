@@ -97,14 +97,14 @@ init::online(){
             run yum install -y -q epel-release 
             run yum makecache fast -q
             run yum install -y -q sshpass python-pip uuidgen pwgen expect curl net-tools
-            run pip install -U setuptools -q
+            run pip install -U setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		*)
            notice "Not Support $lsb_dist"
 		;;
     esac
     export LC_ALL=C
-    run pip install ansible -q
+    run pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
 }
 
 # Support for CentOS offline deployment
@@ -345,6 +345,23 @@ config::docker(){
     info "docker version" "${DOCKER_VERSION:-18.06}"
 }
 
+# Config storage
+config::storage(){
+    if [ "$STORAGE" == "gfs" ];then
+        sed -i -r  "s/(^storage_type: ).*/\1$STORAGE/" roles/rainvar/defaults/main.yml
+        sed -i -r  "s#(^storage_cmd: ).*#\1\"$STORAGE_ARGS\"#" roles/rainvar/defaults/main.yml
+    elif [ "$STORAGE" == "nas" ];then
+        sed -i -r  "s/(^storage_type: ).*/\1$STORAGE/" roles/rainvar/defaults/main.yml
+        sed -i -r  "s#(^storage_cmd: ).*#\1\"$STORAGE_ARGS\"#" roles/rainvar/defaults/main.yml
+    else
+        # Todo
+        #sed -i -r  "s/(^storage_type: ).*/\1nfs/" roles/rainvar/defaults/main.yml
+        echo ""
+    fi
+    info "storage type" "$STORAGE"
+    info "storage args" "$STORAGE_ARGS"
+}
+
 # Config install_type & deploy_type
 config::install_deploy(){
     sed -i -r  "s/(^install_type: ).*/\1$INSTALL_TYPE/" roles/rainvar/defaults/main.yml
@@ -355,8 +372,8 @@ config::install_deploy(){
 prepare::general(){
     progress "Preparation before installation..."
     detect_linux_distribution
-    info "Install Type" "$INSTALL_TYPE"
-    info "Deploy Type" "$DEPLOY_TYPE"
+    info "Installation type" "$INSTALL_TYPE"
+    info "Deployment type" "$DEPLOY_TYPE"
     if [ "$INSTALL_TYPE" == "online" ]; then
         init::online
     else
@@ -373,6 +390,7 @@ prepare::general(){
     config::dns
     config::docker
     config::install_deploy
+    config::storage
     [ ! -z "$EIP" ] && config::domain $EIP $VIP || config::domain $IIP $VIP
     if [ "$ROLE" == "master" -o "$ROLE" == "manage" ]; then 
         cp inventory/hosts.master inventory/hosts

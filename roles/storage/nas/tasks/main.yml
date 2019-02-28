@@ -1,0 +1,45 @@
+---
+- name: Storage | copy check storage
+  template:
+    src: check_storage.sh.j2
+    dest: /tmp/install/check_storage.sh
+    mode: 0777
+
+- name: Storage | run check storage
+  shell: "bash /tmp/install/check_storage.sh"
+
+- name: Storage | check grdata
+  stat: path=/tmp/.grdata.init
+  register: check_grdata
+
+- name: install nfs client debian
+  action: apt pkg=nfs-common state=present
+  when: ansible_os_family == 'Debian'
+
+- name: install nfs client centos
+  action: yum pkg=nfs-utils state=present
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure rpcbind is running (CentOS)
+  action: service name=rpcbind state=started enabled=yes
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure rpcbind is running (Debian)
+  action: service name=rpcbind state=started enabled=yes
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure /grdata directory exists
+  action: file path=/grdata state=directory
+
+- name: write /etc/fstab
+  blockinfile:
+    dest: /etc/fstab
+    block: |-
+        {{ storage_cmd }}
+    state: present
+    create: yes
+    backup: yes
+  when: check_grdata.stat.isreg is not defined
+
+- name: mount /grdata
+  shell: mount -a

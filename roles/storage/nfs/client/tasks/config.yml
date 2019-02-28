@@ -1,6 +1,6 @@
 ---
 - name: check nfs server
-  stat: path="/grdata/kubernetes/kube-proxy.kubeconfig"
+  stat: path="/grdata/services/storage/health.check"
   register: check_server
 
 - shell: if [ -z "$nfsoptions" ]; then  echo rw; else echo $nfsoptions; fi
