@@ -3,8 +3,10 @@
   roles:
     - { role: rainvar, tags: default }
     - { role: prepare, tags: health-thirdparty }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: storage/nas, when: "storage_type == 'nas'" }
+    - { role: storage/gfs, when: "storage_type == 'gfs'" }
     - { role: etcd, tags: etcd }
     - { role: lb, tags: lb }
     - { role: health, tags: health }
-    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
     - { role: node, tags: node }

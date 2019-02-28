@@ -5,6 +5,18 @@
     - { role: prepare, tags: prepare-thirdparty }
     - { role: thirdparty, tags: thirdparty}
 
+- hosts: storage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
+
+- hosts: master:worker:lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: storage/nas, when: "storage_type == 'nas'" }
+    - { role: storage/gfs, when: "storage_type == 'gfs'" }
+
 - hosts: deploy
   roles:
     - { role: rainvar, tags: default }
@@ -29,16 +41,6 @@
   roles:
     - { role: rainvar, tags: default }
     - { role: db, tags: db }
-
-- hosts: storage
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
-
-- hosts: master:worker:lb
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
 
 - hosts: lb
   roles:
