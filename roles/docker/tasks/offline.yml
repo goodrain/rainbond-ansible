@@ -1,5 +1,5 @@
 ---
-- name: Offline | Copy Docker Install Script
+- name: Copy Docker Offline Install Script
   template:
     src: get_docker.sh.j2
     dest: /tmp/install_docker.sh
@@ -11,10 +11,7 @@
   until: docker_task_result is succeeded
   retries: 4
 
-#- name: show docker info
-#  debug: var=docker_task_result
-
-- name: Docker | Start docker
+- name: Start docker if succeeded
   service:
     name: docker
     enabled: yes
