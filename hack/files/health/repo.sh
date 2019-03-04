@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-check_type="{{ pillar['install-type'] }}"
+check_type="{{ install-type }}"
 
 #Logfile=/tmp/.repo.$(date +%Y%m%d)
 #Oldlogfile=/tmp/.repo.$(date +%Y%m%d --date='1 days ago')

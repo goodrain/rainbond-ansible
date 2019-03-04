@@ -8,20 +8,17 @@
   template:
     src: http-proxy.conf.j2
     dest: /etc/systemd/system/docker.service.d/http-proxy.conf
-#  notify: restart docker
   when: http_proxy is defined or https_proxy is defined
 
 - name: Write docker EnvironmentFile 
   template:
     src: docker.sh.j2
     dest: "{{ rbd_dir }}/envs/docker.sh"
-#  notify: restart docker
-#  when: docker_check.stat.isreg is not defined
 
 - name: Check docker dir
   file: path=/etc/docker state=directory mode=0755
 
-- name: Docker | Check if daemon is existing
+- name: Check if daemon is existing
   stat: path=/etc/docker/daemon.json
   register: docker_daemon_check
 
@@ -45,19 +42,12 @@
 #  notify: restart docker
 #  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"]) and docker_check.stat.isreg is not defined
 
-- name: Write docker options systemd drop-in
-  template:
-    src: docker-options.conf.j2
-    dest: "/etc/systemd/system/docker.service.d/docker-options.conf"
-  notify: restart docker
-  when: docker_check.stat.isreg is not defined
-
-#- name: Write docker dns systemd drop-in
+#- name: Write docker options systemd drop-in
 #  template:
-#    src: docker-dns.conf.j2
-#    dest: "/etc/systemd/system/docker.service.d/docker-dns.conf"
+#    src: docker-options.conf.j2
+#    dest: "/etc/systemd/system/docker.service.d/docker-options.conf"
 #  notify: restart docker
-#  when: dns_mode != 'none' and resolvconf_mode == 'docker_dns'
+#  when: docker_check.stat.isreg is not defined
 
 - name: Copy docker orphan clean up script to the node
   copy:
@@ -72,5 +62,3 @@
     dest: "/etc/systemd/system/docker.service.d/docker-orphan-cleanup.conf"
   notify: restart docker
   when: docker_orphan_clean_up | bool
-
-- meta: flush_handlers

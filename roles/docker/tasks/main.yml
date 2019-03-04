@@ -1,40 +1,47 @@
 ---
-- name: Docker | Check if docker is installed
+- name: Set Docker
+  import_tasks: prepare.yml
+
+- name: Check if docker is installed
   stat: path="/usr/bin/docker"
   register: docker_check
 
-#- name: show docker_check
-#  debug: var=docker_check
-
-- name: Docker | Check Version if docker is installed
+- name: Check Version if docker is installed
   command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
   register: get_docker_version
+  ignore_errors: true
   when: docker_check.stat.isreg is defined
 
-#- name: show installed_docker_version debug info
-#  debug: var=get_docker_version
+- name: minimum docker version if docker is installed
+  fail:
+    msg: >
+          docker requires a minimum version of
+          {{ docker_min_version }} on
+          {{ ansible_distribution }}-{{ ansible_distribution_version }}
+  when: docker_check.stat.isreg is defined and get_docker_version.stdout is version(docker_min_version, "<")
 
-- name: Docker | import docker check version
-  import_tasks: check_docker_version.yml
-  when: docker_check.stat.isreg is defined
-
-- import_tasks: online.yml
+- name: Online install Docker if docker is not installed
+  import_tasks: online.yml
   when: install_type == "online" and docker_check.stat.isreg is not defined
 
-- import_tasks: offline.yml
+- name: Offline install Docker if docker is not installed
+  import_tasks: offline.yml
   when: install_type == "offline" and docker_check.stat.isreg is not defined
 
-- name: Docker | Get Docker Version
+- name: Get Docker Version
   command: "docker version -f '{{ '{{' }}.Client.Version{{ '}}' }}'"
   register: installed_docker_version
+  when: docker_check.stat.isreg is not defined
 
-- name: Docker | Set docker systemd config
-  import_tasks: systemd.yml
-  
-- name: Docker | ensure docker service is started and enabled
+- name: Ensure docker service is started and enabled
   service:
-    name: "{{ item }}"
+    name: docker
     enabled: yes
-    state: restarted
-  with_items:
-    - docker
+    state: started
+
+- name: Wait for docker
+  command: "{{ docker_bin_dir }}/docker images"
+  register: docker_ready
+  retries: 10
+  delay: 5
+  until: docker_ready.rc == 0

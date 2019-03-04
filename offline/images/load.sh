@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -x
+set -xe
 
 pushd /grdata/services/offline/images
 ls | grep tgz | xargs -I {} docker load -i ./{}
+[ "$?" -eq 0 ] && touch /grdata/services/offline/images/push.local.image
 popd

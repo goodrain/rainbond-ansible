@@ -34,6 +34,12 @@
     dest: "{{ rbd_dir }}/health/storage.sh"
     mode: 0777
 
+- name: Health | Add NFS Health Check
+  template:
+    src: "{{ base_dir }}/hack/files/health/check_nfs.sh"
+    dest: "{{ rbd_dir }}/health/check_nfs.sh"
+    mode: 0777
+
 - name: Rainbond | check cni bin
   stat: path="{{ rbd_dir }}/bin/calico"
   register: re_cni_is_done
@@ -92,6 +98,12 @@
 
 - name: Health | Add Health Only Health Role
   template:
+    src: only_health.nfs.role.j2
+    dest: "{{ node_role_dir }}/only_health.yaml"
+  when: storage_type == "nfs"
+
+- name: Health | Add Health Only Health Role
+  template:
     src: only_health.role.j2
     dest: "{{ node_role_dir }}/only_health.yaml"
-#  when: docker_install_by_rainbond.stat.isreg is defined
+  when: storage_type != "nfs"

@@ -47,7 +47,7 @@ check_ip_reachable(){
     ping -c2 $1 >/dev/null 2>&1 
     echo $?
 }
-
+echo "check ip if reachable"
 [ "$(check_ip_reachable $node_ip)" -ne 0 ] && echo "Destination Host ${node_ip} Unreachable..." && exit 1
 
 if [ "$login_type" == "pass" ]; then
@@ -88,11 +88,19 @@ exist_node(){
     sed -i "s#${old_node_uuid}#${node_uuid}#g" /opt/rainbond/.init/node.uuid
 }
 
+check_ssh(){
+    ansible -i /opt/rainbond/rainbond-ansible/inventory/hosts $1  -a 'uptime' | grep rc=0 >/dev/null
+    echo $?
+}
+
 cd /opt/rainbond/rainbond-ansible
 
 deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep "deploy" | awk '{print $2}')
 
 [ "$(check_exist $node_uuid $node_ip)" -eq 0 ] && new_node || exist_node
+
+echo "check ip if ssh"
+[ "$(check_ssh $node_uuid)" -ne 0 ] && echo "Make sure you can SSH in ${node_ip}" && exit 1
 
 if [ "$node_role" == "compute" ]; then
     if [ "$deploy_type" == "thirdparty" ]; then
