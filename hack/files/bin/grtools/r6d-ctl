@@ -24,9 +24,24 @@ func::service() {
     fi
 }
 
+func::app() {
+    if [ "$1" == "info" ];then
+        [ -z "$3" ] && echo "need namespaces and pods name"  && exit 1
+        an=$(kubectl describe pods/$3 -n $2 | grep "name=gr" | awk -F= '{print $2}')
+        tn=$(grctl tenant list | grep $2  | awk '{print $2}')
+        echo "$tn/$an"
+        grctl service get $an -t $tn
+    else
+        echo "not support"
+    fi
+}
+
 case $1 in
     service)
         func::service ${@:2}
+    ;;
+    app)
+        func::app ${@:2}
     ;;
     *)
         exit 0
