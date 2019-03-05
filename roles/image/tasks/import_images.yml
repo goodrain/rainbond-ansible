@@ -28,7 +28,7 @@
   when: check_rainbond_image_tgz_unarchive.stat.isreg is not defined
 
 - name: Check Push image if Pushed
-  stat: path=/grdata/services/offline/images/push.local.image
+  stat: path=/tmp/install/push.local.image
   register: check_push_image
 
 - name: The next task may take some time to execute

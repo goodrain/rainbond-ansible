@@ -26,7 +26,6 @@
   command: swapoff -a
   when: ansible_swaptotal_mb > 0
 
-
 # modify irqbalance configuration file
 - name: check centos configuration file exists
   stat: path=/etc/sysconfig/irqbalance

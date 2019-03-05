@@ -18,5 +18,5 @@ set -xe
 
 pushd /grdata/services/offline/images
 ls | grep tgz | xargs -I {} docker load -i ./{}
-[ "$?" -eq 0 ] && touch /grdata/services/offline/images/push.local.image
+[ "$?" -eq 0 ] && touch /tmp/install/push.local.image
 popd
