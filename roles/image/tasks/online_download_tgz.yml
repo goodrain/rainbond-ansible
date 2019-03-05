@@ -12,7 +12,7 @@
   get_url:
     url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/base.images.2019-03-06-5.0.4.tgz
     dest: /grdata/services/offline/base.images.tgz
-    checksum: sha256:7ff32e98b8daaeb9d42362180283782eb9364267cc938e62fcef31258d28f64a
+    checksum: sha256:ffedc318c0737cc82e8713861d2a0b3f4be584a55a6c852b53395618b1ba7e36
   when: check_image_base_tgz_download.stat.isreg is not defined
 
 - name: Check | Check if rainbond.image.tgz is download
@@ -28,5 +28,5 @@
   get_url:
     url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.0/rainbond.images.2019-03-06-5.0.4.tgz
     dest: /grdata/services/offline/rainbond.images.tgz
-    checksum: sha256:3b2551efff1395d4af6e7d5fe8bf8b7503c6d35e6f20c416d25a4c669fa4d3bd
+    checksum: sha256:e83d3503d66ae828ca37b3aadd617ae923a475d959db5006fd265e729b876535
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
