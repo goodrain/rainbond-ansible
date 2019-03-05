@@ -1,7 +1,7 @@
 #!/bin/bash
 
 version=5.0
-rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog)
+rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog rbd-dns)
 all=(node rbd-chaos rbd-worker rbd-api rbd-eventlog rbd-db rbd-repo calico kube-controller-manager kube-scheduler rbd-app-ui rbd-monitor rbd-webcli rbd-mq rbd-gateway kube-apiserver rbd-dns rbd-hub etcd)
 
 upgrade(){

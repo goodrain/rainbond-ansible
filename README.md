@@ -10,7 +10,7 @@
 
 #### Stable version installation
 
-current version: 5.0.3
+current version: 5.0.4
 
 ```bash
 #export DOCKER_VERSION=18.06

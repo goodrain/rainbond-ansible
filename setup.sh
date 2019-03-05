@@ -81,9 +81,7 @@ get_default_netwrok_type() {
     fi
     info "Pod Network Provider" "${network}"
     if [ -z "$POD_NETWORK_CIDR" ];then
-        IP_INFO=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1')
-        IP_ITEMS=($IP_INFO)
-        INET_IP=${IP_ITEMS%%.*}
+        INET_IP=${IIP%%.*}
         if [ "$NETWORK_TYPE" == "flannel" ];then
             pod_network_cidr="${flannel_pod_network_cidr}"
         else
@@ -235,12 +233,12 @@ online_init(){
     case "$lsb_dist" in
 		ubuntu|debian)
             apt-get update
-            apt-get install -y sshpass python-pip uuid-runtime pwgen expect
+            apt-get install -y sshpass python-pip uuid-runtime pwgen expect curl net-tools
 		;;
 		centos)
             yum install -y epel-release 
             yum makecache fast 
-            yum install -y sshpass python-pip uuidgen pwgen expect
+            yum install -y sshpass python-pip uuidgen pwgen expect curl net-tools
             # fix centos 7.5 pip install ImportError
             pip install -U setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
@@ -331,10 +329,37 @@ check_disk(){
             info "!!! Skip disk check.The disk is recommended to be at least 40GB(now ${disk}GB)"
         fi
     fi
+}
 
+check_os(){
+    lsb_dist=$( get_distribution )
+    lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
+    case "$lsb_dist" in
+        centos)
+            v_num=$(cat /etc/redhat-release | grep -E "(7.5|7.6)" | wc -l)
+            u_num=$(uname -r | grep "^3.1" | wc -l)
+            if [[ "$v_num" -gt 0 ]]; then
+                if [[ "$u_num" -ne 0 ]]; then
+                    info "!!! 目前5.0.x CentOS 7.5/7.6 版本内核需要4.x版本上,否则会导致失败"
+                    info "参考文档 https://www.rainbond.com/docs/v5.0/operation-manual/op-guide/recommendation.html"
+                    info "参考社区 https://t.goodrain.com/t/centos-check-unpack/628"
+                    read -n1 -p "请确定是否放弃操作 [Y/N]?" answer
+                    case $answer in
+                    Y | y)
+                        notice "安装程序退出"
+                    ;;
+                    *)
+                        echo ""
+                    ;;
+                    esac
+                fi
+            fi
+        ;;
+    esac
 }
 
 precheck(){
+    check_os
     progress "Prepare check"
     if [ ! -f "/opt/rainbond/.init/.port_check" ];then
         check_port
