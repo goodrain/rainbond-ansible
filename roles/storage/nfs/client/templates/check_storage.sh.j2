@@ -2,7 +2,7 @@
 
 [ -f "/tmp/.grdata.init" ] && rm /tmp/.grdata.init
 
-df -h  | grep "/grdata"
+df -h  | grep "/grdata$" | grep ":"
 if [ "$?" -eq 0 ];then
     touch /tmp/.grdata.init
 fi
