@@ -151,7 +151,7 @@ EOF
 
 # Port detection
 precheck::check_port(){
-    local portlist=(53 80 443 3306)
+    local portlist=(53 80 443 3306 6060 7070 8443 8888 9999)
     local check_fail_num=0
     for port in ${portlist[@]}; do
         netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" >> /tmp/install/check_port_log && ((check_fail_num+=1)) || sleep 1
@@ -397,7 +397,7 @@ prepare::general(){
     else
         cp inventory/hosts.all inventory/hosts
     fi
-    hname=$(hostname -s)
+    hname=$(cat /opt/rainbond/.init/uuid)
     sed -i "s#node1#$hname#g" inventory/hosts
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
