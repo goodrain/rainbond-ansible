@@ -303,7 +303,7 @@ get_default_install_type(){
 }
 
 check_port(){
-    local portlist=(53 80 443 3306)
+    local portlist=(53 80 443 3306 6060 7070 8443 8888 9999)
     local check_fail_num=0
     for port in ${portlist[@]}
     do
@@ -417,7 +417,7 @@ prepare(){
     info "Deploy Type" $DEPLOY_TYPE
     get_default_config
     [ ! -z "$EIP" ] && Generate_domain $EIP $VIP || Generate_domain $IIP $VIP
-    hname=$(hostname -s)
+    hname=$(cat /opt/rainbond/.init/uuid)
     if [ "$ROLE" == "master" ];then 
         cp inventory/hosts.master inventory/hosts
     else
