@@ -165,8 +165,8 @@ precheck::check_port(){
 
 # Detection of the disk
 precheck::check_disk(){
-    local disk=$(df -h | grep "/$" | awk '{print $2}' | tr 'G' ' ')
-    DISK_LIMIT=40
+    local disk=$(df | grep "/$" | awk '{print $2}' | tr 'G' ' ')
+    DISK_LIMIT=40000000
     DISK_STATUS=$(awk -v num1=$disk -v num2=$DISK_LIMIT 'BEGIN{print(num1>=num2)?"0":"1"}')
     if [ "$DISK_STATUS" == '0' ]; then
         info "prepare check disk" "passed"
