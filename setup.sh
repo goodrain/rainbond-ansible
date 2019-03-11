@@ -91,12 +91,12 @@ init::online(){
     case "$lsb_dist" in
 		ubuntu|debian)
             run apt-get update -q
-            run apt-get install -y -q sshpass python-pip uuid-runtime pwgen expect curl net-tools
+            run apt-get install -y -q sshpass python-pip uuid-runtime pwgen expect curl net-tools git
 		;;
 		centos)
             run yum install -y -q epel-release 
             run yum makecache fast -q
-            run yum install -y -q sshpass python-pip uuidgen pwgen expect curl net-tools
+            run yum install -y -q sshpass python-pip uuidgen pwgen expect curl net-tools git
             run pip install -U setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 		;;
 		*)
@@ -141,7 +141,7 @@ enabled=1
 EOF
             touch /opt/rainbond/.init/.offline
             run yum makecache -q
-            run yum install -y -q sshpass python-pip uuidgen pwgen ansible netstat
+            run yum install -y -q sshpass python-pip uuidgen pwgen ansible netstat git
 		;;
 		*)
             notice "Not Support $lsb_dist"
@@ -368,9 +368,17 @@ config::install_deploy(){
     sed -i -r  "s/(^deploy_type: ).*/\1$DEPLOY_TYPE/" roles/rainvar/defaults/main.yml
 }
 
+# Dev Mode
+detect_dev_mode(){
+    if [ ! -z "$INSTALL_DEBUG" ];then
+        sed -i -r  "s/(^dev_mode: ).*/\1goodrain/" roles/rainvar/defaults/main.yml
+    fi
+}
+
 # General preparation before installation
 prepare::general(){
     progress "Preparation before installation..."
+    detect_dev_mode
     detect_linux_distribution
     info "Installation type" "$INSTALL_TYPE"
     info "Deployment type" "$DEPLOY_TYPE"

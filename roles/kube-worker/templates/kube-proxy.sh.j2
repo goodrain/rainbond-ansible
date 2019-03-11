@@ -8,17 +8,17 @@ KUBE_MASTER="--master=http://127.0.0.1:8080"
 KUBE_PROXY_ARGS="--bind-address=0.0.0.0 \
                  --hostname-override=${NODE_UUID} \
                  --kubeconfig={{ kubecfg_dir }}/kube-proxy.kubeconfig \
-                 --cluster-cidr={{ service_cidr }}"
+                 --cluster-cidr={{ service_cidr }} --proxy-mode=iptables"
 
 exec  /usr/bin/docker \
     run \
     --privileged \
     --restart=always \
     --net=host \
-    --name kube-scheduler \
+    --name kube-proxy \
     --volume={{ rbd_dir }}/etc/kubernetes:/opt/rainbond/etc/kubernetes \
     goodrain.me/{{ kubernetes_image }} proxy \
             $KUBE_LOGTOSTDERR \
             $KUBE_LOG_LEVEL \
             $KUBE_MASTER \
-            $KUBE_SCHEDULER_ARGS
+            $KUBE_PROXY_ARGS

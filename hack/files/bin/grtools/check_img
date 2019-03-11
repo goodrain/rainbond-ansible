@@ -17,7 +17,7 @@
 check_k8s(){
     [ -f "/tmp/install/check_k8s_img" ] && rm /tmp/install/check_k8s_img
     num=$(docker images | grep "kube-apiserver" | grep "goodrain.me" | wc -l)
-    if [ "$num" == 1 ];then
+    if [ "$num" != 0 ];then
         echo "ok" > /tmp/install/check_k8s_img
     fi
 }
@@ -25,7 +25,7 @@ check_k8s(){
 check_etcd(){
     [ -f "/tmp/install/check_etcd_img" ] && rm /tmp/install/check_etcd_img
     num=$(docker images | grep "etcd" | grep "goodrain.me" | wc -l)
-    if [ "$num" == 1 ];then
+    if [ "$num" != 0 ];then
         echo "ok" > /tmp/install/check_etcd_img
     fi
 }
@@ -33,7 +33,7 @@ check_etcd(){
 check_db(){
     [ -f "/tmp/install/check_db_img" ] && rm /tmp/install/check_db_img
     num=$(docker images | grep "rbd-db" | grep "goodrain.me" | wc -l)
-    if [ "$num" == 1 ];then
+    if [ "$num" != 0 ];then
         echo "ok" > /tmp/install/check_db_img
     fi
 }
@@ -41,7 +41,7 @@ check_db(){
 check_calico(){
     [ -f "/tmp/install/check_calico_img" ] && rm /tmp/install/check_calico_img
     num=$(docker images | grep "calico" | grep "goodrain.me" | wc -l)
-    if [ "$num" == 1 ];then
+    if [ "$num" != 0 ];then
         echo "ok" > /tmp/install/check_calico_img
     fi
 }
