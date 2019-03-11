@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version=5.0
+version=5.1.0
 rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog rbd-dns)
 all=(node rbd-chaos rbd-worker rbd-api rbd-eventlog rbd-db rbd-repo calico kube-controller-manager kube-scheduler rbd-app-ui rbd-monitor rbd-webcli rbd-mq rbd-gateway kube-apiserver rbd-dns rbd-hub etcd)
 
@@ -61,18 +61,15 @@ stop(){
     )
 }
 
-del_role(){
-    mv /opt/rainbond/conf/k8s-worker.yaml /opt/rainbond/conf/k8s-worker.yaml.bak
-    systemctl stop kubelet
-    systemctl disable kubelet
-    sed -i "s#manage,compute#manage#g" /opt/rainbond/scripts/start-node.sh
-    systemctl restart node
+start(){
+    systemctl start etcd
+    systemctl start node
 }
 
 reset(){
     systemctl stop node
     systemctl stop kubelet
-    dps | grep goodrain.me | awk '{print $NF}' | xargs -I {} systemctl stop {}
+    dps | grep goodrain.me | grep -v 'k8s' | awk '{print $NF}' | xargs -I {} systemctl stop {}
     cclear
     rm -rf /opt/rainbond/
     rm -rf /tmp/*
@@ -81,21 +78,19 @@ reset(){
 }
 
 help(){
-    echo "grclis stop <服务名>"
+    echo "grclis start/stop <服务名>"
     echo "grclis upgrade <服务名/all>"
     echo "grclis reset"
-    #echo "grclis del role worker"
 }
 
 case $1 in
     upgrade)
         upgrade $2 
     ;;
+    start)
+        start
     stop)
         stop $2
-    ;;
-    del)
-        del_role $2 $3
     ;;
     reset)
         read -n1 -p "Are you sure you want to continue resetting node [Y/N]?" answer
