@@ -10,9 +10,9 @@
 
 - name: Rainbond | Download base image tgz ok
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-03-11-5.1.0.tgz
+    url: "{{ base_images_url }}"
     dest: /grdata/services/offline/base.images.tgz
-    checksum: sha256:ffedc318c0737cc82e8713861d2a0b3f4be584a55a6c852b53395618b1ba7e36
+    checksum: "{{ base_images_sha256 }}"
   when: check_image_base_tgz_download.stat.isreg is not defined
 
 - name: Check | Check if rainbond.image.tgz is download
@@ -26,7 +26,7 @@
 
 - name: Rainbond | Download rainbond image tgz ok
   get_url:
-    url: http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-03-11-5.1.0.tgz
+    url: "{{ rainbond_images_url }}"
     dest: /grdata/services/offline/rainbond.images.tgz
-    checksum: sha256:e83d3503d66ae828ca37b3aadd617ae923a475d959db5006fd265e729b876535
+    checksum: "{{ rainbond_images_sha256 }}"
   when: check_image_rainbond_tgz_download.stat.isreg is not defined

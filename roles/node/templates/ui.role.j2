@@ -18,7 +18,8 @@ services:
   start: >-
     docker run --name rbd-app-ui
     --network host
-    -e MANAGE_SECRET_KEY={{ secretkey }}
+    -e MANAGE_SECRET_KEY={{ secretkey }} {% if dev_mode == "goodrain" %} -e ENTERPRISE_ID={{ enterprise_id }} {% endif %}
+
     -e MYSQL_HOST={{ MASTER_IP }}
     -e MYSQL_PORT=3306
     -e MYSQL_USER={{ db_user }}

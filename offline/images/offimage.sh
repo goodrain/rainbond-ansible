@@ -14,23 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-offline_image_path=${1:-/opt/rainbond/offline/images}
-version=5.0
-rainbond=(mq eventlog webcli gateway worker chaos api app-ui monitor)
-base=(rbd-db rbd-dns)
-runtime=(runner adapter)
+#!/bin/bash
+
+offline_image_path="/opt/rainbond/offline/images"
+version=5.1.0
+rainbond=(mq eventlog webcli gateway worker chaos api app-ui monitor rbd-dns runner)
+base=(rbd-db )
+runtime=(adapter)
 k8s=(kube-scheduler kube-controller-manager kube-apiserver)
 plugins=(tcm mesh_plugin)
+rm -rf ${offline_image_path}
 mkdir -pv ${offline_image_path}/{base,rainbond}
 
-docker images | grep "rainbond" | awk '{print $1":"$2}' | xargs -I {} docker rmi {}
-docker images | grep "goodrain.me" | awk '{print $3}' | xargs -I {} docker rmi {}
+#docker images | grep "rainbond" | awk '{print $1":"$2}' | xargs -I {} docker rmi {}
+#docker images | grep "goodrain.me" | awk '{print $3}' | xargs -I {} docker rmi {}
 
-buildtime=$(date +%F)
+buildtime="2019-03-11-5.1.0"
 
 base_images(){
-    docker pull rainbond/cni:k8s_5.0
-    docker save rainbond/cni:k8s_5.0 > ${offline_image_path}/base/cni_k8s.tgz
+    docker pull rainbond/cni:k8s_5.1.0
+    docker save rainbond/cni:k8s_5.1.0 > ${offline_image_path}/base/cni_k8s.tgz
     docker pull rainbond/kubecfg:dev
     docker save rainbond/kubecfg:dev > ${offline_image_path}/base/kubecfg_dev.tgz
     docker pull rainbond/cfssl:dev
@@ -38,9 +41,9 @@ base_images(){
     for img in ${base[@]}
     do
         [ -f "${offline_image_path}/base/${img}.tgz" ] && rm -rf ${offline_image_path}/base/${img}.tgz
-        docker pull rainbond/${img}:${version}
-        docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
-        docker save goodrain.me/${img}:${version} > ${offline_image_path}/base/${img}.tgz
+        docker pull rainbond/${img}
+        docker tag rainbond/${img} goodrain.me/${img}
+        docker save goodrain.me/${img} > ${offline_image_path}/base/${img}.tgz
     done
     for pimg in ${plugins[@]}
     do
@@ -58,13 +61,13 @@ base_images(){
     done
     for kimg in ${k8s[@]}
     do
-        docker pull rainbond/${kimg}:v1.10.11
-        docker tag rainbond/${kimg}:v1.10.11 goodrain.me/${kimg}:v1.10.11
+        docker pull rainbond/${kimg}:v1.10.13
+        docker tag rainbond/${kimg}:v1.10.13 goodrain.me/${kimg}:v1.10.13
         [ -f "${offline_image_path}/base/${kimg}.tgz" ] && rm -rf ${offline_image_path}/base/${kimg}.tgz
-        docker save goodrain.me/${kimg}:v1.10.11 > ${offline_image_path}/base/${kimg}.tgz
+        docker save goodrain.me/${kimg}:v1.10.13 > ${offline_image_path}/base/${kimg}.tgz
     done
-    docker pull rainbond/rbd-builder:5.0
-    docker tag rainbond/rbd-builder:5.0 goodrain.me/builder
+    docker pull rainbond/rbd-builder:5.1.0
+    docker tag rainbond/rbd-builder:5.1.0 goodrain.me/builder
     docker save goodrain.me/builder > ${offline_image_path}/base/builder.tgz
     docker pull rainbond/rbd-repo:6.5.9
     docker tag rainbond/rbd-repo:6.5.9 goodrain.me/rbd-repo:6.5.9
@@ -92,8 +95,8 @@ rainbond_images(){
         [ -f "${offline_image_path}/rainbond/${img}.tgz" ] && rm -rf ${offline_image_path}/rainbond/${img}.tgz
         docker save goodrain.me/rbd-${img}:${version} > ${offline_image_path}/rainbond/${img}.tgz
     done
-    docker pull rainbond/cni:rbd_5.0
-    docker save rainbond/cni:rbd_5.0 > ${offline_image_path}/rainbond/cni_rbd.tgz
+    docker pull rainbond/cni:rbd_${version}
+    docker save rainbond/cni:rbd_${version} > ${offline_image_path}/rainbond/cni_rbd.tgz
 }
 
 rainbond_tgz(){
@@ -113,12 +116,12 @@ base_tgz(){
 }
 
 
-case $2 in
+case $1 in
 	rainbond)
-		rainbond_tgz push
+		rainbond_tgz 
 	;;
 	base)
-		base_tgz push
+		base_tgz 
 	;;
 	*)
 		rainbond_tgz

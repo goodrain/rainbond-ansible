@@ -14,8 +14,8 @@ services:
   after:
     - docker
   type: simple
-  pre_start: docker rm etcd
+  pre_start: docker rm etcd-proxy
   start: {{ rbd_dir }}/scripts/start-etcd-proxy.sh
-  stop: docker stop etcd
+  stop: docker stop etcd-proxy
   restart_policy: always
   restart_sec: 10

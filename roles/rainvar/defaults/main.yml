@@ -1,5 +1,5 @@
-r6d_version: 5.0
-kubernetes_version: v1.10.11
+r6d_version: 5.1.0
+kubernetes_version: v1.10.13
 docker_version: 18.06
 docker_selinux_version: '17.03'
 docker_log_opts: "--log-opt max-size=50m --log-opt max-file=5"
@@ -22,7 +22,7 @@ env_dir: "{{ rbd_dir }}/envs"
 script_dir: "{{ rbd_dir }}/scripts"
 region_ca_dir: "{{ rbd_dir }}/etc/rbd-api/region.goodrain.me/ssl"
 secretkey: aek0yi7ro5AJaeg5ooRoMie2owu4raeT
-rbd_db_image: rbd-db:{{ r6d_version }}
+rbd_db_image: rbd-db:latest
 db_user: write
 db_pass: 1833efe4
 
@@ -99,8 +99,13 @@ autoreg_node: disable
 
 install_logs_dir: "/tmp/install"
 
-base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-03-11-5.1.0.tgz"
+## eid
+enterprise_id: "5887587af6dafeefb192b1dbff6c518d"
+dev_mode: debug
 
+base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-03-11-5.1.0.tgz"
+base_images_sha256: "sha256:10fbf6d7e192d5df560daff4006f13ef27201b27912d389f178a41480d6eb401"
 # rainbond.image.tgz.url
 
 rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-03-11-5.1.0.tgz"
+rainbond_images_sha256: "sha256:8950d59cb83ea36f8c9747bbbc51a4e038ebe71e8e021615197ec07a63e2920f"
