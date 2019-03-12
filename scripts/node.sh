@@ -22,6 +22,7 @@ node_ip=$3
 login_type=$4
 login_key=$5
 node_uuid=$6
+node_port=${SSH_PORT:-22}
 
 [ -z "$node_uuid" ] && echo "node uuid is null" && exit 1
 
@@ -33,7 +34,7 @@ ssh_key_copy()
     # start copy 
     expect -c "
     set timeout 100
-    spawn ssh-copy-id root@$1
+    spawn ssh-copy-id root@$1 -p $3
     expect {
     \"yes/no\"   { send \"yes\n\"; exp_continue; }
     \"password\" { send \"$2\n\"; }
@@ -52,7 +53,7 @@ echo "check ip if reachable"
 
 if [ "$login_type" == "pass" ]; then
     echo "configure ssh for secure login"
-    ssh_key_copy $node_ip $login_key
+    ssh_key_copy $node_ip $login_key $node_port
 fi
 
 check_exist(){
@@ -69,7 +70,7 @@ check_exist(){
 # 新添加节点
 new_node(){
     echo "add new node: ${node_ip} ---> ${node_uuid}"
-    sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ip=$node_ip" inventory/hosts
+    sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ansible_port=$node_port ip=$node_ip port=$node_port" inventory/hosts
     if [ "$node_role" == "compute" ]; then
         sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
     else

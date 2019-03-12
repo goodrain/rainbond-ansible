@@ -1,6 +1,4 @@
 ---
-storage_type: nfs
-
 nfsserver: "{{hostvars[groups['master'][0]]['ip']}}"
 nfspath: "/grdata"
 nfsmount: "/grdata"

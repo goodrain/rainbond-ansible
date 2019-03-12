@@ -1,14 +1,14 @@
 ---
-- name: Storage | copy check storage
+- name: Gfs | copy check storage
   template:
     src: check_storage.sh.j2
     dest: /tmp/install/check_storage.sh
     mode: 0777
 
-- name: Storage | run check storage
+- name: Gfs | run check storage
   shell: "bash /tmp/install/check_storage.sh"
 
-- name: Storage | check grdata
+- name: Gfs | check grdata
   stat: path=/tmp/.grdata.init
   register: check_grdata
 
@@ -35,3 +35,11 @@
 
 - name: mount /grdata
   shell: mount -a
+
+- name: check grdata for rainbond
+  file: name={{ item }} state=directory
+  with_items:
+    - /grdata/services/ssh
+    - /grdata/services/storage
+    - /grdata/services/offline/images
+    - /grdata/kubernetes

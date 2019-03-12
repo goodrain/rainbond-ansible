@@ -1,14 +1,14 @@
 ---
-- name: Storage | copy check storage
+- name: Nfs | copy check storage
   template:
     src: check_storage.sh.j2
     dest: /tmp/install/check_storage.sh
     mode: 0777
 
-- name: Storage | run check storage
+- name: Nfs | run check storage
   shell: "bash /tmp/install/check_storage.sh"
 
-- name: Storage | check init 
+- name: Nfs | check init 
   stat: path=/tmp/.grdata.init
   register: check_grdata_server
 

@@ -17,3 +17,11 @@
 - name: Ensure nfs is running.
   service: "name={{ nfs_server_daemon }} state=started enabled=yes"
 
+- name: check grdata for rainbond
+  file: name={{ item }} state=directory
+  with_items:
+    - /grdata/services/ssh
+    - /grdata/services/storage
+    - /grdata/services/offline/images
+    - /grdata/kubernetes
+

@@ -89,6 +89,7 @@ case $1 in
     ;;
     start)
         start
+    ;;
     stop)
         stop $2
     ;;
