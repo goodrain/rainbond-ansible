@@ -51,3 +51,29 @@
     - /grdata/services/storage
     - /grdata/services/offline/images
     - /grdata/kubernetes
+
+- name: deploy check ssh
+  stat: path="/root/.ssh/id_rsa.pub"
+  register: deploy_check_ssh
+  delegate_to: "{{ groups.deploy[0] }}"
+
+- name: Copy ssh pub key as builder pub key
+  copy:
+    src: /root/.ssh/id_rsa.pub
+    dest: /grdata/services/ssh/builder_rsa.pub
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined
+
+- name: Copy ssh key as builder key
+  copy:
+    src: /root/.ssh/id_rsa
+    dest: /grdata/services/ssh/builder_rsa
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined
+
+- name: Copy ssh config 
+  copy:
+    src: "{{ base_dir }}/hack/files/ssh/config"
+    dest: /grdata/services/ssh/config
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined
