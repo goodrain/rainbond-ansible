@@ -22,6 +22,25 @@
     src: init.sql.j2
     dest: /opt/rainbond/.init/init.sql
 
+- name: Rainbond | Check goodrain.me
+  shell: "bash /tmp/install/check_registries.sh"
+
+- name: Rainbond | Check check_ok
+  stat: path="/opt/rainbond/.init/goodrain.me.ok"
+  register: check_goodrainme_done
+
+- name: The next task may take some time to execute
+  debug:
+    msg: "The next task may take some time to execute: Waiting Pushing local images to goodrain.me"
+  when: check_goodrainme_done.stat.isreg is defined
+
+- name: Rainbond | Push local images to goodrain.me
+  shell: "bash /tmp/install/pushimage.sh"
+  register: pushimage_task_result
+  until: pushimage_task_result is succeeded
+  retries: 5
+  when: check_goodrainme_done.stat.isreg is defined
+
 - name: Prepare db
   shell: "bash /tmp/install/updatedb.sh prepare >> /tmp/install/db.prepare.log"
   register: prepare_db_ok
@@ -54,22 +73,3 @@
     - prepare_db_ok is succeeded
     - migrate_ui_ok is succeeded
     - region_init_result is succeeded
-
-- name: Rainbond | Check goodrain.me
-  shell: "bash /tmp/install/check_registries.sh"
-
-- name: Rainbond | Check check_ok
-  stat: path="/opt/rainbond/.init/goodrain.me.ok"
-  register: check_goodrainme_done
-
-- name: The next task may take some time to execute
-  debug:
-    msg: "The next task may take some time to execute: Waiting Pushing local images to goodrain.me"
-  when: check_goodrainme_done.stat.isreg is defined
-
-- name: Rainbond | Push local images to goodrain.me
-  shell: "bash /tmp/install/pushimage.sh"
-  register: pushimage_task_result
-  until: pushimage_task_result is succeeded
-  retries: 5
-  when: check_goodrainme_done.stat.isreg is defined

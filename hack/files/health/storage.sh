@@ -16,14 +16,15 @@
 
 check_key="{{ secretkey }}"
 
-if [ -f "/grdata/.check" ];then
-    cat /grdata/.check | grep "$check_key" > /dev/null
+if [ -f "/grdata/services/storage/health.check" ];then
+    cat /grdata/services/storage/health.check | grep "$check_key" > /dev/null
     if [ "$?" -eq 0 ];then
         exit 0
     else
         exit 1
     fi
 else
-    cat /grdata/services/storage/health.check > /grdata/.check
+    [ -d "/grdata/services/storage" ] || mkdir -p /grdata/services/storage
+    cat /opt/rainbond/.init/secretkey > /grdata/services/storage/health.check
     exit 1
 fi

@@ -104,8 +104,8 @@ enterprise_id: "5887587af6dafeefb192b1dbff6c518d"
 dev_mode: debug
 
 base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-03-11-5.1.0.tgz"
-base_images_sha256: "sha256:10fbf6d7e192d5df560daff4006f13ef27201b27912d389f178a41480d6eb401"
+base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-03-11-5.1.0.sha256sum.txt"
 # rainbond.image.tgz.url
 
 rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-03-11-5.1.0.tgz"
-rainbond_images_sha256: "sha256:8950d59cb83ea36f8c9747bbbc51a4e038ebe71e8e021615197ec07a63e2920f"
+rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-03-11-5.1.0.sha256sum.txt"

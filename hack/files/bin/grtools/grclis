@@ -52,6 +52,7 @@ upgrade(){
 stop(){
     [ ! -z "$1" ] && (
         systemctl stop $1
+        node service stop $1
     ) || (
         for s in ${all[@]}
         do          
