@@ -14,15 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/bin/bash
-
 offline_image_path="/opt/rainbond/offline/images"
 version=5.1.0
-rainbond=(mq eventlog webcli gateway worker chaos api app-ui monitor rbd-dns runner)
-base=(rbd-db )
+rainbond=(mq eventlog webcli gateway worker chaos api app-ui monitor)
+baserbd=(rbd-dns)
+base=(rbd-db runner builder)
 runtime=(adapter)
 k8s=(kube-scheduler kube-controller-manager kube-apiserver)
-plugins=(tcm mesh_plugin)
+plugins=(tcm mesh_plugin rbd-init-probe)
 rm -rf ${offline_image_path}
 mkdir -pv ${offline_image_path}/{base,rainbond}
 
@@ -38,17 +37,24 @@ base_images(){
     docker save rainbond/kubecfg:dev > ${offline_image_path}/base/kubecfg_dev.tgz
     docker pull rainbond/cfssl:dev
     docker save rainbond/cfssl:dev > ${offline_image_path}/base/cfssl_dev.tgz
+    for bimg in ${baserbd[@]}
+    do
+	[ -f "${offline_image_path}/base/${bimg}.tgz"] && rm -rf ${offline_image_path}/base/${bimg}.tgz
+        docker pull rainbond/${bimg}:${version}
+        docker tag rainbond/${bimg}:${version} goodrain.me/${bimg}:${version}
+        docker save goodrain.me/${bimg}:${version} > ${offline_image_path}/base/${bimg}.tgz
+    done
     for img in ${base[@]}
     do
         [ -f "${offline_image_path}/base/${img}.tgz" ] && rm -rf ${offline_image_path}/base/${img}.tgz
-        docker pull rainbond/${img}
-        docker tag rainbond/${img} goodrain.me/${img}
+        docker pull rainbond/${img}:${version}
+        docker tag rainbond/${img}:${version} goodrain.me/${img}
         docker save goodrain.me/${img} > ${offline_image_path}/base/${img}.tgz
     done
     for pimg in ${plugins[@]}
     do
-        docker pull rainbond/plugins:${pimg}
-        docker tag rainbond/plugins:${pimg} goodrain.me/${pimg}
+        docker pull rainbond/${pimg}:${version}
+        docker tag rainbond/${pimg}:${version} goodrain.me/${pimg}
         [ -f "${offline_image_path}/base/${pimg}.tgz" ] && rm -rf ${offline_image_path}/base/${pimg}.tgz
         docker save goodrain.me/${pimg}> ${offline_image_path}/base/${pimg}.tgz
     done
@@ -66,9 +72,6 @@ base_images(){
         [ -f "${offline_image_path}/base/${kimg}.tgz" ] && rm -rf ${offline_image_path}/base/${kimg}.tgz
         docker save goodrain.me/${kimg}:v1.10.13 > ${offline_image_path}/base/${kimg}.tgz
     done
-    docker pull rainbond/rbd-builder:5.1.0
-    docker tag rainbond/rbd-builder:5.1.0 goodrain.me/builder
-    docker save goodrain.me/builder > ${offline_image_path}/base/builder.tgz
     docker pull rainbond/rbd-repo:6.5.9
     docker tag rainbond/rbd-repo:6.5.9 goodrain.me/rbd-repo:6.5.9
     docker save goodrain.me/rbd-repo:6.5.9 > ${offline_image_path}/base/repo.tgz
@@ -84,7 +87,6 @@ base_images(){
     docker pull rainbond/pause-amd64:3.0
     docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
     docker save goodrain.me/pause-amd64:3.0 > ${offline_image_path}/base/pause.tgz
-
 }
 
 rainbond_images(){
@@ -104,6 +106,7 @@ rainbond_tgz(){
     pushd $offline_image_path/rainbond
         [ -f "$offline_image_path/rainbond.images.${buildtime}.tgz" ] && rm -rf $offline_image_path/rainbond.images.${buildtime}.tgz
         tar zcf $offline_image_path/rainbond.images.${buildtime}.tgz `find .  | sed 1d`
+        sha256sum  $offline_image_path/rainbond.images.${buildtime}.tgz | awk '{print $1}' > $offline_image_path/rainbond.images.${buildtime}.sha256sum.txt
     popd
 }
 
@@ -112,19 +115,20 @@ base_tgz(){
     pushd $offline_image_path/base
         [ -f "$offline_image_path/base.images.${buildtime}.tgz" ] && rm -rf $offline_image_path/base.images.${buildtime}.tgz
         tar zcf $offline_image_path/base.images.${buildtime}.tgz `find .  | sed 1d`
+        sha256sum $offline_image_path/base.images.${buildtime}.tgz | awk '{print $1}' > $offline_image_path/base.images.${buildtime}.sha256sum.txt
     popd
 }
 
 
 case $1 in
 	rainbond)
-		rainbond_tgz 
+		rainbond_tgz
 	;;
 	base)
-		base_tgz 
+		base_tgz
 	;;
 	*)
-		rainbond_tgz
-		base_tgz
+		rainbond_tgz push
+		base_tgz push
 	;;
 esac

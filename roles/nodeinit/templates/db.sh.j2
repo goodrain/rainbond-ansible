@@ -15,7 +15,7 @@ EOF
 }
 
 prepare(){
-    sleep 10
+    sleep 5
     db_num=$(docker ps | grep rbd-db | wc -l)
     if [ "$db_num" == 1 ]; then
         docker exec rbd-db mysql -e "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";docker exec rbd-db mysql -e "delete from mysql.user where user=''; flush privileges"
@@ -26,7 +26,7 @@ prepare(){
 
 migrate_ui(){
     # docker run -it --rm -e MYSQL_HOST={{ MASTER_IP }} -e MYSQL_PORT=3306 -e MYSQL_USER={{ db_user }} -e MYSQL_PASS={{ db_pass }} -e MYSQL_DB=console -i goodrain.me/{{ rbd_app_ui }} python /app/ui/manage.py migrate
-    sleep 10
+    sleep 5
     ui_num=$(docker ps | grep rbd-app-ui | wc -l)
     if [ "$ui_num" == 1 ]; then
         docker exec rbd-app-ui python /app/ui/manage.py migrate
@@ -46,13 +46,22 @@ init_config(){
 
 case $1 in
     prepare)
-        prepare && generate_region_sql
+        for ((i=1;i<=6;i++))
+        do
+            prepare && generate_region_sql
+        done
     ;;
     migrate)
-        migrate_ui 
+        for ((i=1;i<=6;i++))
+        do
+            migrate_ui 
+        done
     ;;
     config)
-        init_config
+        for ((i=1;i<=6;i++))
+        do
+            init_config
+        done
     ;;
     *)
         # Todo

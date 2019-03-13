@@ -12,7 +12,7 @@
   get_url:
     url: "{{ base_images_url }}"
     dest: /grdata/services/offline/base.images.tgz
-    checksum: "{{ base_images_sha256 }}"
+#    checksum: "{{ base_images_sha256 }}"
   when: check_image_base_tgz_download.stat.isreg is not defined
 
 - name: Check | Check if rainbond.image.tgz is download
@@ -28,5 +28,5 @@
   get_url:
     url: "{{ rainbond_images_url }}"
     dest: /grdata/services/offline/rainbond.images.tgz
-    checksum: "{{ rainbond_images_sha256 }}"
+#    checksum: "{{ rainbond_images_sha256 }}"
   when: check_image_rainbond_tgz_download.stat.isreg is not defined
