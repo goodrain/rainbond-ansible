@@ -7,12 +7,12 @@
 
 - name: Upgrade | Copy Upgrade db sql
   template:
-    src: 5.0.3.sql.j2
-    dest: /tmp/5.0.3.sql
+    src: 5.0.4-5.1.0.sql.j2
+    dest: /tmp/5.0.4-5.1.0.sql
     mode: 0777
 
 - name: Upgrade | Upgrade images to goodrain.me
-  shell: "bash -x /tmp/upgradeimage.sh > /tmp/5.0.3.upgrade.log"
+  shell: "bash -x /tmp/upgradeimage.sh > /tmp/5.0.4.upgrade.log"
   register: upgrade501_task_result
   until: upgrade501_task_result is succeeded
   retries: 5
