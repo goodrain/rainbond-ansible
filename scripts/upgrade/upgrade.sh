@@ -71,4 +71,6 @@ mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.0.4
 
 docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_5.1.0 tar zxf /pkg.tgz -C /sysdir
 
+export ANSIBLE_HOST_KEY_CHECKING=False
+
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml

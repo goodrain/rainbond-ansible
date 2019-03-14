@@ -19,7 +19,7 @@ chmod +x ./grctl
 ./grctl init  --iip <内网ip/Internal IP> --eip <外网ip/External IP>
 ```
 
-Refer to the documentation for more information [online installation](https://www.rainbond.com/docs/stable/getting-started/online-installation.html)
+Refer to the documentation for more information [online installation](https://www.rainbond.com/docs/user-operations/op-guide/recommendation/)
 
 
 #### Development version installation

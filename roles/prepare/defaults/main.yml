@@ -5,7 +5,7 @@ r6d_min_cpu: 2
 
 # Mem
 #r6d_min_ram: 4096
-r6d_min_ram: 3900
+r6d_min_ram: 3500
 
 # Disk
 r6d_min_disk: 40000000000

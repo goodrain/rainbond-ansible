@@ -90,7 +90,7 @@
 
 - name: Preflight check - Linux OS family and distribution version
   fail:
-    msg: "System versions lower than Red Hat Enterprise Linux / CentOS 7.3 have been deprecated. Please use CentOS 7.3 and above. See https://www.rainbond.com/docs/stable/getting-started/online-installation.html#part-5351512729e21236"
+    msg: "System versions lower than Red Hat Enterprise Linux / CentOS 7.3 have been deprecated. Please use CentOS 7.3 and above. See https://www.rainbond.com/docs/user-operations/op-guide/recommendation/"
   when: "ansible_os_family == 'RedHat' and ansible_distribution_version < '7.3'"
 
 - name: Preflight check - Check Linux kernel overcommit_memory parameter

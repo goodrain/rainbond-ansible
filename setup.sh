@@ -219,8 +219,8 @@ precheck(){
 do_install::ok(){
     [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
-    info "扩容节点" "https://www.rainbond.com/docs/dev/operation-manual/cluster-management/add-node.html"
-    info "操作文档" "https://www.rainbond.com/docs/dev/getting-started/rainbond-overview.html"
+    info "扩容节点" "https://www.rainbond.com/docs/user-operations/management/add-node/"
+    info "操作文档" "https://www.rainbond.com/docs/user-manual/"
     info "社区" "https://t.goodrain.com"
     info "查询集群状态" "grctl cluster"
     grctl cluster
