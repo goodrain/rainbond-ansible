@@ -27,5 +27,6 @@ case $1 in
         dps | grep rbd-api > /dev/null  && upgrade_rainbond || echo ""
         dps | grep rbd-db > /dev/null && upgrade_db || echo ""
         dps | grep rbd-dns > /dev/null && upgrade_dns || echo ""
+        node service update
     ;;
 esac

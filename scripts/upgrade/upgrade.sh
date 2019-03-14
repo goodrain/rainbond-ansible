@@ -67,8 +67,8 @@ done
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.0.4
-mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl/node.5.0.4
+mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.0.4
 
-docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_5.0 tar zxf /pkg.tgz -C /sysdir
+docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_5.1.0 tar zxf /pkg.tgz -C /sysdir
 
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml
