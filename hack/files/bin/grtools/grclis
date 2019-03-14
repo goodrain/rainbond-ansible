@@ -17,6 +17,7 @@
 version=5.1.0
 rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog rbd-dns)
 all=(node rbd-chaos rbd-worker rbd-api rbd-eventlog rbd-db rbd-repo calico kube-controller-manager kube-scheduler rbd-app-ui rbd-monitor rbd-webcli rbd-mq rbd-gateway kube-apiserver rbd-dns rbd-hub etcd)
+plugins=(rbd-init-probe)
 
 upgrade(){
     if [ "$1" == "all" ];then
@@ -30,11 +31,21 @@ upgrade(){
         done
     elif [ "$1" == "node" ]; then
             docker pull rainbond/cni:rbd_${version}
+            [ -f "/opt/rainbond/etc/tools/bin/node" ] && mv /opt/rainbond/etc/tools/bin/node /tmp/node_old
+            [ -f "/opt/rainbond/etc/tools/bin/grctl" ] && mv /opt/rainbond/etc/tools/bin/grctl /tmp/grctl_old
             docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
             systemctl stop node
             cp -a /opt/rainbond/etc/tools/bin/node /usr/local/bin/node
+            cp -a /opt/rainbond/etc/tools/bin/grctl /usr/local/bin/grctl
             systemctl start node
             [ "$?" -eq 0 ] && echo "restart node ok."
+    elif [ "$1" == "plugins" ]; then
+        for plugin in ${plugins[@]}; do
+            docker pull rainbond/${plugin}:${version}
+            docker tag rainbond/${plugin}:${version} goodrain.me/${plugin}
+            docker push goodrain.me/${plugin}
+            echo "upgrade plugin ${plugin} ok."
+        done
     else
         echo "will upgrade $1 image"
         for img in ${rainbond[@]}; do
@@ -80,7 +91,7 @@ reset(){
 
 help(){
     echo "grclis start/stop <服务名>"
-    echo "grclis upgrade <服务名/all>"
+    echo "grclis upgrade <服务名/all/node/plugins>"
     echo "grclis reset"
 }
 
