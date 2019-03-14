@@ -405,9 +405,14 @@ prepare::general(){
     else
         cp inventory/hosts.all inventory/hosts
     fi
+    INSTALL_SSH_PORT=${INSTALL_SSH_PORT:-22}
+    info "install ssh port" $INSTALL_SSH_PORT
+    sed -i -r  "s/(^install_ssh_port: ).*/\1${INSTALL_SSH_PORT}/" roles/rainvar/defaults/main.yml
     hname=$(cat /opt/rainbond/.init/uuid)
     sed -i "s#node1#$hname#g" inventory/hosts
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
+    sed -i "s#port=22#port=$INSTALL_SSH_PORT#g" inventory/hosts
+
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
 }
 
