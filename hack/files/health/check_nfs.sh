@@ -2,9 +2,9 @@
 
 nfs_server={{ MASTER_IP }}
 
-num=$(showmount -e $nfs_server | grep "/grdata " | wc -l)
+num=$(showmount -e $nfs_server | grep "/opt/rainbond" | wc -l)
 
-if [ "$num" -eq 1 ];then
+if [ "$num" -ne 0 ];then
     exit 0
 else
     exit 1
