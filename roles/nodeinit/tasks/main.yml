@@ -2,7 +2,7 @@
 - name: Copy db init script
   template:
     src: db.sh.j2
-    dest: /tmp/install/updatedb.sh
+    dest: /opt/rainbond/.init/updatedb.sh
     mode: 0777
 
 - name: Copy image push script
@@ -42,13 +42,13 @@
   when: check_goodrainme_done.stat.isreg is defined
 
 - name: Prepare db
-  shell: "bash /tmp/install/updatedb.sh prepare >> /tmp/install/db.prepare.log"
+  shell: "bash -x /opt/rainbond/.init/updatedb.sh prepare >> /tmp/install/db.prepare.log"
   register: prepare_db_ok
   until: prepare_db_ok is succeeded
   retries: 5
 
 - name: Migrate ui if prepare_db_ok is succeeded
-  shell: "bash /tmp/install/updatedb.sh migrate >> /tmp/install/db.ui.migrate.log"
+  shell: "bash -x /opt/rainbond/.init/updatedb.sh migrate >> /tmp/install/db.ui.migrate.log"
   register: migrate_ui_ok
   until: migrate_ui_ok is succeeded
   retries: 5
@@ -56,7 +56,7 @@
     - prepare_db_ok is succeeded
 
 - name: Init Data Region if migrate_ui_ok is succeeded
-  shell: "bash /tmp/install/updatedb.sh config >> /tmp/install/db.init.config.log"
+  shell: "bash -x /opt/rainbond/.init/updatedb.sh config >> /tmp/install/db.init.config.log"
   register: region_init_result
   until: region_init_result is succeeded
   retries: 5
@@ -65,7 +65,7 @@
     - migrate_ui_ok is succeeded
 
 - name: Check init db if succeeded
-  shell: "bash /tmp/install/updatedb.sh check >> /tmp/install/check.db.log"
+  shell: "bash -x /opt/rainbond/.init/updatedb.sh check >> /tmp/install/check.db.log"
   register: checkdb_task_result
   until: checkdb_task_result is succeeded
   retries: 3
