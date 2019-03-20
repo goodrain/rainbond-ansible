@@ -9,6 +9,9 @@ login_type=$4
 login_key=$5
 node_uuid=$6
 
+get_port=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep install_ssh_port | awk '{print $2}')
+node_port=${get_port:-22}
+
 [ -z "$node_uuid" ] && echo "node uuid is null" && exit 1
 
 ssh_key_copy()
@@ -47,8 +50,8 @@ check_exist(){
 
 # 新添加节点
 new_node(){
-    echo "add new node: ${node_ip} ---> ${node_uuid}"
-    sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ip=$node_ip" inventory/hosts
+    echo "add new node: ${node_ip}:${node_port} ---> ${node_uuid}"
+    sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ansible_port=$node_port ip=$node_ip port=$node_port" inventory/hosts
     if [ "$node_role" == "compute" ];then
         sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
     else

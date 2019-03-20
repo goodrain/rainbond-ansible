@@ -21,9 +21,9 @@ services:
     -i goodrain.me/{{ gateway }}
     --etcd-endpoints=${ETCD_ENDPOINTS}
     --log-level=debug
-    --enable-kubeapi=true
     --kubeapi-ip=0.0.0.0
-    --error-log=/dev/stderr error
+    --error-log=/dev/stderr error {% if deploy_type != "thirdparty" %}--enable-kubeapi=true{% endif %}
+
   stop: docker stop rbd-gateway
   restart_policy: always
   restart_sec: 10
