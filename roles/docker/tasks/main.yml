@@ -38,6 +38,7 @@
     name: docker
     enabled: yes
     state: started
+  ignore_errors: true
 
 - name: Wait for docker
   command: "{{ docker_bin_dir }}/docker images"

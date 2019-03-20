@@ -39,7 +39,7 @@ base_images(){
     docker save rainbond/cfssl:dev > ${offline_image_path}/base/cfssl_dev.tgz
     for bimg in ${baserbd[@]}
     do
-	[ -f "${offline_image_path}/base/${bimg}.tgz"] && rm -rf ${offline_image_path}/base/${bimg}.tgz
+	[ -f "${offline_image_path}/base/${bimg}.tgz" ] && rm -rf ${offline_image_path}/base/${bimg}.tgz
         docker pull rainbond/${bimg}:${version}
         docker tag rainbond/${bimg}:${version} goodrain.me/${bimg}:${version}
         docker save goodrain.me/${bimg}:${version} > ${offline_image_path}/base/${bimg}.tgz
@@ -128,7 +128,7 @@ case $1 in
 		base_tgz
 	;;
 	*)
-		rainbond_tgz push
-		base_tgz push
+		rainbond_tgz
+		base_tgz
 	;;
 esac
