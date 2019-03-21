@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version=5.1.0
+version=5.1.1
 rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog rbd-dns)
 all=(node rbd-chaos rbd-worker rbd-api rbd-eventlog rbd-db rbd-repo calico kube-controller-manager kube-scheduler rbd-app-ui rbd-monitor rbd-webcli rbd-mq rbd-gateway kube-apiserver rbd-dns rbd-hub etcd)
 plugins=(rbd-init-probe)

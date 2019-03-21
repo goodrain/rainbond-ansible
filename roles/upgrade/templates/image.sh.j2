@@ -12,8 +12,8 @@ upgrade_rainbond(){
 }
 
 upgrade_db(){
-    docker cp /tmp/5.0.4-5.1.0.sql rbd-db:/root/5.0.4-5.1.0.sql
-    docker exec rbd-db mysql -e "use console;source /root/5.0.4-5.1.0.sql;"
+    docker cp /tmp/5.1.0-5.1.1.sql rbd-db:/root/5.1.0-5.1.1.sql
+    docker exec rbd-db mysql -e "use console;source /root/5.1.0-5.1.1.sql;"
 }
 
 upgrade_dns(){
@@ -23,10 +23,11 @@ upgrade_dns(){
 
 case $1 in
     *)
-        grep ":5.0$"  /opt/rainbond/conf/ -R | awk -F: '{print $1}' | uniq | grep -v 'db' | xargs sed -i "s#5.0#5.1.0#g"
+        # grep ":5.0$"  /opt/rainbond/conf/ -R | awk -F: '{print $1}' | uniq | grep -v 'db' | xargs sed -i "s#5.0#5.1.0#g"
+        grep ":5.1.0$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#5.1.0#5.1.1#g"
         dps | grep rbd-api > /dev/null  && upgrade_rainbond || echo ""
         dps | grep rbd-db > /dev/null && upgrade_db || echo ""
-        dps | grep rbd-dns > /dev/null && upgrade_dns || echo ""
+        # dps | grep rbd-dns > /dev/null && upgrade_dns || echo ""
         node service update
     ;;
 esac
