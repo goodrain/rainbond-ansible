@@ -15,7 +15,7 @@
 # limitations under the License.
 
 IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.1.tgz"
-#IMAGE_BASE_LOCAL="/grdata/services/offline/base.images.upgrade.5.1.1.tgz"
+IMAGE_BASE_LOCAL="/grdata/services/offline/runtime.upgrade.2019-03-21-5.1.1.tgz"
 
 IMAGE_PATH="/grdata/services/offline/upgrade"
 
@@ -23,17 +23,17 @@ INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.1.tgz"
 
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
 
-if [ -f "$IMAGE_R6D_LOCAL" ];then
+if [ -f "$IMAGE_R6D_LOCAL" ]; then
     tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH}
 else
     exit 1
 fi
 
-#if [ -f "$IMAGE_BASE_LOCAL" ];then
-#    tar xf ${IMAGE_BASE_LOCAL} -C ${IMAGE_PATH}
-#else
-#    exit 1
-#fi
+if [ -f "$IMAGE_BASE_LOCAL" ]; then
+    tar xf ${IMAGE_BASE_LOCAL} -C ${IMAGE_PATH}
+else
+    exit 1
+fi
 
 version_check=$(grctl version | grep "5.1.0" | wc -l)
 if [ "$version_check" -eq 0 ]; then
@@ -41,11 +41,16 @@ if [ "$version_check" -eq 0 ]; then
     exit 1
 fi
 
-disk=$(df | grep "/$" | awk '{print $4}' | tr 'G' ' ')
+check_grdata=$(df -h | grep "/grdata$" | wc -l)
+if [ "$check_grdata" == 0 ]; then
+    disk=$(df | grep "/$" | awk '{print $4}' | tr 'G' ' ')
+else
+    disk=$(df | grep "/grdata$" | awk '{print $4}' | tr 'G' ' ')
+fi
 DISK_LIMIT=6000000
 DISK_STATUS=$(awk -v num1=$disk -v num2=$DISK_LIMIT 'BEGIN{print(num1>=num2)?"0":"1"}')
 if [ "$DISK_STATUS" -ne '0' ]; then
-    echo "!!! 磁盘至少可用空间大于6GB(now ${disk}GB)"
+    echo "!!! 磁盘(/grdata)至少可用空间大于6GB(now ${disk}GB)"
     exit 1
 fi
 
@@ -78,7 +83,7 @@ for ((i=1;i<=60;i++));do
     [ "$?" -eq 0 ] && export readyok="ok"  && break
 done
 
-[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | awk '{print $1":"$2}' | xargs -I {} docker push {}
+[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|none|v|k8s|rbd_|5\.0|3\.0)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.0
 mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.0
@@ -90,5 +95,5 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml
 
 rm -rf ${IMAGE_R6D_LOCAL}
-
+rm -rf ${IMAGE_BASE_LOCAL}
 rm -rf ${IMAGE_PATH}
