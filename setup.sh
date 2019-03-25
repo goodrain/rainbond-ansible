@@ -205,8 +205,22 @@ precheck::check_system(){
     info "prepare check system" "passed"
 }
 
+precheck::check_uid(){
+    if [ "$ENABLE_CHECK" == "enable" ]; then
+        if [ "${UID}" != 0 ]; then
+            notice "The root user must be used by default."
+        fi
+    else
+        if [ "${UID}" != 0 ]; then
+            info "Root(uid 0) is recommended"
+        fi
+    fi
+    info "prepare check uid" "passed"
+}
+
 precheck(){
     progress "Prepare check"
+    precheck::check_uid
     if [ ! -f "/opt/rainbond/.init/.port_check" ]; then
         precheck::check_port
     fi
@@ -393,6 +407,7 @@ prepare::general(){
     info "internal ip" $IIP
     [ ! -z "$EIP" ] && info "external ip" $EIP
     [ ! -z "$VIP" ] && info "virtual ip" $VIP
+    
     precheck
     config::default
     config::dns
