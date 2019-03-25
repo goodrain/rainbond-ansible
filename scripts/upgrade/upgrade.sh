@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.1.tgz"
-IMAGE_BASE_LOCAL="/grdata/services/offline/runtime.upgrade.2019-03-21-5.1.1.tgz"
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.2.tgz"
+IMAGE_BASE_LOCAL="/grdata/services/offline/runtime.upgrade.5.1.2.tgz"
 
 IMAGE_PATH="/grdata/services/offline/upgrade"
 
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.1.tgz"
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.2.tgz"
 
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
 
@@ -35,7 +35,7 @@ else
     exit 1
 fi
 
-version_check=$(grctl version | grep "5.1.0" | wc -l)
+version_check=$(grctl version | grep "5.1." | wc -l)
 if [ "$version_check" -eq 0 ]; then
     echo "请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803"
     exit 1
@@ -55,20 +55,21 @@ if [ "$DISK_STATUS" -ne '0' ]; then
 fi
 
 if [ -f "$INSTALL_SCRIPT" ];then
-    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_5.1.0
+    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_5.1.1
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond
     rm -rf /opt/rainbond/rainbond-ansible/inventory
-    cp -a /opt/rainbond/rainbond-ansible_5.1.0/inventory /opt/rainbond/rainbond-ansible
-    secretkey=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep secretkey | awk '{print $2}')
-    db_pass=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep db_pass | awk '{print $2}')
-    pod_cidr=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep pod_cidr | awk '{print $2}')
-    app_domain=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep app_domain | awk '{print $2}')
-    default_dns_local=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep default_dns_local | awk '{print $2}')
-    sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    sed -i -r  "s/(^db_pass: ).*/\1$db_pass/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    sed -i -r  "s#(^pod_cidr: ).*#\1$pod_cidr#" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    sed -i -r  "s/(^app_domain: ).*/\1$app_domain/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    sed -i -r  "s/(^default_dns_local: ).*/\1$default_dns_local/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    cp -a /opt/rainbond/rainbond-ansible_5.1.1/inventory /opt/rainbond/rainbond-ansible
+    cp -a /opt/rainbond/rainbond-ansible_5.1.1/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    #secretkey=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep secretkey | awk '{print $2}')
+    #db_pass=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep db_pass | awk '{print $2}')
+    #pod_cidr=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep pod_cidr | awk '{print $2}')
+    #app_domain=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep app_domain | awk '{print $2}')
+    #default_dns_local=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep default_dns_local | awk '{print $2}')
+    #sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    #sed -i -r  "s/(^db_pass: ).*/\1$db_pass/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    #sed -i -r  "s#(^pod_cidr: ).*#\1$pod_cidr#" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    #sed -i -r  "s/(^app_domain: ).*/\1$app_domain/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    #sed -i -r  "s/(^default_dns_local: ).*/\1$default_dns_local/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
 else
     exit 1
 fi
@@ -85,10 +86,10 @@ done
 
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|none|v|k8s|rbd_|5\.0|3\.0)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
-mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.0
-mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.0
+mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.1
+mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.1
 
-docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_5.1.1 tar zxf /pkg.tgz -C /sysdir
+docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_5.1.2 tar zxf /pkg.tgz -C /sysdir
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 
