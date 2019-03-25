@@ -276,7 +276,7 @@ config::default(){
         )
     )
     [ ! -f "/root/.ssh/id_rsa.pub" ] && (
-        ssh-keygen -t rsa -f /root/.ssh/id_rsa -P "" 1>/dev/null
+        ssh-keygen -t rsa -f /root/.ssh/id_rsa -P ""
     )
     db_user=$(cat /opt/rainbond/.init/db_user)
     db_pass=$(cat /opt/rainbond/.init/db_pass)
