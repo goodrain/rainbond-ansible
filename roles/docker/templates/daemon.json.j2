@@ -10,7 +10,4 @@
     "max-size": "{{ LOG_MAX_SIZE }}",
     "max-file": "{{ LOG_MAX_FILE }}"
     }
-  {% if ENABLE_REMOTE_API %}
-  , "hosts": ["{{ DOCKER_HOST_TCP }}", "{{ DOCKER_HOST_SOCK }}"]
-  {% endif %}
 }

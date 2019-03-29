@@ -1,19 +1,9 @@
 - name: Docker | Install docker online
-  shell: "export VERSION={{ docker_version }} && curl -fsSL http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/docker/get-docker.sh | bash -s docker --mirror Aliyun"
+  shell: "export VERSION={{ docker_version }} && curl -fsSL http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/releases/docker/install-docker.sh | bash -s docker "
   register: docker_task_result
   until: docker_task_result is succeeded
   retries: 4
   notify: restart docker
-
-#- name: show docker info
-#  debug: var=docker_task_result
-
-#- name: Install docker api
-#  shell: "pip install docker-py -i https://pypi.tuna.tsinghua.edu.cn/simple"
-#  register: docker_py_task_result
-#  until: docker_py_task_result is succeeded
-#  retries: 4
-#  when: docker_task_result is succeeded
 
 - name: Docker | Start docker
   service:
