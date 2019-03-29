@@ -1,5 +1,5 @@
 ---
-- name: Hosts | populate rainbond into hosts file
+- name: populate rainbond into hosts file
   blockinfile:
     dest: /etc/hosts
     block: |-

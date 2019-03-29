@@ -23,7 +23,7 @@
   become: true
   when: http_proxy is defined
 
-- name: PKG| remove centos pkg
+- name: remove centos firewall pkg
   yum: 
     name: 
       - firewalld
@@ -35,11 +35,11 @@
     state: absent
   tags: prepare
 
-- name: PKG| add EPEL repo
+- name: add Online EPEL repo
   yum: name=epel-release state=latest
   when: install_type == "online"
 
-- name: PKG| install centos package
+- name: install centos package
   yum: 
     name: 
       - conntrack-tools     # ipvs mode
@@ -55,12 +55,22 @@
       - expect
     state: latest
 
-- name: SYSTEM | disable selinux
+- name: disable selinux
   shell: "setenforce 0"
   failed_when: false
 
-- name: SYSTEM | disable selinux forover
+- name: disable selinux forover
   lineinfile:
     dest: /etc/selinux/config
     regexp: "^SELINUX="
     line: "SELINUX=disabled"
+
+- name: disable rsyslog get journald
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    state: present
+    regexp: 'ModLoad imjournal'
+    line: '#$ModLoad imjournal # provides access to the systemd journal'
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
