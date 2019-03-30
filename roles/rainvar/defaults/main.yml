@@ -1,4 +1,4 @@
-r6d_version: 5.1.2
+r6d_version: V5.1-dev
 kubernetes_version: v1.10.13
 docker_version: 18.06
 docker_selinux_version: '17.03'
@@ -58,9 +58,9 @@ hub: rbd-registry:2.6.2
 kubecfg: kubecfg:dev
 cfssl: cfssl:dev
 
-builder: builder:{{ r6d_version }}
-runner: runner:{{ r6d_version }}
-adapter: adapter:{{ r6d_version }}
+builder: builder
+runner: runner
+adapter: adapter
 repo: rbd-repo:6.5.9
 api: rbd-api:{{ r6d_version }}
 worker: rbd-worker:{{ r6d_version }}
@@ -70,9 +70,9 @@ chaos: rbd-chaos:{{ r6d_version }}
 mq: rbd-mq:{{ r6d_version }}
 webcli: rbd-webcli:{{ r6d_version }}
 rbd_app_ui: rbd-app-ui:{{ r6d_version }}
-k8s_cni: cni:k8s_{{ r6d_version }}
+k8s_cni: cni:k8s
 rbd_cni: cni:rbd_{{ r6d_version }}
-dns: rbd-dns:{{ r6d_version }}
+dns: rbd-dns
 monitor: rbd-monitor:{{ r6d_version }}
 
 CLUSTER_NETWORK: calico

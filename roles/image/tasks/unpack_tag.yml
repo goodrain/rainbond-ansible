@@ -9,6 +9,6 @@
   when: unpack_is_done.stat.isreg is not defined
 
 - name: Rainbond | Unpack k8s cni tools
-  shell: "docker run --rm -v {{ local_tools }}:/sysdir rainbond/{{ k8s_cni }} tar zxf /pkg.tgz -C /sysdir"
+  shell: "docker run --rm -v {{ local_tools }}:/sysdir goodrain.me/{{ k8s_cni }} tar zxf /pkg.tgz -C /sysdir"
   when: unpack_is_done.stat.isreg is not defined
 
