@@ -24,7 +24,8 @@ upgrade_dns(){
 case $1 in
     *)
         # grep ":5.0$"  /opt/rainbond/conf/ -R | awk -F: '{print $1}' | uniq | grep -v 'db' | xargs sed -i "s#5.0#5.1.0#g"
-        grep ":5.1.0$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#5.1.0#5.1.1#g"
+        grep ":5.1.0$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#5.1.0#v5.1.2-release#g"
+        grep ":5.1.1$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#5.1.0#v5.1.2-release#g"
         dps | grep rbd-api > /dev/null  && upgrade_rainbond || echo ""
         dps | grep rbd-db > /dev/null && upgrade_db || echo ""
         # dps | grep rbd-dns > /dev/null && upgrade_dns || echo ""
