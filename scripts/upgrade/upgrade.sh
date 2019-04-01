@@ -89,7 +89,7 @@ done
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.1
 mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.1
 
-docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_5.1.2 tar zxf /pkg.tgz -C /sysdir
+docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_v5.1.2-release tar zxf /pkg.tgz -C /sysdir
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 
