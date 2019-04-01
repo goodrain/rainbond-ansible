@@ -23,12 +23,14 @@ INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.2.tgz"
 
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
 
+echo "tar xf rainbond.images "
 if [ -f "$IMAGE_R6D_LOCAL" ]; then
     tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH}
 else
     exit 1
 fi
 
+echo "tar xf runtime "
 if [ -f "$IMAGE_BASE_LOCAL" ]; then
     tar xf ${IMAGE_BASE_LOCAL} -C ${IMAGE_PATH}
 else
@@ -40,6 +42,9 @@ if [ "$version_check" -eq 0 ]; then
     echo "请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803"
     exit 1
 fi
+
+echo "clean old endpoints"
+kubectl get ns | grep -vE '(default|kube-public|kube-system|rainbond|NAME)' | awk '{print $1}' | xargs -I {} kubectl delete ep -l service-kind="third_party",creater="Rainbond" -n {}
 
 check_grdata=$(df -h | grep "/grdata$" | wc -l)
 if [ "$check_grdata" == 0 ]; then
@@ -74,6 +79,7 @@ else
     exit 1
 fi
 
+echo "start load docker image"
 pushd $IMAGE_PATH
 ls | grep tgz | xargs -I {} docker load -i ./{}
 popd
