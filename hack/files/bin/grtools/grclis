@@ -88,7 +88,6 @@ reset(){
     systemctl stop kubelet
     dps | grep goodrain.me | grep -v 'k8s' | awk '{print $NF}' | xargs -I {} systemctl stop {}
     cclear
-    rm -rf /opt/rainbond/
     rm -rf /tmp/*
     rm -rf /usr/local/bin/grctl
     rm -rf /usr/local/bin/node
