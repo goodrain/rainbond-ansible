@@ -29,7 +29,7 @@ services:
     -i goodrain.me/{{ api }}
     --etcd=${ETCD_ENDPOINTS}
     --api-addr-ssl={{ nodeip }}:8443
-    --api-addr={{ nodeip }}:8888
+    --api-addr=127.0.0.1:8888
     --log-level=debug
     --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
     --api-ssl-enable=true

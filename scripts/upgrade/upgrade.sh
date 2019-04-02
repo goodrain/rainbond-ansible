@@ -75,6 +75,8 @@ if [ -f "$INSTALL_SCRIPT" ];then
     #sed -i -r  "s#(^pod_cidr: ).*#\1$pod_cidr#" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     #sed -i -r  "s/(^app_domain: ).*/\1$app_domain/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     #sed -i -r  "s/(^default_dns_local: ).*/\1$default_dns_local/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    version=$(cat /opt/rainbond/rainbond-ansible/version)
+    sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
 else
     exit 1
 fi
