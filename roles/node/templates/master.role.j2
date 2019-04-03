@@ -30,7 +30,7 @@ services:
     --etcd=${ETCD_ENDPOINTS}
     --api-addr-ssl={{ nodeip }}:8443
     --api-addr=127.0.0.1:8888
-    --log-level=debug
+    --log-level=info
     --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
     --api-ssl-enable=true
     --api-ssl-certfile=/etc/goodrain/region.goodrain.me/ssl/server.pem
@@ -65,7 +65,7 @@ services:
     -v /var/run:/var/run
     -v /grdata/services/ssh:/root/.ssh
     -i goodrain.me/{{ chaos }}
-    --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }} --log-level=debug --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
+    --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }} --log-level=info --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
   stop: docker stop rbd-chaos
   restart_policy: always
   restart_sec: 10
@@ -88,7 +88,7 @@ services:
     docker run --name rbd-mq
     --network host
     -i goodrain.me/{{ mq }}
-    --log-level=debug --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }}
+    --log-level=info --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }}
   stop: docker stop rbd-mq
   restart_policy: always
   restart_sec: 10
@@ -146,7 +146,6 @@ services:
     --etcd-endpoints=${ETCD_ENDPOINTS}
     --node-name={{ inventory_hostname }}
     --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
-    --log-level=debug
     --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
   stop: docker stop rbd-worker
   restart_policy: always

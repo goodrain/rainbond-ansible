@@ -20,7 +20,7 @@ services:
     -e DEFAULT_PORT=80
     -i goodrain.me/{{ gateway }}
     --etcd-endpoints=${ETCD_ENDPOINTS}
-    --log-level=debug
+    --log-level=info
     --error-log=/dev/stderr error {% if deploy_type != "thirdparty" %}--enable-kubeapi=true{% endif %}
 
   stop: docker stop rbd-gateway
