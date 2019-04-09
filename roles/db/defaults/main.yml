@@ -1,5 +1,3 @@
 ---
 db_host: "{{hostvars[inventory_hostname]['ip']}}"
 db_port: 3306
-db_user: 
-db_passwd: 
