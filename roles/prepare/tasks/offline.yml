@@ -23,3 +23,6 @@
   args:
     warn: no
   when: ansible_distribution == "CentOS"
+
+- import_tasks: chrony.yml
+  when: "groups.deploy[0]]['NTP_ENABLED'] == 'yes'"

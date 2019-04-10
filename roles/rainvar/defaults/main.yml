@@ -25,6 +25,9 @@ secretkey: aek0yi7ro5AJaeg5ooRoMie2owu4raeT
 rbd_db_image: rbd-db:latest
 db_user: write
 db_pass: 1833efe4
+db_port: 3306
+db_host: 127.0.0.1
+db_type: internal
 
 override_system_hostname: true
 #kube_pods_subnet: 10.233.64.0/18

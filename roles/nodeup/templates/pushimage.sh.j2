@@ -6,4 +6,4 @@ for ((i=1;i<=60;i++));do
     [ "$?" -eq 0 ] && export readyok="ok"  && break
 done
 
-[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | awk '{print $1":"$2}' | xargs -I {} docker push {}
+[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -v none | awk '{print $1":"$2}' | xargs -I {} docker push {}

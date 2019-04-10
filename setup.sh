@@ -263,6 +263,20 @@ do_install::3rd(){
     fi
 }
 
+# support config db
+config::db(){
+    [ ! -f "/opt/rainbond/.init/db_pass" ] && (
+        db_pass=$(pwgen 8 1)
+        [ ! -z "$db_pass" ] &&  (
+            echo "$db_pass" > /opt/rainbond/.init/db_pass
+        )
+        db_user=$(pwgen 6 1)
+        [ ! -z "$db_user" ] &&  (
+            echo "$db_user" > /opt/rainbond/.init/db_user
+        )
+    )
+}
+
 # Generate default configuration
 config::default(){
     [ ! -f "/opt/rainbond/.init/uuid" ] && (
@@ -279,24 +293,21 @@ config::default(){
             echo "$secretkey" > /opt/rainbond/.init/secretkey
         )
     )
-    [ ! -f "/opt/rainbond/.init/db_pass" ] && (
-        db_pass=$(pwgen 8 1)
-        [ ! -z "$db_pass" ] &&  (
-            echo "$db_pass" > /opt/rainbond/.init/db_pass
-        )
-        db_user=$(pwgen 6 1)
-        [ ! -z "$db_user" ] &&  (
-            echo "$db_user" > /opt/rainbond/.init/db_user
-        )
-    )
+    config::db
     [ ! -f "/root/.ssh/id_rsa.pub" ] && (
         ssh-keygen -t rsa -f /root/.ssh/id_rsa -P ""
     )
-    db_user=$(cat /opt/rainbond/.init/db_user)
-    db_pass=$(cat /opt/rainbond/.init/db_pass)
+    db_user=$(cat /opt/rainbond/.init/db | grep db_user | awk -F: '{print $2}')
+    db_pass=$(cat /opt/rainbond/.init/db | grep db_pass | awk -F: '{print $2}')
+    db_host=$(cat /opt/rainbond/.init/db | grep db_host | awk -F: '{print $2}')
+    db_port=$(cat /opt/rainbond/.init/db | grep db_port | awk -F: '{print $2}')
+    db_type=$(cat /opt/rainbond/.init/db | grep db_type | awk -F: '{print $2}')
     secretkey=$(cat /opt/rainbond/.init/secretkey)
     sed -i -r  "s/(^db_user: ).*/\1$db_user/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^db_pass: ).*/\1$db_pass/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^db_host: ).*/\1$db_host/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^db_port: ).*/\1$db_port/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^db_type: ).*/\1$db_type/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     touch /opt/rainbond/.init/.init_done

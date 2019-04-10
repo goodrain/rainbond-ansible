@@ -1,5 +1,4 @@
 ---
-
 # CPU
 r6d_min_cpu: 2
 
@@ -9,3 +8,10 @@ r6d_min_ram: 3500
 
 # Disk
 r6d_min_disk: 40000000000
+
+# 设置时间源服务器
+ntp_server: "ntp1.aliyun.com"
+
+# 设置允许内部时间同步的网络段，比如"10.0.0.0/8"，默认全部允许
+local_network: "0.0.0.0/0"
+
