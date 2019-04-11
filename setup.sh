@@ -230,51 +230,41 @@ precheck(){
     precheck::check_system
 }
 
-do_install::ok(){
-    [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
-    [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
-    info "扩容节点" "https://www.rainbond.com/docs/user-operations/management/add-node/"
-    info "操作文档" "https://www.rainbond.com/docs/user-manual/"
-    info "社区" "https://t.goodrain.com"
-    info "查询集群状态" "grctl cluster"
-    grctl cluster
-}
-
-# Install the rainbond cluster
-do_install::r6d(){
-    progress "Initialize the data center"
-    run ansible-playbook -i inventory/hosts setup.yml
-    if [ "$?" -eq 0 ]; then
-        curl -Is 127.0.0.1:7070 | head -1 | grep 200 > /dev/null && progress "Congratulations on your successful installation" || sleep 1
-        do_install::ok
-    else
-        notice "The installation did not succeed, please redo it or ask for help"
-    fi
-}
-
-# Install the rainbond cluster on the existing k8s cluster
-do_install::3rd(){
-    progress "Only Install Rainbond On Thirdparty Node"
-    run ansible-playbook -i inventory/hosts hack/thirdparty/setup.yaml
-    if [ "$?" -eq 0 ]; then
-        do_install::ok
-    else
-        notice "The installation did not succeed, please redo it or ask for help"
-    fi
-}
-
 # support config db
 config::db(){
-    [ ! -f "/opt/rainbond/.init/db_pass" ] && (
-        db_pass=$(pwgen 8 1)
-        [ ! -z "$db_pass" ] &&  (
-            echo "$db_pass" > /opt/rainbond/.init/db_pass
+    
+    # 使用外部数据库
+    if [ ! -z "$ENABLE_EXDB" ]; then
+        if [ ! -z "$EXDB_PASSWD" ] && [ ! -z "$EXDB_PORT" ] && [ ! -z "$EXDB_HOST" ] && [ ! -z "$EXDB_USER" ]; then
+            cat > /opt/rainbond/.init/db <<EOF
+db_user: $EXDB_USER
+db_pass: $EXDB_PASSWD
+db_port: $EXDB_PORT
+db_host: $EXDB_HOST
+db_type: external
+EOF
+        else
+            notice "使用外部数据库,参数不全"
+        fi
+    else
+        [ ! -f "/opt/rainbond/.init/.db_info" ] && (
+            db_pass=$(pwgen 8 1)
+            [ ! -z "$db_pass" ] &&  (
+                echo "db_pass:$db_pass" > /opt/rainbond/.init/.db_info
+            )
+            db_user=$(pwgen 6 1)
+            [ ! -z "$db_user" ] &&  (
+                echo "db_user:$db_user" >> /opt/rainbond/.init/.db_info
+            )
         )
-        db_user=$(pwgen 6 1)
-        [ ! -z "$db_user" ] &&  (
-            echo "$db_user" > /opt/rainbond/.init/db_user
-        )
-    )
+            cat > /opt/rainbond/.init/db <<EOF
+db_user: $(cat /opt/rainbond/.init/.db_info | grep db_user | awk -F: '{print $2}')
+db_pass: $(cat /opt/rainbond/.init/.db_info | grep db_pass | awk -F: '{print $2}')
+db_port: 3306
+db_host: $1
+db_type: internal
+EOF
+    fi
 }
 
 # Generate default configuration
@@ -293,7 +283,7 @@ config::default(){
             echo "$secretkey" > /opt/rainbond/.init/secretkey
         )
     )
-    config::db
+    config::db $1
     [ ! -f "/root/.ssh/id_rsa.pub" ] && (
         ssh-keygen -t rsa -f /root/.ssh/id_rsa -P ""
     )
@@ -309,6 +299,8 @@ config::default(){
     sed -i -r  "s/(^db_port: ).*/\1$db_port/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^db_type: ).*/\1$db_type/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
+    info "Use database type" "${db_type}"
+    info "database info" "mysql -u ${db_user} -h ${db_host} -P ${db_port} -p ${db_pass}"
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     touch /opt/rainbond/.init/.init_done
     info "Generate the default configuration" "$(cat /opt/rainbond/.init/uuid)/$(cat /opt/rainbond/.init/secretkey)"
@@ -407,6 +399,7 @@ prepare::general(){
     detect_linux_distribution
     info "Installation type" "$INSTALL_TYPE"
     info "Deployment type" "$DEPLOY_TYPE"
+    info "Rainbond Version" "$VERSION"
     if [ "$INSTALL_TYPE" == "online" ]; then
         init::online
     else
@@ -420,7 +413,7 @@ prepare::general(){
     [ ! -z "$VIP" ] && info "virtual ip" $VIP
     
     precheck
-    config::default
+    config::default $IIP
     config::dns
     config::docker
     config::install_deploy
@@ -492,6 +485,47 @@ prepare::3rd(){
     sed -i -r  "s/(^etcd_port_c1: ).*/\1$etcd_port_c1/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^etcd_port_c2: ).*/\1$etcd_port_c2/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^etcd_port_s1: ).*/\1$etcd_port_s1/" roles/rainvar/defaults/main.yml
+}
+
+do_install::ok(){
+    [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
+    [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
+    info "扩容节点" "https://www.rainbond.com/docs/user-operations/management/add-node/"
+    info "操作文档" "https://www.rainbond.com/docs/user-manual/"
+    info "社区" "https://t.goodrain.com"
+    info "查询集群状态" "grctl cluster"
+    grctl cluster
+}
+
+# Install the rainbond cluster
+do_install::r6d(){
+    progress "Initialize the data center"
+    if [ -z "$DRY_RUN" ]; then
+        run ansible-playbook -i inventory/hosts setup.yml
+        if [ "$?" -eq 0 ]; then
+            curl -Is 127.0.0.1:7070 | head -1 | grep 200 > /dev/null && progress "Congratulations on your successful installation" || sleep 1
+            do_install::ok
+        else
+            notice "The installation did not succeed, please redo it or ask for help"
+        fi
+    else
+        run echo "dry run: setup.sh"
+    fi
+}
+
+# Install the rainbond cluster on the existing k8s cluster
+do_install::3rd(){
+    progress "Only Install Rainbond On Thirdparty Node"
+    if [ -z "$DRY_RUN" ]; then
+        run ansible-playbook -i inventory/hosts hack/thirdparty/setup.yaml
+        if [ "$?" -eq 0 ]; then
+            do_install::ok
+        else
+            notice "The installation did not succeed, please redo it or ask for help"
+        fi
+    else
+        run echo "dry run: setup.sh"
+    fi
 }
 
 case $DEPLOY_TYPE in
