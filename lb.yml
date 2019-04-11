@@ -1,0 +1,8 @@
+- hosts: lb
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: bootstrap, tags: bootstrap }
+    - { role: prepare, tags: prepare }
+    - { role: docker, tags: docker }
+    - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
+    - { role: lb, tags: lb }

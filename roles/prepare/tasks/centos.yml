@@ -36,7 +36,7 @@
   tags: prepare
 
 - name: add Online EPEL repo
-  yum: name=epel-release state=latest
+  yum: name=epel-release state=present
   when: install_type == "online"
 
 - name: install centos package

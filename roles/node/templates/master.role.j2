@@ -8,7 +8,7 @@ services:
   health:
     name: rbd-api
     model: http
-    address: {{ nodeip }}:8888/v2/health
+    address: 127.0.0.1:8888/v2/health
     max_errors_num: 3
     time_interval: 5
   after:
@@ -31,7 +31,7 @@ services:
     --api-addr-ssl={{ nodeip }}:8443
     --api-addr=127.0.0.1:8888
     --log-level=info
-    --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
+    --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region"
     --api-ssl-enable=true
     --api-ssl-certfile=/etc/goodrain/region.goodrain.me/ssl/server.pem
     --api-ssl-keyfile=/etc/goodrain/region.goodrain.me/ssl/server.key.pem
@@ -65,7 +65,7 @@ services:
     -v /var/run:/var/run
     -v /grdata/services/ssh:/root/.ssh
     -i goodrain.me/{{ chaos }}
-    --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }} --log-level=info --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
+    --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }} --log-level=info --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region"
   stop: docker stop rbd-chaos
   restart_policy: always
   restart_sec: 10
@@ -146,7 +146,7 @@ services:
     --etcd-endpoints=${ETCD_ENDPOINTS}
     --node-name={{ inventory_hostname }}
     --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
-    --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region"
+    --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region"
   stop: docker stop rbd-worker
   restart_policy: always
   restart_sec: 10
@@ -196,11 +196,12 @@ services:
     docker run --name rbd-eventlog
     --network host
     -e K8S_MASTER=http://127.0.0.1:8181
+    -e DOCKER_LOG_SAVE_DAY=7
     -v {{ rbd_dir }}/logs/rbd-eventlog:/var/log
     -v /grdata/downloads/log:/grdata/logs
     -v /opt/rainbond/etc/node:/opt/rainbond/etc/node
     -i goodrain.me/{{ eventlog }}
-    --cluster.bind.ip={{ nodeip }} --cluster.instance.ip={{ nodeip }} --db.type=mysql --db.url="{{ db_user }}:{{ db_pass }}@tcp({{ MASTER_IP }}:3306)/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ nodeip }} --websocket.bind.ip={{ nodeip }}
+    --cluster.bind.ip={{ nodeip }} --cluster.instance.ip={{ nodeip }} --db.type=mysql --db.url="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ nodeip }} --websocket.bind.ip={{ nodeip }}
   stop: docker stop rbd-eventlog
   restart_policy: always
   restart_sec: 10

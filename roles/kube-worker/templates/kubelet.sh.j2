@@ -23,11 +23,10 @@ KUBELET_ARGS="
     --fail-swap-on=false \
     --image-gc-high-threshold=90 \
     --image-gc-low-threshold=80 \
-    --kube-reserved=cpu=300m,memory=512Mi,ephemeral-storage=1Gi \
-    --system-reserved=cpu=700m,memory=1024Mi,ephemeral-storage=1Gi \
-    --max-pods=10000 \
+    --kube-reserved={{ kube_reserved }} \
+    --system-reserved={{ system_reserved }} \
+    --max-pods={{ max_pods }} \
     --cpu-cfs-quota=false \
-    --fail-swap-on=false \
     --eviction-max-pod-grace-period=40 \
     --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
     --maximum-dead-containers-per-container=0"

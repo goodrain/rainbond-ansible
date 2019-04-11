@@ -20,8 +20,8 @@ services:
     --network host
     -e MANAGE_SECRET_KEY={{ secretkey }} {% if dev_mode == "goodrain" %} -e ENTERPRISE_ID={{ enterprise_id }} {% endif %}
 
-    -e MYSQL_HOST={{ MASTER_IP }}
-    -e MYSQL_PORT=3306
+    -e MYSQL_HOST={{ db_host }}
+    -e MYSQL_PORT={{ db_port }}
     -e MYSQL_USER={{ db_user }}
     -e MYSQL_PASS={{ db_pass }}
     -e MYSQL_DB=console
