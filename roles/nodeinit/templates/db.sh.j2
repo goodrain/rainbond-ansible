@@ -21,13 +21,13 @@ if [ "$NET_TYPE" == "internal" ]; then
     fi
     DOCKER_CMD="docker exec rbd-db mysql -e"
 else
-    DOCKER_CMD="docker run -i --rm -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} rainbond/mysql-client"
+    DOCKER_CMD="docker run -i --rm -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} goodrain.me/r6dctl:sqlclient"
     if [ "$ENABLE_CONSOLE" == "true" ]; then
-        DOCKER_CMD_REGION="docker run -i --rm  -e DB_HOST={{ db_host }} -e DB_PORT={{ db_port }} -e DB_PASS={{ db_pass }} -e DB_USER={{ db_user }} rainbond/mysql-client"
+        DOCKER_CMD_REGION="docker run -i --rm  -e DB_HOST={{ db_host }} -e DB_PORT={{ db_port }} -e DB_PASS={{ db_pass }} -e DB_USER={{ db_user }} goodrain.me/r6dctl:sqlclient"
     fi
 fi
 
-DOCKER_CMD_CS="docker run -i --rm -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} rainbond/mysql-client"
+DOCKER_CMD_CS="docker run -i --rm -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} goodrain.me/r6dctl:sqlclient"
 
 
 generate_region_sql(){
