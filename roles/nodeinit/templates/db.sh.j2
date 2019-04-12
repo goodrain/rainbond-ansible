@@ -11,6 +11,14 @@ NET_TYPE={{ net_type }}
 ENABLE_CONSOLE={{ enable_console }}
 
 if [ "$NET_TYPE" == "internal" ]; then
+    if [ ! -f "/tmp/install/waiting.db" ]; then
+        for ((i=1;i<=10;i++))
+        do
+            num=$(dps | grep rbd-db | wc -l)
+            [ "$num" -ne 0 ] && echo "db is ok" && touch /tmp/install/waiting.db && break
+            sleep 5
+        done
+    fi
     DOCKER_CMD="docker exec rbd-db mysql -e"
 else
     DOCKER_CMD="docker run -i --rm -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} rainbond/mysql-client"

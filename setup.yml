@@ -67,6 +67,11 @@
 - hosts: master:worker
   roles:
     - { role: rainvar, tags: default }
+    - { role: monitor, tags: monitor }
+
+- hosts: master:worker
+  roles:
+    - { role: rainvar, tags: default }
     - { role: node, tags: node }
 
 - hosts: deploy
