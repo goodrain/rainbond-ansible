@@ -20,10 +20,10 @@ services:
     --network host
     -e MANAGE_SECRET_KEY={{ secretkey }} {% if dev_mode == "goodrain" %} -e ENTERPRISE_ID={{ enterprise_id }} {% endif %}
 
-    -e MYSQL_HOST={{ db_host }}
-    -e MYSQL_PORT={{ db_port }}
-    -e MYSQL_USER={{ db_user }}
-    -e MYSQL_PASS={{ db_pass }}
+    -e MYSQL_HOST={{ dbcs_host }}
+    -e MYSQL_PORT={{ dbcs_port }}
+    -e MYSQL_USER={{ dbcs_user }}
+    -e MYSQL_PASS={{ dbcs_pass }}
     -e MYSQL_DB=console
     -v /grdata/services/console:/app/ui/data
     -v {{ rbd_dir }}/etc/rbd-api:/etc/goodrain

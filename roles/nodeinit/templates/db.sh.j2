@@ -2,16 +2,21 @@
 
 set -xe
 
-DB_HOST={{ db_host }}
-DB_PORT={{ db_port }}
-DB_USER={{ db_user }}
-DB_PASS={{ db_pass }}
-DB_TYPE={{ db_type }}
+DB_HOST={{ dbcs_host }}
+DB_PORT={{ dbcs_port }}
+DB_USER={{ dbcs_user }}
+DB_PASS={{ dbcs_pass }}
+NET_TYPE={{ net_type }}
 
-if [ "$DB_TYPE" == "internal" ]; then
+ENABLE_CONSOLE={{ enable_console }}
+
+if [ "$NET_TYPE" == "internal" ]; then
     DOCKER_CMD="docker exec rbd-db mysql -e"
 else
-    DOCKER_CMD="docker run -i --rm  -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} rainbond/mysql-client"
+    DOCKER_CMD="docker run -i --rm -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} rainbond/mysql-client"
+    if [ "$ENABLE_CONSOLE" == "true" ]; then
+        DOCKER_CMD_REGION="docker run -i --rm  -e DB_HOST={{ db_host }} -e DB_PORT={{ db_port }} -e DB_PASS={{ db_pass }} -e DB_USER={{ db_user }} rainbond/mysql-client"
+    fi
 fi
 
 generate_region_sql(){
@@ -35,12 +40,26 @@ prepare(){
     do
         db_num=$(curl -s --connect-timeout 5 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
         if [ "$db_num" == 1 ]; then
-            $DOCKER_CMD "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";
-            $DOCKER_CMD "delete from mysql.user where user=''; flush privileges"
-            $DOCKER_CMD "CREATE DATABASE IF NOT EXISTS region DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
-            $DOCKER_CMD "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
-            check_db=$($DOCKER_CMD "show databases" | grep console | wc -l)
-            [ "$check_db" -ne 0 ] && break
+            if [ "$ENABLE_CONSOLE" == "true" ]; then
+                $DOCKER_CMD "grant all on *.* to '{{ dbcs_user }}'@'%' identified by '{{ dbcs_pass }}' with grant option; flush privileges";
+                $DOCKER_CMD "delete from mysql.user where user=''; flush privileges"
+                $DOCKER_CMD "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+
+                $DOCKER_CMD_REGION "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";
+                $DOCKER_CMD_REGION "delete from mysql.user where user=''; flush privileges"
+                $DOCKER_CMD_REGION "CREATE DATABASE IF NOT EXISTS region DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+
+                check_console_db=$($DOCKER_CMD "show databases" | grep console | wc -l)
+                check_region_db=$($DOCKER_CMD_REGION "show databases" | grep region | wc -l)
+                [ "$check_console_db" -ne 0 ] && [ "$check_region_db" -ne 0 ] && break
+            else
+                $DOCKER_CMD "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";
+                $DOCKER_CMD "delete from mysql.user where user=''; flush privileges"
+                $DOCKER_CMD "CREATE DATABASE IF NOT EXISTS region DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+                $DOCKER_CMD "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+                check_db=$($DOCKER_CMD "show databases" | grep console | wc -l)
+                [ "$check_db" -ne 0 ] && break
+            fi
         else
             echo "prepare try $i"
             ((fail_num+=1))
@@ -66,18 +85,28 @@ migrate_ui(){
 }
 
 init_config(){
-    check=$($DOCKER_CMD "select wsurl from console.region_info where region_id='asdasdasdasdasdasdasdasdas';")
-    if [ -z "$check" ]; then
-        #docker cp /opt/rainbond/.init/init.sql rbd-db:/root
-        #docker cp /opt/rainbond/.init/region_info.sql rbd-db:/root
-        init_sql=$(cat /opt/rainbond/.init/init.sql)
-        region_sql=$(cat /opt/rainbond/.init/region_info.sql)
-        $DOCKER_CMD "use console;truncate table console_sys_config"
-        #$DOCKER_CMD "use console;source /root/init.sql;"
-        #$DOCKER_CMD "use console;source /root/region_info.sql;"
-        $DOCKER_CMD "use console;$init_sql;"
-        $DOCKER_CMD "use console;$region_sql;"
-    fi
+    local fail_num=0
+    for ((i=1;i<=6;i++))
+    do
+        check=$($DOCKER_CMD "select wsurl from console.region_info where region_id='asdasdasdasdasdasdasdasdas';")
+        if [ -z "$check" ]; then
+            #docker cp /opt/rainbond/.init/init.sql rbd-db:/root
+            #docker cp /opt/rainbond/.init/region_info.sql rbd-db:/root
+            init_sql=$(cat /opt/rainbond/.init/init.sql)
+            region_sql=$(cat /opt/rainbond/.init/region_info.sql)
+            $DOCKER_CMD "use console;truncate table console_sys_config"
+            $DOCKER_CMD "use console;source /opt/rainbond/.init/init.sql;"
+            $DOCKER_CMD "use console;source /opt/rainbond/.init/region_info.sql;"
+            #$DOCKER_CMD "use console;$init_sql;"
+            #$DOCKER_CMD "use console;$region_sql;"
+        else
+            echo "init config ok"
+            break
+        fi
+        echo "try init $1"
+        ((fail_num+=1))
+    done
+    [ "$fail_num" == 6 ] && echo "init config failed" && exit 1 || echo "init config ok" && exit 0
 }
 
 case $1 in

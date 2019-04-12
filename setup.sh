@@ -232,22 +232,7 @@ precheck(){
 
 # support config db
 config::db(){
-    
-    # 使用外部数据库
-    if [ ! -z "$ENABLE_EXDB" ]; then
-        if [ ! -z "$EXDB_PASSWD" ] && [ ! -z "$EXDB_PORT" ] && [ ! -z "$EXDB_HOST" ] && [ ! -z "$EXDB_USER" ]; then
-            cat > /opt/rainbond/.init/db <<EOF
-db_user: $EXDB_USER
-db_pass: $EXDB_PASSWD
-db_port: $EXDB_PORT
-db_host: $EXDB_HOST
-db_type: external
-EOF
-        else
-            notice "使用外部数据库,参数不全"
-        fi
-    else
-        [ ! -f "/opt/rainbond/.init/.db_info" ] && (
+    [ ! -f "/opt/rainbond/.init/.db_info" ] && (
             db_pass=$(pwgen 8 1)
             [ ! -z "$db_pass" ] &&  (
                 echo "db_pass:$db_pass" > /opt/rainbond/.init/.db_info
@@ -256,13 +241,63 @@ EOF
             [ ! -z "$db_user" ] &&  (
                 echo "db_user:$db_user" >> /opt/rainbond/.init/.db_info
             )
-        )
+    )
+    # 使用外部数据库
+    if [ ! -z "$ENABLE_EXDB" ]; then
+        # region & console
+        if [ ! -z "$EXDB_PASSWD" ] && [ ! -z "$EXDB_PORT" ] && [ ! -z "$EXDB_HOST" ] && [ ! -z "$EXDB_USER" ] && [ -z "$EXCSDB_ONLY_ENABLE" ]; then
             cat > /opt/rainbond/.init/db <<EOF
-db_user: $(cat /opt/rainbond/.init/.db_info | grep db_user | awk -F: '{print $2}')
-db_pass: $(cat /opt/rainbond/.init/.db_info | grep db_pass | awk -F: '{print $2}')
-db_port: 3306
-db_host: $1
-db_type: internal
+db_user:$EXDB_USER
+db_pass:$EXDB_PASSWD
+db_port:$EXDB_PORT
+db_host:$EXDB_HOST
+dbcs_user:$EXDB_USER
+dbcs_pass:$EXDB_PASSWD
+dbcs_port:$EXDB_PORT
+dbcs_host:$EXDB_HOST
+db_type:${EXDB_TYPE:-mysql}
+net_type:external
+enable_console:false
+EOF
+        else
+            # only console
+            if [ ! -z "$EXCSDB_ONLY_ENABLE" ]; then
+                if [ ! -z "$EXCSDB_PASSWD" ] && [ ! -z "$EXCSDB_PORT" ] && [ ! -z "$EXCSDB_HOST" ] && [ ! -z "$EXCSDB_USER" ]; then
+                    cat > /opt/rainbond/.init/db <<EOF
+db_user:$(cat /opt/rainbond/.init/.db_info | grep db_user | awk -F: '{print $2}')
+db_pass:$(cat /opt/rainbond/.init/.db_info | grep db_pass | awk -F: '{print $2}')
+db_port:3306
+db_host:$1
+dbcs_user:$EXCSDB_USER
+dbcs_pass:$EXCSDB_PASSWD
+dbcs_port:$EXCSDB_PORT
+dbcs_host:$EXCSDB_HOST
+db_type:mysql
+net_type:internal
+enable_console:true
+EOF
+                else
+                    notice "使用外部数据库console库参数不全"
+                fi
+            
+            else
+                notice "使用外部数据库,参数不全"
+            fi
+          
+        fi
+    else
+            cat > /opt/rainbond/.init/db <<EOF
+db_user:$(cat /opt/rainbond/.init/.db_info | grep db_user | awk -F: '{print $2}')
+db_pass:$(cat /opt/rainbond/.init/.db_info | grep db_pass | awk -F: '{print $2}')
+db_port:3306
+db_host:$1
+dbcs_user:$(cat /opt/rainbond/.init/.db_info | grep db_user | awk -F: '{print $2}')
+dbcs_pass:$(cat /opt/rainbond/.init/.db_info | grep db_pass | awk -F: '{print $2}')
+dbcs_port:3306
+dbcs_host:$1
+db_type:mysql
+net_type:internal
+enable_console:false
 EOF
     fi
 }
@@ -291,16 +326,32 @@ config::default(){
     db_pass=$(cat /opt/rainbond/.init/db | grep db_pass | awk -F: '{print $2}')
     db_host=$(cat /opt/rainbond/.init/db | grep db_host | awk -F: '{print $2}')
     db_port=$(cat /opt/rainbond/.init/db | grep db_port | awk -F: '{print $2}')
+    dbcs_user=$(cat /opt/rainbond/.init/db | grep dbcs_user | awk -F: '{print $2}')
+    dbcs_pass=$(cat /opt/rainbond/.init/db | grep dbcs_pass | awk -F: '{print $2}')
+    dbcs_host=$(cat /opt/rainbond/.init/db | grep dbcs_host | awk -F: '{print $2}')
+    dbcs_port=$(cat /opt/rainbond/.init/db | grep dbcs_port | awk -F: '{print $2}')
     db_type=$(cat /opt/rainbond/.init/db | grep db_type | awk -F: '{print $2}')
+    net_type=$(cat /opt/rainbond/.init/db | grep net_type | awk -F: '{print $2}')
     secretkey=$(cat /opt/rainbond/.init/secretkey)
     sed -i -r  "s/(^db_user: ).*/\1$db_user/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^db_pass: ).*/\1$db_pass/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^db_host: ).*/\1$db_host/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^db_port: ).*/\1$db_port/" roles/rainvar/defaults/main.yml
-    sed -i -r  "s/(^db_type: ).*/\1$db_type/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^dbcs_user: ).*/\1$dbcs_user/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^dbcs_pass: ).*/\1$dbcs_pass/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^dbcs_host: ).*/\1$dbcs_host/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^dbcs_port: ).*/\1$dbcs_port/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^db_type: ).*/\1${db_type:-mysql}/" roles/rainvar/defaults/main.yml
+    sed -i -r  "s/(^net_type: ).*/\1$net_type/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" roles/rainvar/defaults/main.yml
-    info "Use database type" "${db_type}"
-    info "database info" "mysql -u ${db_user} -h ${db_host} -P ${db_port} -p ${db_pass}"
+    info "Use database type" "${net_type}/${db_type:-mysql}"
+    if [ ! -z "$EXCSDB_ONLY_ENABLE" ]; then
+        sed -i -r  "s/(^enable_console: ).*/\1true}/" roles/rainvar/defaults/main.yml
+        info "database region info" "user:${db_user}/${db_pass} host:${db_host}:${db_port}"
+        info "database console info" "user:${dbcs_user}/${dbcs_pass} host:${dbcs_host}:${dbcs_port}"
+    else
+        info "database region/console info" "user:${db_user}/${db_pass} host:${db_host}:${db_port}"
+    fi
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     touch /opt/rainbond/.init/.init_done
     info "Generate the default configuration" "$(cat /opt/rainbond/.init/uuid)/$(cat /opt/rainbond/.init/secretkey)"

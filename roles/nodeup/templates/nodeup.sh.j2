@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 uid=$(grctl node list | grep compute | awk '{print $2}')
 
 if [ ! -z "$uid" ];then
