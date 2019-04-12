@@ -14,9 +14,9 @@ if [ "$NET_TYPE" == "internal" ]; then
     if [ ! -f "/tmp/install/waiting.db" ]; then
         for ((i=1;i<=10;i++))
         do
-            num=$(dps | grep rbd-db | wc -l)
+            num=$(curl -s --connect-timeout 5 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
             [ "$num" -ne 0 ] && echo "db is ok" && touch /tmp/install/waiting.db && break
-            sleep 5
+            sleep 10
         done
     fi
     DOCKER_CMD="docker exec rbd-db mysql -e"
