@@ -448,9 +448,10 @@ prepare::general(){
     progress "Preparation before installation..."
     detect_dev_mode
     detect_linux_distribution
+    r6d_version=$( cat /opt/rainbond/rainbond-ansible/version)
     info "Installation type" "$INSTALL_TYPE"
     info "Deployment type" "$DEPLOY_TYPE"
-    info "Rainbond Version" "$VERSION"
+    info "Rainbond Version" "$VERSION($r6d_version)"
     if [ "$INSTALL_TYPE" == "online" ]; then
         init::online
     else
@@ -482,6 +483,8 @@ prepare::general(){
     sed -i "s#node1#$hname#g" inventory/hosts
     sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
     sed -i "s#port=22#port=$INSTALL_SSH_PORT#g" inventory/hosts
+    
+    sed -i -r  "s/(^r6d_version: ).*/\1${r6d_version}/" roles/rainvar/defaults/main.yml
 
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
 }
