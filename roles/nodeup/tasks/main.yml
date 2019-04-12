@@ -6,7 +6,7 @@
     mode: 0777
 
 - name: Rainbond | Up Node 
-  shell: "bash /tmp/install/nodeup.sh"
+  shell: "bash -x /tmp/install/nodeup.sh > /tmp/install/nodeup.log"
   register: nodeup_task_result
   until: nodeup_task_result is succeeded
   retries: 5

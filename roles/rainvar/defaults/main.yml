@@ -27,7 +27,13 @@ db_user: write
 db_pass: 1833efe4
 db_port: 3306
 db_host: 127.0.0.1
-db_type: internal
+dbcs_user: write
+dbcs_pass: 1833efe4
+dbcs_port: 3306
+dbcs_host: 127.0.0.1
+db_type: mysql
+net_type: internal
+enable_console: false
 
 override_system_hostname: true
 #kube_pods_subnet: 10.233.64.0/18
