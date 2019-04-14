@@ -17,8 +17,7 @@ services:
   type: simple
   pre_start: docker rm kube-apiserver
   start: >-
-    /usr/bin/docker
-    run
+    docker run
     --privileged
     --restart=always
     --net=host
@@ -61,8 +60,7 @@ services:
   type: simple
   pre_start: docker rm kube-scheduler
   start: >-
-    /usr/bin/docker
-    run
+    docker run
     --privileged
     --restart=always
     --net=host
@@ -94,8 +92,7 @@ services:
   type: simple
   pre_start: docker rm kube-controller-manager
   start: >-
-    /usr/bin/docker
-    run
+    docker run
     --privileged
     --restart=always
     --net=host

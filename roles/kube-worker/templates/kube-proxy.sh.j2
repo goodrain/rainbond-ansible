@@ -10,7 +10,7 @@ KUBE_PROXY_ARGS="--bind-address=0.0.0.0 \
                  --kubeconfig={{ kubecfg_dir }}/kube-proxy.kubeconfig \
                  --cluster-cidr={{ service_cidr }} --proxy-mode=iptables"
 
-exec  /usr/bin/docker \
+exec  docker \
     run \
     --privileged \
     --restart=always \

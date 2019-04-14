@@ -38,7 +38,7 @@ KUBE_API_ARGS=" --anonymous-auth=false \
                 --storage-backend=etcd3 \
                 --enable-swagger-ui=true"
 
-exec /usr/bin/docker \
+exec docker \
     run \
     --privileged \
     --restart=always \

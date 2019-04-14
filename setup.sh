@@ -240,6 +240,8 @@ config::db(){
             db_user=$(pwgen 6 1)
             [ ! -z "$db_user" ] &&  (
                 echo "db_user:$db_user" >> /opt/rainbond/.init/.db_info
+                echo "db_port:3306" >> /opt/rainbond/.init/.db_info
+                echo "db_host:$1" >> /opt/rainbond/.init/.db_info
             )
     )
     # 使用外部数据库
@@ -262,18 +264,28 @@ EOF
         else
             # only console
             if [ ! -z "$EXCSDB_ONLY_ENABLE" ]; then
+
+                if [ ! -z "$EXDB_PASSWD" ] && [ ! -z "$EXDB_PORT" ] && [ ! -z "$EXDB_HOST" ] && [ ! -z "$EXDB_USER" ]; then
+cat > /opt/rainbond/.init/.db_info <<EOF
+db_user:$EXDB_USER
+db_pass:$EXDB_PASSWD
+db_port:$EXDB_PORT
+db_host:$EXDB_HOST
+EOF
+                fi
+
                 if [ ! -z "$EXCSDB_PASSWD" ] && [ ! -z "$EXCSDB_PORT" ] && [ ! -z "$EXCSDB_HOST" ] && [ ! -z "$EXCSDB_USER" ]; then
                     cat > /opt/rainbond/.init/db <<EOF
 db_user:$(cat /opt/rainbond/.init/.db_info | grep db_user | awk -F: '{print $2}')
 db_pass:$(cat /opt/rainbond/.init/.db_info | grep db_pass | awk -F: '{print $2}')
-db_port:3306
-db_host:$1
+db_port:$(cat /opt/rainbond/.init/.db_info | grep db_port | awk -F: '{print $2}')
+db_host:$(cat /opt/rainbond/.init/.db_info | grep db_host | awk -F: '{print $2}')
 dbcs_user:$EXCSDB_USER
 dbcs_pass:$EXCSDB_PASSWD
 dbcs_port:$EXCSDB_PORT
 dbcs_host:$EXCSDB_HOST
 db_type:mysql
-net_type:internal
+net_type:external
 enable_console:true
 EOF
                 else
