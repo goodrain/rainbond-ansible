@@ -12,7 +12,7 @@ services:
   type: simple
   pre_start: docker rm calico
   start: >-
-    /usr/bin/docker
+    docker
     run 
     --net=host  
     --privileged  

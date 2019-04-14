@@ -9,7 +9,7 @@ KUBE_SCHEDULER_ARGS="   --address=0.0.0.0 \
                         --leader-elect=true \
                         --algorithm-provider=DefaultProvider"
 
-exec  /usr/bin/docker \
+exec  docker \
     run \
     --privileged \
     --restart=always \

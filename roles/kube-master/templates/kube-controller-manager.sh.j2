@@ -21,7 +21,7 @@ KUBE_CONTROLLER_MANAGER_ARGS="  --bind-address=0.0.0.0 \
                                 --service-account-private-key-file={{ ca_dir }}/ca-key.pem \
                                 --feature-gates=RotateKubeletServerCertificate=true"
 
-exec /usr/bin/docker \
+exec docker \
     run \
     --privileged \
     --restart=always \

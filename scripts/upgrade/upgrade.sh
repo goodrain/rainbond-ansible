@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.2.tgz"
-IMAGE_BASE_LOCAL="/grdata/services/offline/runtime.upgrade.5.1.2.tgz"
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.3.tgz"
+IMAGE_BASE_LOCAL="/grdata/services/offline/runtime.upgrade.5.1.3.tgz"
 
 IMAGE_PATH="/grdata/services/offline/upgrade"
 
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.2.tgz"
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.3.tgz"
 
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
 
@@ -43,8 +43,8 @@ if [ "$version_check" -eq 0 ]; then
     exit 1
 fi
 
-echo "clean old endpoints"
-kubectl get ns | grep -vE '(default|kube-public|kube-system|rainbond|NAME)' | awk '{print $1}' | xargs -I {} kubectl delete ep -l service-kind="third_party",creater="Rainbond" -n {}
+#echo "clean old endpoints"
+#kubectl get ns | grep -vE '(default|kube-public|kube-system|rainbond|NAME)' | awk '{print $1}' | xargs -I {} kubectl delete ep -l service-kind="third_party",creater="Rainbond" -n {}
 
 check_grdata=$(df -h | grep "/grdata$" | wc -l)
 if [ "$check_grdata" == 0 ]; then
@@ -60,11 +60,11 @@ if [ "$DISK_STATUS" -ne '0' ]; then
 fi
 
 if [ -f "$INSTALL_SCRIPT" ];then
-    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_5.1.1
+    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_5.1.2
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond
     rm -rf /opt/rainbond/rainbond-ansible/inventory
-    cp -a /opt/rainbond/rainbond-ansible_5.1.1/inventory /opt/rainbond/rainbond-ansible
-    cp -a /opt/rainbond/rainbond-ansible_5.1.1/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    cp -a /opt/rainbond/rainbond-ansible_5.1.2/inventory /opt/rainbond/rainbond-ansible
+    cp -a /opt/rainbond/rainbond-ansible_5.1.2/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     #secretkey=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep secretkey | awk '{print $2}')
     #db_pass=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep db_pass | awk '{print $2}')
     #pod_cidr=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep pod_cidr | awk '{print $2}')
@@ -94,10 +94,10 @@ done
 
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|none|v|k8s|rbd_|5\.0|3\.0)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
-mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.1
-mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.1
+mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.2
+mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.2
 
-docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_v5.1.2-release tar zxf /pkg.tgz -C /sysdir
+docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_v5.1.3-release tar zxf /pkg.tgz -C /sysdir
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 

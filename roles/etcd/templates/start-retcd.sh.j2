@@ -19,7 +19,7 @@ else
     ETCD_INITIAL_CLUSTER_STATE="existing"
 fi
 
-exec /usr/bin/docker \
+exec docker \
   run \
   --privileged \
   --restart=always \
