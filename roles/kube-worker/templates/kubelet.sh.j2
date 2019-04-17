@@ -26,7 +26,6 @@ KUBELET_ARGS="
     --kube-reserved={{ kube_reserved }} \
     --system-reserved={{ system_reserved }} \
     --max-pods={{ max_pods }} \
-    --cpu-cfs-quota=false \
     --eviction-max-pod-grace-period=40 \
     --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
     --maximum-dead-containers-per-container=0"
