@@ -141,7 +141,7 @@ enabled=1
 EOF
             touch /opt/rainbond/.init/.offline
             run yum makecache -q
-            run yum install -y -q sshpass python-pip uuidgen pwgen ansible netstat git
+            run yum install -y -q sshpass python-pip uuidgen pwgen ansible net-tools git
 		;;
 		*)
             notice "Not Support $lsb_dist"

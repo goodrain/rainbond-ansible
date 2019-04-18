@@ -25,6 +25,7 @@ services:
     -e MYSQL_USER={{ dbcs_user }}
     -e MYSQL_PASS={{ dbcs_pass }}
     -e MYSQL_DB=console
+    -v {{ rbd_dir }}/.init:/initdata
     -v /grdata/services/console:/app/ui/data
     -v {{ rbd_dir }}/etc/rbd-api:/etc/goodrain
     -v {{ rbd_dir }}/logs/rbd-app-ui:/app/logs

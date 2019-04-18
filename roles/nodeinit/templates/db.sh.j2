@@ -74,6 +74,7 @@ prepare(){
         else
             echo "prepare try $i"
             ((fail_num+=1))
+            sleep 10
         fi
     done
     [ "$fail_num" == 6 ] && echo "prepare failed" && exit 1 || echo "prepare ok" && exit 0
@@ -90,6 +91,7 @@ migrate_ui(){
         else
             echo "migrate ui try $i"
             ((fail_num+=1))
+            sleep 10
         fi
     done
     [ "$fail_num" == 6 ] && echo "migrate ui failed" && exit 1 || echo "migrate ui ok" && exit 0
@@ -116,6 +118,7 @@ init_config(){
         fi
         echo "try init $1"
         ((fail_num+=1))
+        sleep 5
     done
     [ "$fail_num" == 6 ] && echo "init config failed" && exit 1 || echo "init config ok" && exit 0
 }
