@@ -9,5 +9,4 @@
     - { role: etcd, tags: etcd }
     - { role: lb, tags: lb }
     - { role: monitor, tags: monitor }
-    - { role: health, tags: health }
     - { role: node, tags: node }

@@ -15,3 +15,21 @@ ntp_server: "ntp1.aliyun.com"
 # 设置允许内部时间同步的网络段，比如"10.0.0.0/8"，默认全部允许
 local_network: "0.0.0.0/0"
 
+# 节点ip
+nodeip: "{{hostvars[inventory_hostname]['ip']}}"
+
+# 节点模式
+run_mode: |-
+  {%- if inventory_hostname in groups['master'] -%}master{%- else -%}worker{%- endif -%}
+
+# 节点属性
+noderule: |-
+  {%- if inventory_hostname in groups['master'] -%}
+    {%- if inventory_hostname in groups['worker'] -%}
+      manage,compute
+    {%- else -%}
+      manage
+    {%- endif -%}
+  {%- else -%}
+      compute
+  {%- endif -%}

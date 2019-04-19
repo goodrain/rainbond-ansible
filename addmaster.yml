@@ -12,7 +12,6 @@
     - { role: etcd, tags: etcd }
     - { role: lb, tags: lb }
     - { role: monitor, tags: monitor }
-    - { role: health, tags: health }
     - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
     - { role: master, tags: master }

@@ -10,7 +10,6 @@
     - { role: docker, tags: docker }
     - { role: kube-worker, tags: kube-worker }
     - { role: etcd-proxy, tags: etcd-proxy }
-    - { role: health, tags: health }
     - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
     - { role: node, tags: node }

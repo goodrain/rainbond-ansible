@@ -39,3 +39,10 @@
 
 #- name: Network | start flanneld
 #  shell: "systemctl daemon-reload && systemctl enable flanneld && systemctl start flanneld"
+
+- name: Add flannel Health Check
+  template:
+    src: "network_{{ CLUSTER_NETWORK }}.sh.j2"
+    dest: "{{ rbd_dir }}/health/network.sh"
+    mode: 0777
+  tags: health

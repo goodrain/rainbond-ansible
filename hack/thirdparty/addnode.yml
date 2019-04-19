@@ -7,7 +7,6 @@
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
     - { role: etcd-proxy, tags: etcd-proxy }
-    - { role: health, tags: health-thirdparty }
     - { role: node, tags: node }
 
 - hosts: deploy

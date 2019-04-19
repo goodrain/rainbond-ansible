@@ -32,11 +32,6 @@
     - { role: rainvar, tags: default }
     - { role: etcd-proxy, tags: etcd-proxy }
 
-- hosts: master:worker
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: health, tags: health-thirdparty }
-
 - hosts: master[0]
   roles:
     - { role: rainvar, tags: default }
