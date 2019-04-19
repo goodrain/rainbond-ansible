@@ -6,3 +6,4 @@
     - { role: docker, tags: docker }
     - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
     - { role: lb, tags: lb }
+    - { role: exnode, tags: exnode }
