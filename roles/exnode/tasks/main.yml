@@ -2,7 +2,7 @@
 - name: Rainbond | Copy kubeconfig from deploy
   copy:
     src: "{{  kubecfg_dir }}/admin.kubeconfig"
-    dest: "/root/.kube/config"
+    dest: "/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig"
     mode: 0755
 
 - name: Rainbond | Copy node binary from deploy
