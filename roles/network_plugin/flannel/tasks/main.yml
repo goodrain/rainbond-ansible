@@ -15,6 +15,12 @@
     dest: "{{ env_dir }}/mk-docker-opts.sh"
     mode: 0755
 
+- name: Network | prepare check etcdctl
+  copy:
+    src: "{{ local_tools }}/bin/etcdctl"
+    dest: "{{ bin_dir }}/etcdctl"
+    mode: 0755
+
 - name: Network | Copy Init flanneld 
   template:
     src: init.sh.j2
