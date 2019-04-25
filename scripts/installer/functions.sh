@@ -17,6 +17,8 @@
 # make sure we have a UID
 [ -z "${UID}" ] && UID="$(id -u)"
 
+export PATH="${PATH}:/usr/local/bin"
+
 # checking the availability of commands
 
 which_cmd() {
