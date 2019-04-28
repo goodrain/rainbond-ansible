@@ -1,0 +1,8 @@
+---
+- name: Create offline directory
+  file: path=/grdata/services/offline/pkgs state=directory
+
+- name: Extract rpm.tgz into /grdata/services/offline/pkgs
+  unarchive:
+    src: "{{ local_offline }}/rpm.tgz"
+    dest: /grdata/services/offline/pkgs/

@@ -16,4 +16,4 @@
 
 PASSWORD=${1:-12345678}
 
-docker run -it --rm  --network host -e MYSQL_HOST={{ MASTER_IP }} -e MYSQL_PORT=3306 -e MYSQL_USER={{ db_user }} -e MYSQL_PASS={{ db_pass }} -e MYSQL_DB=console -e PASSWORD=${PASSWORD} rainbond/tools:reset_password
+docker run -it --rm  --network host -e MYSQL_HOST={{ master_ip }} -e MYSQL_PORT=3306 -e MYSQL_USER={{ db_user }} -e MYSQL_PASS={{ db_pass }} -e MYSQL_DB=console -e PASSWORD=${PASSWORD} rainbond/tools:reset_password

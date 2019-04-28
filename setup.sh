@@ -48,6 +48,12 @@ command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
 
+get_docker0_ip() {
+    local bip=$(ip r | grep docker0 | awk '{print $9}')
+    echo $bip | grep "\." > /dev/null 2>&1
+    [ "$?" -eq 0 ] && echo $bip || echo "172.30.42.1" 
+}
+
 kylin_ubuntu(){
     info "Update default to Ubuntu" "$1"
     cp -a ./hack/chinaos/ubuntu-release /etc/os-release
@@ -126,7 +132,7 @@ init::offline(){
     case "$lsb_dist" in
 		ubuntu|debian)
             cat > /etc/apt/sources.list.d/local_rainbond.list <<EOF
-deb file:/grdata/services/offline/pkgs/debian/9/ rainbond 5.0
+deb file:/opt/rainbond/offline/pkgs/debian/9/ rainbond 5.0
 EOF
             touch /opt/rainbond/.init/.offline
 		;;
@@ -135,7 +141,7 @@ EOF
             cat > /etc/yum.repos.d/rainbond.repo << EOF
 [rainbond]
 name=rainbond_offline_install_repo
-baseurl=file:///grdata/services/offline/pkgs/rpm/centos/7
+baseurl=file:///opt/rainbond/offline/pkgs/rpm/centos/7
 gpgcheck=0
 enabled=1
 EOF
@@ -419,10 +425,16 @@ config::dns() {
 
 # Config::docker version
 config::docker(){
-    if [ ! -z "$DOCKER_VERSION" ]; then
-        sed -i -r  "s/(^docker_version: ).*/\1$DOCKER_VERSION/" roles/rainvar/defaults/main.yml
+    if command_exists docker && [ -e /var/run/docker.sock ]; then
+        DOCKER_BRIDGE_IP=$(get_docker0_ip)
+        sed -i -r "s/(^docker_bridge_ip: ).*/\1$DOCKER_BRIDGE_IP/" roles/rainvar/defaults/main.yml
+        info "Existing docker bip:" "${DOCKER_BRIDGE_IP}"
+    else
+        if [ ! -z "$DOCKER_VERSION" ]; then
+            sed -i -r  "s/(^docker_version: ).*/\1$DOCKER_VERSION/" roles/rainvar/defaults/main.yml
+        fi
+        info "docker version" "${DOCKER_VERSION:-18.06}"
     fi
-    info "docker version" "${DOCKER_VERSION:-18.06}"
 }
 
 # Config storage
@@ -482,6 +494,7 @@ prepare::general(){
     config::docker
     config::install_deploy
     config::storage
+    
     [ ! -z "$EIP" ] && config::domain $EIP $VIP || config::domain $IIP $VIP
     if [ "$ROLE" == "master" -o "$ROLE" == "manage" ]; then 
         cp inventory/hosts.master inventory/hosts

@@ -15,7 +15,8 @@ rbd_dir: "/opt/rainbond"
 base_dir: "/opt/rainbond/rainbond-ansible"
 ca_dir: "{{ rbd_dir }}/etc/kubernetes/ssl"
 local_tools: "{{ rbd_dir }}/etc/tools"
-local_imgaes: "{{ rbd_dir }}/rainbond-ansible/offline/images"
+local_offline: "{{ rbd_dir }}/offline"
+ex_data: "{{ rbd_dir }}/etc/exdata"
 kubecfg_dir: "{{ rbd_dir }}/etc/kubernetes/kubecfg"
 node_role_dir: "{{ rbd_dir }}/conf"
 env_dir: "{{ rbd_dir }}/envs"
@@ -48,9 +49,9 @@ kube_apiserver_ip: "{{ kube_service_addresses|ipaddr(1)|ipaddr('address') }}"
 kube_dns_server: "{{ kube_service_addresses|ipaddr(10)|ipaddr('address') }}"
 rainbond_domain: "kubeapi.goodrain.me goodrain.me repo.goodrain.me lang.goodrain.me maven.goodrain.me region.goodrain.me"
 
-MASTER_IP: "{{hostvars[groups['master'][0]]['ip']}}"
+master_ip: "{{hostvars[groups['master'][0]]['ip']}}"
 
-KUBE_APISERVER: "https://kubeapi.goodrain.me:6443"
+kube_apiserver: "https://kubeapi.goodrain.me:6443"
 
 # k8s
 etcd_image: etcd:{{ etcd_version }}
@@ -95,10 +96,10 @@ storage_type: nfs
 storage_path: "/grdata"
 storage_cmd: ""
 default_dns_local: 114.114.114.114 
-DOCKER_BRIDGE_IP: 172.30.42.1
+docker_bridge_ip: 172.30.42.1
 
-#FLANNEL_BACKEND: "vxlan"
-FLANNEL_BACKEND: host-gw
+#flannel_backend: "vxlan"
+flannel_backend: host-gw
 
 etcd_port_c1: 2379
 etcd_port_c2: 4001
@@ -113,9 +114,9 @@ install_logs_dir: "/tmp/install"
 enterprise_id: "5887587af6dafeefb192b1dbff6c518d"
 dev_mode: debug
 
-base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-04-15-5.1.3.tgz"
-base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-04-15-5.1.3.sha256sum.txt"
+base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-04-28-5.1.4.tgz"
+base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-04-28-5.1.4.sha256sum.txt"
 # rainbond.image.tgz.url
 
-rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-04-15-5.1.3.tgz"
-rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-04-15-5.1.3.sha256sum.txt"
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-04-28-5.1.4.tgz"
+rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-04-28-5.1.4.sha256sum.txt"

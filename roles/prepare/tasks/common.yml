@@ -26,7 +26,7 @@
     - /root/.rbd
     - /grdata/services/ssh
     - /grdata/services/storage
-    - /grdata/services/offline/images
+    - /opt/rainbond/offline/images
     - /grdata/kubernetes
     - /etc/NetworkManager/conf.d
     - /etc/calico

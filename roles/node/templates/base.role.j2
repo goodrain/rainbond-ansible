@@ -41,7 +41,7 @@ services:
   start: >-
     docker run --name rbd-repo
     --network host
-    -v /grdata/services/artifactory-{{ inventory_hostname }}:/var/opt/jfrog/artifactory
+    -v {{ ex_data }}/repo/{{ inventory_hostname }}:/var/opt/jfrog/artifactory
     -i goodrain.me/{{ repo }}
   stop: docker stop rbd-repo
   restart_policy: always

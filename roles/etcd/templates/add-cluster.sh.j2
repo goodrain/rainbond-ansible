@@ -2,10 +2,10 @@
 
 IP=$(cat {{ env_dir }}/etcd.sh | awk -F= '{print $2}')
 
-echo $IP | grep "{{ MASTER_IP }}" > /dev/null
+echo $IP | grep "{{ master_ip }}" > /dev/null
 
 if [ "$?" -ne 0 ];then
-    curl http://{{ MASTER_IP }}:{{ etcd_port_c1 }}/v2/members -XPOST -H "Content-Type: application/json" -d '{"peerURLs": ["http://'$IP':{{ etcd_port_s1 }}"]}'
+    curl http://{{ master_ip }}:{{ etcd_port_c1 }}/v2/members -XPOST -H "Content-Type: application/json" -d '{"peerURLs": ["http://'$IP':{{ etcd_port_s1 }}"]}'
 else
-    echo "master node {{ MASTER_IP }}"
+    echo "master node {{ master_ip }}"
 fi

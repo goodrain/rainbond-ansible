@@ -1,6 +1,6 @@
 #!/bin/bash
 
-nfs_server={{ MASTER_IP }}
+nfs_server={{ master_ip }}
 
 num=$(showmount -e $nfs_server | grep "/opt/rainbond" | wc -l)
 

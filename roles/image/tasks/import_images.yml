@@ -1,6 +1,6 @@
 ---
 - name: Check | Check if base.image.tgz is unarchive
-  stat: path=/grdata/services/offline/images/etcd.tgz
+  stat: path="{{ local_offline }}/images/etcd.tgz"
   register: check_base_image_tgz_unarchive
 
 - name: The next task may take some time to execute
@@ -9,12 +9,12 @@
 
 - name: Rainbond | Unzip base image Ok
   unarchive:
-    src: /grdata/services/offline/base.images.tgz
-    dest: /grdata/services/offline/images
+    src: "{{ local_offline }}/base.images.tgz"
+    dest: "{{ local_offline }}/images"
   when: check_base_image_tgz_unarchive.stat.isreg is not defined
 
 - name: Check | Check if rainbond.image.tgz is unarchive
-  stat: path=/grdata/services/offline/images/mq.tgz
+  stat: path="{{ local_offline }}/images/mq.tgz"
   register: check_rainbond_image_tgz_unarchive
 
 - name: The next task may take some time to execute
@@ -23,8 +23,8 @@
 
 - name: Rainbond | Unzip rainbond image Ok
   unarchive:
-    src: /grdata/services/offline/rainbond.images.tgz
-    dest: /grdata/services/offline/images
+    src: "{{ local_offline }}/rainbond.images.tgz"
+    dest: "{{ local_offline }}/images"
   when: check_rainbond_image_tgz_unarchive.stat.isreg is not defined
 
 - name: Check Push image if Pushed

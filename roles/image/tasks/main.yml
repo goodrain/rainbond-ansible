@@ -1,24 +1,14 @@
 ---
-#- name: Online | docker pull images
-#  import_tasks: online_images.yml
-#  when: install_type == "online"
-
-#- name: Offline | docker load images
-#  import_tasks: offline_images.yml
-#  when: install_type == "offline"
-
-- name: Rainbond | download image tgz
-  import_tasks: online_download_tgz.yml
+- name: online download image tgz
+  import_tasks: dl_image_tgz.yml
   when: install_type == "online"
 
-- name: Rainbond | import image from local
+- name: import image from local
   import_tasks: import_images.yml
 
-- name: Rainbond | Unpack TGZ
-  import_tasks: unpack_tag.yml
+- name: Copy cni & certificates
+  import_tasks: rsync.yml
 
-- name: Rainbond | check cni
-  import_tasks: check_or_copy.yml
-
-- name: Rainbond | check_or_create certificates or kubeconfig
-  import_tasks: check_or_create.yml
+- name: Copy offline pkgs
+  import_tasks: import_pkgs.yml
+  when: install_type == "offline"

@@ -1,0 +1,36 @@
+---
+- name: Check Unpack 
+  stat: path="{{ local_tools }}/bin/etcdctl"
+  register: unpack_is_done
+  ignore_errors: true
+
+- name: Rainbond | Unpack rbd cni tools
+  shell: "docker run --rm -v {{ local_tools }}:/sysdir rainbond/{{ rbd_cni }} tar zxf /pkg.tgz -C /sysdir"
+  when: unpack_is_done.stat.isreg is not defined
+
+- name: Rainbond | Unpack k8s cni tools
+  shell: "docker run --rm -v {{ local_tools }}:/sysdir goodrain.me/{{ k8s_cni }} tar zxf /pkg.tgz -C /sysdir"
+  when: unpack_is_done.stat.isreg is not defined
+
+- name: Check CNI
+  stat: path="{{ rbd_dir }}/bin/calico"
+  register: cni_is_done
+  ignore_errors: true
+
+- name: K8S | Copy CNI
+  copy: src={{ item }} dest={{ rbd_dir }}/bin owner=root mode=777
+  with_fileglob:
+    - "{{ rbd_dir }}/etc/tools/cni/bin/*"
+  when: cni_is_done.stat.isreg is not defined
+
+- name: K8S | Copy tools
+  copy: src={{ item }} dest={{ bin_dir }} owner=root mode=777
+  with_fileglob:
+    - "{{ rbd_dir }}/etc/tools/bin/*"
+  when: cni_is_done.stat.isreg is not defined
+
+- name: Generate certificate
+  shell: docker run --rm -v {{ ca_dir }}:{{ ca_dir }} -v {{ region_ca_dir }}:{{ region_ca_dir }} -v {{ kubecfg_dir }}:{{ kubecfg_dir }} -v /grdata/kubernetes:/grdata/kubernetes rainbond/r6dctl:docker-cfg-certs kip {{ master_ip }}
+  register: generate_certificate_task_result
+  until: generate_certificate_task_result is succeeded
+  retries: 5

@@ -4,7 +4,7 @@
 #server 1.centos.pool.ntp.org iburst
 #server 2.centos.pool.ntp.org iburst
 #server 3.centos.pool.ntp.org iburst
-server {{ MASTER_IP }} iburst
+server {{ master_ip }} iburst
 
 # 根据实际时间计算出服务器增减时间的比率，然后记录到一个文件中，在系统重启后为系统做出最佳时间补偿调整。
 driftfile /var/lib/chrony/drift

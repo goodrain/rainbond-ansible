@@ -1,8 +1,9 @@
 #!/bin/bash
 
-echo "{{ MASTER_IP }}:/opt/rainbond/etc/tools /opt/rainbond/etc/tools nfs rw 0 0" >> /etc/fstab
-echo "{{ MASTER_IP }}:/opt/rainbond/.init /opt/rainbond/.init nfs rw 0 0" >> /etc/fstab
-echo "{{ MASTER_IP }}:/opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible nfs rw 0 0">> /etc/fstab
+echo "{{ master_ip }}:/opt/rainbond/etc/tools /opt/rainbond/etc/tools nfs rw 0 0" >> /etc/fstab
+echo "{{ master_ip }}:/opt/rainbond/offline /opt/rainbond/offline nfs rw 0 0" >> /etc/fstab
+echo "{{ master_ip }}:/opt/rainbond/.init /opt/rainbond/.init nfs rw 0 0" >> /etc/fstab
+echo "{{ master_ip }}:/opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible nfs rw 0 0">> /etc/fstab
 
 mount -a
 

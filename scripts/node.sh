@@ -46,6 +46,15 @@ ssh_key_copy()
     "
 }
 
+#check_first_node(){
+#    getuuid=$(cat /opt/rainbond/rainbond-ansible/inventory/hosts | grep "$1" | awk '{print $1}')
+#    cat /opt/rainbond/rainbond-ansible/inventory/hosts | grep "NTP_ENABLED" | grep $getuuid > /dev/null 2>&1
+#    echo $?
+#}
+
+#echo "Check whether the node is the first management node"
+#[ "$(check_first_node $node_ip)" -ne 0 ] && echo "First management node ${node_ip} not allow..." && exit 1
+
 check_ip_reachable(){
     ping -c2 $1 >/dev/null 2>&1 
     echo $?

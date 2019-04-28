@@ -16,7 +16,7 @@
 
 set -xe
 
-pushd /grdata/services/offline/images
+pushd /opt/rainbond/offline/images
 ls | grep tgz | xargs -I {} docker load -i ./{}
 [ "$?" -eq 0 ] && touch /tmp/install/push.local.image
 popd
