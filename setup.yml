@@ -20,7 +20,7 @@
 - hosts: deploy:master:worker:lb
   roles:
     - { role: rainvar, tags: default }
-    - { role: docker/insstall, tags: docker }
+    - { role: docker/install, tags: docker }
 
 - hosts: deploy
   roles:
