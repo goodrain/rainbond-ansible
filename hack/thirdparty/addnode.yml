@@ -6,7 +6,7 @@
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
-    - { role: etcd-proxy, tags: etcd-proxy }
+    - { role: etcd/compute, tags: etcd-proxy }
     - { role: node, tags: node }
 
 - hosts: deploy

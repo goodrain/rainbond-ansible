@@ -20,17 +20,17 @@
 - hosts: deploy
   roles:
     - { role: rainvar, tags: default }
-    - { role: image, tags: image-thirdparty }
+    - { role: docker/image, tags: image-thirdparty }
 
 - hosts: etcd
   roles:
     - { role: rainvar, tags: default }
-    - { role: etcd, tags: etcd }
+    - { role: etcd/manage, tags: etcd }
 
 - hosts: worker
   roles:
     - { role: rainvar, tags: default }
-    - { role: etcd-proxy, tags: etcd-proxy }
+    - { role: etcd/compute, tags: etcd-proxy }
 
 - hosts: master[0]
   roles:
