@@ -23,7 +23,7 @@
     mode: 0777
 
 - name: Rainbond | Write node uuid
-  shell: "bash /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
+  shell: "bash -x /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
 
 - name: Rainbond | Copy Node Script
   template:

@@ -6,7 +6,7 @@
     mode: 0777
 
 - name: Gfs | run check storage
-  shell: "bash /tmp/install/check_storage.sh"
+  shell: "bash -x /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
 
 - name: Gfs | check grdata
   stat: path=/tmp/.grdata.init

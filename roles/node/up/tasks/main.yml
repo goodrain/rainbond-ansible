@@ -24,7 +24,7 @@
     mode: 0777
 
 - name: Rainbond | Check goodrain.me
-  shell: "bash /tmp/install/check_registries.sh"
+  shell: "bash -x /tmp/install/check_registries.sh > /tmp/install/check_registries.log"
 
 - name: Rainbond | Check check_ok
   stat: path="/opt/rainbond/.init/goodrain.me.ok"
@@ -36,7 +36,7 @@
   when: check_goodrainme_done.stat.isreg is defined
 
 - name: Rainbond | Push local images to goodrain.me
-  shell: "bash /tmp/install/pushimage.sh"
+  shell: "bash -x /tmp/install/pushimage.sh > /tmp/install/pushimage.log"
   register: pushimage_task_result
   until: pushimage_task_result is succeeded
   retries: 5
