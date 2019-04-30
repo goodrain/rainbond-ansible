@@ -67,10 +67,10 @@
 - hosts: master:worker
   roles:
     - { role: rainvar, tags: default }
-    - { role: node, tags: node }
+    - { role: node/core, tags: node }
 
 - hosts: deploy
   roles:
     - { role: rainvar, tags: default }
-    - { role: nodeinit, tags: nodeinit}
-    - { role: nodeup, tags: nodeup }
+    - { role: node/init, tags: nodeinit}
+    - { role: node/up, tags: nodeup }

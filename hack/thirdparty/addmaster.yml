@@ -9,4 +9,4 @@
     - { role: etcd/manage, tags: etcd }
     - { role: lb, tags: lb }
     - { role: monitor, tags: monitor }
-    - { role: node, tags: node }
+    - { role: node/core, tags: node }

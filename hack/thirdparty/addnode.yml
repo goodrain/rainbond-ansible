@@ -7,9 +7,9 @@
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
     - { role: etcd/compute, tags: etcd-proxy }
-    - { role: node, tags: node }
+    - { role: node/core, tags: node }
 
 - hosts: deploy
   roles:
     - { role: rainvar, tags: default }
-    - { role: nodeup, when: "autoreg_node == 'enable'" }
+    - { role: node/up, when: "autoreg_node == 'enable'" }

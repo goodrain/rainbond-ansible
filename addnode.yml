@@ -12,9 +12,9 @@
     - { role: etcd/compute, tags: etcd-proxy }
     - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
-    - { role: node, tags: node }
+    - { role: node/core, tags: node }
 
 - hosts: deploy
   roles:
     - { role: rainvar, tags: default }
-    - { role: nodeup, when: "autoreg_node == 'enable'" }
+    - { role: node/up, when: "autoreg_node == 'enable'" }
