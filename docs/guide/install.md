@@ -70,3 +70,11 @@ NETWORK_TYPE="calico"
 IIP="192.168.56.5"
 DOMAIN=""
 ```
+
+
+#### 说明
+
+```
+# 华为云Debian需要手动安装 
+apt-get install libffi-dev
+```

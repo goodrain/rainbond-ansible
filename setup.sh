@@ -211,6 +211,15 @@ precheck::check_system(){
     info "prepare check system" "passed"
 }
 
+# Avoid internal network IP segment conflicts
+precheck::check_ip(){
+    INET_IP=${IIP%%.*}
+    if [ "$INET_IP" == "172" ]; then
+        echo "$IIP" | grep -E '^172.30' && notice "内网ip所在内网IP段与docker0的内网段(172.30.0.0/16)冲突."
+    fi
+    info "prepare check ip cidr" "passed"
+}
+
 precheck::check_uid(){
     if [ "$ENABLE_CHECK" == "enable" ]; then
         if [ "${UID}" != 0 ]; then
@@ -226,6 +235,7 @@ precheck::check_uid(){
 
 precheck(){
     progress "Prepare check"
+    precheck::check_ip
     precheck::check_uid
     if [ ! -f "/opt/rainbond/.init/.port_check" ]; then
         precheck::check_port
