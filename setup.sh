@@ -465,6 +465,11 @@ detect_dev_mode(){
     if [ ! -z "$INSTALL_DEBUG" ];then
         sed -i -r  "s/(^dev_mode: ).*/\1goodrain/" roles/rainvar/defaults/main.yml
     fi
+    if [ -e /opt/rainbond/offline/base.images.tgz ] && [ -e /opt/rainbond/offline/rainbond.images.tgz ]; then
+        info "Notice" "本地已存储离线镜像文件，将使用本地离线文件"
+    else
+        info "Notice" "将从互联网下载离线镜像文件，下载速度取决于当前机器网络带宽"
+    fi
 }
 
 # General preparation before installation
@@ -573,7 +578,10 @@ do_install::ok(){
     info "操作文档" "https://www.rainbond.com/docs/user-manual/"
     info "社区" "https://t.goodrain.com"
     info "查询集群状态" "grctl cluster"
+    sleep 5
     grctl cluster
+    info "数据中心信息: https://$IIP:8443" "具体如下所示:"
+    grctl show
 }
 
 # Install the rainbond cluster
