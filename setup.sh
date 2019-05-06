@@ -476,9 +476,9 @@ detect_dev_mode(){
         sed -i -r  "s/(^dev_mode: ).*/\1goodrain/" roles/rainvar/defaults/main.yml
     fi
     if [ -e /opt/rainbond/offline/base.images.tgz ] && [ -e /opt/rainbond/offline/rainbond.images.tgz ]; then
-        info "Notice" "本地已存储离线镜像文件，将使用本地离线文件"
+        info "Notice" "检测到本地已存储离线镜像文件，将优先使用本地离线文件"
     else
-        info "Notice" "将从互联网下载离线镜像文件，下载速度取决于当前机器网络带宽"
+        info "Notice" "将从互联网下载离线镜像文件(约2GB)，下载速度取决于当前机器网络带宽"
     fi
 }
 
@@ -499,8 +499,8 @@ prepare::general(){
     [ -z "$IIP" ] && IIP=$1
     [ -z "$IIP" ] && IIP=$( get_default_ip )
     [ -z "$IIP" ] && notice "not found IIP"
-    info "internal ip" $IIP
-    [ ! -z "$EIP" ] && info "external ip" $EIP
+    info "internal ip" $IIP && echo "$IIP" > /opt/rainbond/.init/.ip
+    [ ! -z "$EIP" ] && info "external ip" $EIP && echo "$EIP" > /opt/rainbond/.init/.ip
     [ ! -z "$VIP" ] && info "virtual ip" $VIP
     
     precheck
@@ -581,17 +581,35 @@ prepare::3rd(){
     sed -i -r  "s/(^etcd_port_s1: ).*/\1$etcd_port_s1/" roles/rainvar/defaults/main.yml
 }
 
+# Generate region information
+generate::regioninfo(){
+    local rinfopath="/opt/rainbond/.init/.regioninfo"
+    cat > $rinfopath <<EOF
+region_name: 
+region_alias:
+url:
+desc:
+wsurl: 
+httpdomain:
+tcpdomain:
+ssl_ca_cert:
+cert_file:
+key_file:
+EOF
+}
+
 do_install::ok(){
     [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
+    generate::regioninfo
     info "扩容节点" "https://www.rainbond.com/docs/user-operations/management/add-node/"
     info "操作文档" "https://www.rainbond.com/docs/user-manual/"
     info "社区" "https://t.goodrain.com"
+    info "查询当前数据中心信息" "https://$IIP:8443"
+    run grctl show
     info "查询集群状态" "grctl cluster"
-    sleep 5
-    grctl cluster
-    info "数据中心信息: https://$IIP:8443" "具体如下所示:"
-    grctl show
+    run grctl cluster
+    
 }
 
 # Install the rainbond cluster

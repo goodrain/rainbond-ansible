@@ -31,6 +31,7 @@ DOCKER_CMD_CS="docker run -i --rm --net=host -v /opt/rainbond/.init:/opt/rainbon
 
 
 generate_region_sql(){
+    rinfopath="/opt/rainbond/.init/.regioninfo"
     IP=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk -F ': ' '{print $2}')
     ssl_ca_cert=$(cat {{ region_ca_dir }}/ca.pem)
     key_file=$(cat {{ region_ca_dir }}/client.key.pem)
@@ -39,6 +40,20 @@ generate_region_sql(){
     cat > /opt/rainbond/.init/region_info.sql <<EOF
 INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`) VALUES('asdasdasdasdasdasdasdasdas', 'rainbond', '默认私有数据中心', 'https://region.goodrain.me:8443', NULL, '1', '当前数据中心是默认安装添加的数据中心', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file');
 EOF
+
+    cat > $rinfopath <<EOF
+region_name: rainbond
+region_alias: 默认私有数据中心
+url: https://region.goodrain.me:8443
+desc: 当前数据中心是默认安装添加的数据中心
+wsurl: ws://$IP:6060
+httpdomain: $DOMAIN
+tcpdomain: $IP
+ssl_ca_cert path: {{ region_ca_dir }}/ca.pem
+cert_file path: {{ region_ca_dir }}/client.key.pem
+key_file path: {{ region_ca_dir }}/client.pem
+EOF
+
 }
 
 # 生成默认sql
