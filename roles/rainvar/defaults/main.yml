@@ -114,6 +114,12 @@ install_logs_dir: "/tmp/install"
 enterprise_id: "5887587af6dafeefb192b1dbff6c518d"
 dev_mode: debug
 
+## region
+region_name: "rainbond"
+region_alias: "默认私有数据中心"
+region_url: "https://region.goodrain.me:8443"
+region_desc: "当前数据中心是默认安装添加的数据中心"
+
 base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-05-06-5.1.4.tgz"
 base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-05-06-5.1.4.sha256sum.txt"
 # rainbond.image.tgz.url

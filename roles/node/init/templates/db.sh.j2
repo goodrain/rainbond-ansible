@@ -38,16 +38,16 @@ generate_region_sql(){
     cert_file=$(cat {{ region_ca_dir }}/client.pem)
     DOMAIN={{ app_domain }}
     cat > /opt/rainbond/.init/region_info.sql <<EOF
-INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`) VALUES('asdasdasdasdasdasdasdasdas', 'rainbond', '默认私有数据中心', 'https://region.goodrain.me:8443', NULL, '1', '当前数据中心是默认安装添加的数据中心', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file');
+INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`) VALUES('asdasdasdasdasdasdasdasdas', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file');
 EOF
 
     cat > $rinfopath <<EOF
-region_name: rainbond
-region_alias: 默认私有数据中心
-url: https://region.goodrain.me:8443
-desc: 当前数据中心是默认安装添加的数据中心
+region_name: {{ region_name }}
+region_alias: {{ region_alias }}
+url: {{ region_url }}
+desc: {{ region_desc }}
 wsurl: ws://$IP:6060
-httpdomain: $DOMAIN
+httpdomain: {{ app_domain }}
 tcpdomain: $IP
 ssl_ca_cert path: {{ region_ca_dir }}/ca.pem
 cert_file path: {{ region_ca_dir }}/client.key.pem
@@ -99,14 +99,15 @@ migrate_ui(){
     local fail_num=0
     for ((i=1;i<=6;i++))
     do
+        sleep 10
         ui_num=$(docker ps | grep rbd-app-ui | wc -l)
         if [ "$ui_num" == 1 ]; then
             docker exec rbd-app-ui python /app/ui/manage.py migrate
             [ "$?" -eq 0 ] && break
         else
             echo "migrate ui try $i"
+            docker exec rbd-app-ui python /app/ui/manage.py migrate --fake
             ((fail_num+=1))
-            sleep 10
         fi
     done
     [ "$fail_num" == 6 ] && echo "migrate ui failed" && exit 1 || echo "migrate ui ok" && exit 0

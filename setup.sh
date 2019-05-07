@@ -581,31 +581,13 @@ prepare::3rd(){
     sed -i -r  "s/(^etcd_port_s1: ).*/\1$etcd_port_s1/" roles/rainvar/defaults/main.yml
 }
 
-# Generate region information
-generate::regioninfo(){
-    local rinfopath="/opt/rainbond/.init/.regioninfo"
-    cat > $rinfopath <<EOF
-region_name: 
-region_alias:
-url:
-desc:
-wsurl: 
-httpdomain:
-tcpdomain:
-ssl_ca_cert:
-cert_file:
-key_file:
-EOF
-}
-
 do_install::ok(){
     [ "$INSTALL_TYPE" == "online" ] && up_domain_dns
     [ ! -z "$EIP" ] && info "控制台访问地址" "http://$EIP:7070" || info "控制台访问地址" "http://$IIP:7070"
-    generate::regioninfo
     info "扩容节点" "https://www.rainbond.com/docs/user-operations/management/add-node/"
     info "操作文档" "https://www.rainbond.com/docs/user-manual/"
     info "社区" "https://t.goodrain.com"
-    info "查询当前数据中心信息" "https://$IIP:8443"
+    info "查询当前数据中心信息" "grctl show"
     run grctl show
     info "查询集群状态" "grctl cluster"
     run grctl cluster

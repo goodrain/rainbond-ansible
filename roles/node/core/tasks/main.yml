@@ -45,59 +45,59 @@
     - "{{ region_ca_dir }}/*"
   when: ck_ca_ssl_is_done.stat.isreg is not defined
 
-- name: Rainbond | Copy private key
+- name: copy private key
   copy:
     src: /grdata/services/ssh/builder_rsa
     dest: /root/.ssh/id_rsa
     mode: 0600
     backup: yes
 
-- name: Rainbond | Copy public key
+- name: copy public key
   copy:
     src: /grdata/services/ssh/builder_rsa.pub
     dest: /root/.ssh/id_rsa.pub
     mode: 0644
     backup: yes
 
-- name: Rainbond | Copy kubeconfig from deploy
+- name: copy kubeconfig from deploy
   copy:
     src: "{{  kubecfg_dir }}/admin.kubeconfig"
     dest: "/root/.kube/config"
     mode: 0755
 
-- name: Rainbond | Copy node binary from deploy
+- name: copy node binary from deploy
   copy:
     src: "{{ local_tools }}/bin/node"
     dest: "{{ bin_dir }}/node"
     mode: 0755
 
-- name: Rainbond | Copy node uuid
+- name: copy node uuid
   copy:
     src: /opt/rainbond/.init/node.uuid
     dest: /tmp/install/node.uuid
 
-- name: Rainbond | Prepare check node uuid
+- name: prepare check node uuid
   template:
     src: node_uuid.sh.j2
     dest: /tmp/install/node_uuid.sh
     mode: 0777
 
-- name: Rainbond | Write node uuid
+- name: config node uuid
   shell: "bash -x /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
 
-- name: Rainbond | Copy Master Node Rainbond Role 
+- name: add manage node master.yaml
   template:
     src: master.role.j2
     dest: "{{ node_role_dir }}/master.yaml"
   when: inventory_hostname in groups['master'] + groups['new-master']
 
-- name: Rainbond | Copy Master Node UI Role
+- name: add manage node ui.yaml
   template:
     src: ui.role.j2
     dest: "{{ node_role_dir }}/ui.yaml"
   when: inventory_hostname in groups['master']
 
-- name: Rainbond | Copy Master Node Base Role
+- name: add manage node base.yaml
   template:
     src: base.role.j2
     dest: "{{ node_role_dir }}/base.yaml"
@@ -129,27 +129,27 @@
     dest: "{{ node_role_dir }}/thirdparty_k8s_worker.yaml"
   when: check_k8s_worker.stat.isreg is defined and deploy_type == "thirdparty" 
 
-- name: Rainbond | Copy Node Script
+- name: config node script
   template:
     src: start-node.sh.j2
     dest: "{{ script_dir }}/start-node.sh"
     mode: 0755
 
-- name: Rainbond | Copy Node Env
+- name: config node env
   template:
     src: node.sh.j2
     dest: "{{ env_dir }}/node.sh"
     mode: 0755
 
-- name: Rainbond | Copy Node Services
+- name: config node service
   template:
     src: node.service.j2
     dest: /etc/systemd/system/node.service
 
-- name: Rainbond | Start Node
+- name: start node service
   shell: "systemctl daemon-reload && systemctl enable node && systemctl start node"
 
-- name: Rainbond | Restart Node
+- name: restart node service
   service:
     name: node
     state: restarted
