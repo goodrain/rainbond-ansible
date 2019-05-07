@@ -214,12 +214,15 @@ precheck::check_system(){
 # Avoid internal network IP segment conflicts
 precheck::check_ip(){
     INET_IP=${IIP%%.*}
+    ip r | grep $IIP > /dev/null  && info "prepare check iip" "passed" || notice "Current Node does not exist $IIP"
     if [ "$INET_IP" == "172" ]; then
         echo "$IIP" | grep -E '^172.30' && notice "内网ip所在内网IP段与docker0的内网段(172.30.0.0/16)冲突."
     fi
     info "prepare check ip cidr" "passed"
+
 }
 
+# check user uid
 precheck::check_uid(){
     if [ "$ENABLE_CHECK" == "enable" ]; then
         if [ "${UID}" != 0 ]; then
@@ -233,17 +236,18 @@ precheck::check_uid(){
     info "prepare check uid" "passed"
 }
 
+# prepare check: ip,uid,port,disk,network,system
 precheck(){
     progress "Prepare check"
-    precheck::check_ip
     precheck::check_uid
+    precheck::check_system
+    precheck::check_ip
+    precheck::check_network
     if [ ! -f "/opt/rainbond/.init/.port_check" ]; then
         precheck::check_port
     fi
     info "prepare check port" "passed"
     precheck::check_disk
-    precheck::check_network
-    precheck::check_system
 }
 
 # support config db
@@ -470,9 +474,25 @@ config::install_deploy(){
     sed -i -r  "s/(^deploy_type: ).*/\1$DEPLOY_TYPE/" roles/rainvar/defaults/main.yml
 }
 
+# Config Region info
+config::region(){
+    # eg INSTALL_TOKEN region_name=test&region_alias=alihz&region_desc="阿里杭州"&region_url=https://alihz.dev.grpps.cn
+    if [ ! -z "$INSTALL_TOKEN" ]; then
+        info "Notice" "自定义数据中心信息"
+        region_name=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_name | awk -F= '{print $2}')
+        region_alias=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_alias | awk -F= '{print $2}')
+        region_desc=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_desc | awk -F= '{print $2}')
+        region_url=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_url | awk -F= '{print $2}')
+        sed -i -r  "s/(^region_name: ).*/\1${region_name}/" roles/rainvar/defaults/main.yml
+        sed -i -r  "s/(^region_alias: ).*/\1${region_alias}/" roles/rainvar/defaults/main.yml
+        sed -i -r  "s/(^region_desc: ).*/\1${region_desc}/" roles/rainvar/defaults/main.yml
+        sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
+    fi
+}
+
 # Dev Mode
 detect_dev_mode(){
-    if [ ! -z "$INSTALL_DEBUG" ];then
+    if [ ! -z "$INSTALL_DEBUG" ]; then
         sed -i -r  "s/(^dev_mode: ).*/\1goodrain/" roles/rainvar/defaults/main.yml
     fi
     if [ -e /opt/rainbond/offline/base.images.tgz ] && [ -e /opt/rainbond/offline/rainbond.images.tgz ]; then
@@ -527,6 +547,7 @@ prepare::general(){
     sed -i -r  "s/(^r6d_version: ).*/\1${r6d_version}/" roles/rainvar/defaults/main.yml
 
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
+    config::region
 }
 
 # 域名解析生效
