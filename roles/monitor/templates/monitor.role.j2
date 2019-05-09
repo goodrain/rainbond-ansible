@@ -22,8 +22,9 @@ services:
     docker run --name rbd-monitor
     --network host
     -v {{ rbd_dir }}/data/prom:/prometheusdata
+    -v {{ rbd_dir }}/etc/prom/config:/etc/prometheus/config
     -i goodrain.me/{{ monitor }}
-    --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ nodeip }}:9999 --alertmanager-address={{ nodeip }}:9093  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
+    --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ nodeip }}:9999 --alertmanager-address={{ nodeip }}:9093  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/config/prometheus.yml --rules-config.file=/etc/prometheus/config/rules.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
   stop: docker stop rbd-monitor
   restart_policy: always
   restart_sec: 10
