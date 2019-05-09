@@ -124,5 +124,5 @@ base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/b
 base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-05-06-5.1.4.sha256sum.txt"
 # rainbond.image.tgz.url
 
-rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-05-06-5.1.4.tgz"
-rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-05-06-5.1.4.sha256sum.txt"
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-05-09-5.1.4.tgz"
+rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-05-09-5.1.4.sha256sum.txt"
