@@ -1,0 +1,27 @@
+---
+- name: stop calico
+  shell: node service stop calico && cclear
+
+- name: disable calico
+  shell: systemctl disable calico && systemctl stop calico
+
+- name: remove calico config
+  shell: mv /opt/rainbond/health/network.sh /opt/rainbond/health/network.sh.bak && mv /opt/rainbond/conf/network.yaml /opt/rainbond/conf/network.yaml.bak
+
+- name: remove calico cni config  
+  shell: mv /opt/rainbond/etc/cni/10-calico.conf /tmp/
+
+- name: down calico interface
+  shell: ifconfig tunl0 down
+
+- name: restart kubelet
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: kubelet
+
+- name: restart node
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: node
