@@ -36,7 +36,7 @@
   when: ck_ssl_is_done.stat.isreg is not defined
 
 - name: Rainbond | check region ssl
-  stat: path="{{ region_ca_dir }}/ca.pem"
+  stat: path="{{ ssl_ca_cert }}"
   register: ck_ca_ssl_is_done
 
 - name: Rainbond | Copy region ssl

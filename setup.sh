@@ -479,10 +479,11 @@ config::region(){
     # eg INSTALL_TOKEN region_name=test&region_alias=alihz&region_desc="阿里杭州"&region_url=https://alihz.dev.grpps.cn
     if [ ! -z "$INSTALL_TOKEN" ]; then
         info "Notice" "自定义数据中心信息"
-        region_name=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_name | awk -F= '{print $2}')
-        region_alias=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_alias | awk -F= '{print $2}')
-        region_desc=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_desc | awk -F= '{print $2}')
-        region_url=$(echo $INSTALL_TOKEN | tr '&' '\n' | grep region_url | awk -F= '{print $2}')
+        local token=$(get_token $INSTALL_TOKEN)
+        region_name=$(echo $token | tr '&' '\n' | grep region_name | awk -F= '{print $2}')
+        region_alias=$(echo $token | tr '&' '\n' | grep region_alias | awk -F= '{print $2}')
+        region_desc=$(echo $token | tr '&' '\n' | grep region_desc | awk -F= '{print $2}')
+        region_url=$(echo $token | tr '&' '\n' | grep region_url | awk -F= '{print $2}')
         sed -i -r  "s/(^region_name: ).*/\1${region_name}/" roles/rainvar/defaults/main.yml
         sed -i -r  "s/(^region_alias: ).*/\1${region_alias}/" roles/rainvar/defaults/main.yml
         sed -i -r  "s/(^region_desc: ).*/\1${region_desc}/" roles/rainvar/defaults/main.yml

@@ -1,6 +1,6 @@
 region_api:
   endpoints:
     - {{ region_url }}
-  client-ca-file: {{ region_ca_dir }}/ca.pem
-  tls-cert-file:  {{ region_ca_dir }}/client.pem
-  tls-private-key-file: {{ region_ca_dir }}/client.key.pem
+  client-ca-file: {{ ssl_ca_cert }}
+  tls-cert-file:  {{ client_key_file }}
+  tls-private-key-file: {{ client_cert_file }}
