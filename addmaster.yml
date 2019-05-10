@@ -8,7 +8,7 @@
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
     - { role: docker/install, tags: docker }
-    - { role: k8s/master, tags: kube-master }
+    - { role: k8s/manage, tags: kube-master }
     - { role: etcd/manage, tags: etcd }
     - { role: lb, tags: lb }
     - { role: monitor, tags: monitor }
