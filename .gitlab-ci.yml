@@ -1,0 +1,13 @@
+stages:
+  - syntax_check
+  - build
+
+syntax_check:
+  stage: syntax_check
+  script:
+    - make main
+
+build:
+  stage: build
+  script:
+    - make build_ansible

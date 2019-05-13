@@ -43,11 +43,14 @@ EOF
 
     token="region_name={{ region_name }}&&region_alias={{ region_alias }}&&url={{ region_url }}&&desc={{ region_desc }}&&wsurl=ws://$IP:6060&&httpdomain={{ app_domain }}&&tcpdomain=$IP&&ssl_ca_cert=${ssl_ca_cert}&&key_file=${key_file}&&cert_file=${cert_file}"
     encode_token=$(echo $token | base64)
-    cat > /opt/rainbond/.init/token <<EOF
-$encode_token
-EOF
     ssl_token="ssl_ca_cert=${ssl_ca_cert}&&key_file=${key_file}&&cert_file=${cert_file}"
     encode_ssl=$(echo $ssl_token | base64)
+    cat > /opt/rainbond/.init/token <<EOF
+$encode_token
+-----------------------------------------
+$encode_ssl
+EOF
+
     cat > $rinfopath <<EOF
 region_name: {{ region_name }}
 region_alias: {{ region_alias }}
@@ -60,14 +63,9 @@ token path: /opt/rainbond/.init/token
 ssl_ca_cert path: {{ ssl_ca_cert }}
 cert_file path: {{ client_cert_file }}
 key_file path: {{ client_key_file }}
-ssl: $encode_ssl
 EOF
 
 }
-
-# 生成默认sql
-echo "generate region sql "
-generate_region_sql
 
 prepare(){
     local fail_num=0
@@ -96,7 +94,7 @@ prepare(){
                 [ "$check_db" -ne 0 ] && break
             fi
         else
-            echo "prepare try $i"
+            echo "waiting db up"
             ((fail_num+=1))
             sleep 10
         fi
@@ -111,12 +109,15 @@ migrate_ui(){
         sleep 10
         ui_num=$(docker ps | grep rbd-app-ui | wc -l)
         if [ "$ui_num" == 1 ]; then
-            docker exec rbd-app-ui python /app/ui/manage.py migrate
-            [ "$?" -eq 0 ] && break
+            status=$(docker exec rbd-app-ui python /app/ui/manage.py migrate >/dev/null 2>&1 && echo 0 || echo 1 )
+            [ "$status" -eq 0 ] && break || (
+                echo "migrate ui try $i" >> /tmp/migrate.ui.log
+                docker exec rbd-app-ui python /app/ui/manage.py migrate --fake >> /tmp/migrate.ui.log
+                ((fail_num+=1))
+            )
         else
-            echo "migrate ui try $i"
-            docker exec rbd-app-ui python /app/ui/manage.py migrate --fake
-            ((fail_num+=1))
+            echo "waiting ui start"
+            sleep 10
         fi
     done
     [ "$fail_num" == 6 ] && echo "migrate ui failed" && exit 1 || echo "migrate ui ok" && exit 0
@@ -150,6 +151,7 @@ init_config(){
 
 case $1 in
     prepare)
+        generate_region_sql
         prepare
     ;;
     migrate)
@@ -162,7 +164,6 @@ case $1 in
         done
     ;;
     *)
-        # Todo
-        echo ""
+        :
     ;;
 esac
