@@ -7,14 +7,14 @@
 
 - name: Upgrade | Copy Upgrade db sql
   template:
-    src: 5.1.2-5.1.3.sql.j2
-    dest: /tmp/5.1.2-5.1.3.sql
+    src: 5.1.3-5.1.4.sql.j2
+    dest: /tmp/5.1.3-5.1.4.sql
     mode: 0777
 
 - name: Upgrade | Upgrade images to goodrain.me
-  shell: "bash /tmp/upgradeimage.sh > /tmp/5.1.0.upgrade.log"
-  register: upgrade501_task_result
-  until: upgrade501_task_result is succeeded
+  shell: "bash /tmp/upgradeimage.sh > /tmp/5.1.x.upgrade.log"
+  register: upgrade50x_task_result
+  until: upgrade50x_task_result is succeeded
   retries: 5
 
 - name: Upgrade | Copy grctl binary from deploy
