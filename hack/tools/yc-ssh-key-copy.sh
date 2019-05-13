@@ -16,8 +16,6 @@
 
 # 此脚本为批量部署服务器ssh key使用
 
-#set -x
-
 # check args count
 if test $# -ne 3; then
     echo -e "\nUsage: $0 < hosts file > < username > < password >\n"

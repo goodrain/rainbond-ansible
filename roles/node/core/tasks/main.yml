@@ -83,7 +83,7 @@
     mode: 0777
 
 - name: config node uuid
-  shell: "bash -x /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
+  shell: "bash /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
 
 - name: add manage node master.yaml
   template:

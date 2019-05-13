@@ -37,7 +37,7 @@
   when: check_push_image.stat.isreg is not defined
 
 - name: Rainbond | load image from local ok
-  shell: "bash -x {{ base_dir }}/offline/images/load.sh > /tmp/install/local.image.log"
+  shell: "bash {{ base_dir }}/offline/images/load.sh > /tmp/install/local.image.log"
   register: load_task_result
   until: load_task_result is succeeded
   retries: 4

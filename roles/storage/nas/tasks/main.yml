@@ -6,7 +6,7 @@
     mode: 0777
 
 - name: Nas | run check storage
-  shell: "bash -x /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
+  shell: "bash /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
 
 - name: Nas | check grdata
   stat: path=/tmp/.grdata.init

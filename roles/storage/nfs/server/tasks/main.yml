@@ -6,7 +6,7 @@
     mode: 0777
 
 - name: Nfs | run check storage
-  shell: "bash -x  /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
+  shell: "bash /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
 
 - name: Nfs | check init 
   stat: path=/tmp/.grdata.init
@@ -46,4 +46,4 @@
     mode: 0777
 
 - name: Health | Run health storage check
-  shell: "bash -x /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
+  shell: "bash /tmp/install/check_storage.sh > /tmp/install/check_storage.log"

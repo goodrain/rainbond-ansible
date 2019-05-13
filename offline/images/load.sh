@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -xe
+set -e
 
 pushd /opt/rainbond/offline/images
 ls | grep tgz | xargs -I {} docker load -i ./{}

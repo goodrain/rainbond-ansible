@@ -6,7 +6,7 @@
     mode: 0777
 
 - name: Install docker offline
-  shell: "bash -x /tmp/install_docker.sh"
+  shell: "bash /tmp/install_docker.sh"
   register: docker_task_result
   until: docker_task_result is succeeded
   retries: 4
