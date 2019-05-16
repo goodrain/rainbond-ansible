@@ -2,18 +2,4 @@
 nodeip: "{{hostvars[inventory_hostname]['ip']}}"
 run_mode: |-
   {%- if inventory_hostname in groups['master'] + groups['new-master'] -%}master{%- else -%}worker{%- endif -%}
-noderule: |-
-  {%- if inventory_hostname in groups['master'] + groups['new-master'] + groups['lb'] -%}
-    {%- if deploy_type == "thirdparty" -%}
-      manage
-    {%- else -%}
-      {%- if inventory_hostname in groups['worker'] -%}
-        manage,compute
-      {%- else -%}
-        manage
-      {%- endif -%}
-    {%- endif -%}
-  {%- else -%}
-      compute
-  {%- endif -%}
 

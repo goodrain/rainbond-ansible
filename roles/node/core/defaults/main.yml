@@ -5,12 +5,12 @@ run_mode: |-
 noderule: |-
   {%- if inventory_hostname in groups['master'] + groups['new-master'] -%}
     {%- if deploy_type == "thirdparty" -%}
-      manage
+      manage,gateway
     {%- else -%}
       {%- if inventory_hostname in groups['worker'] -%}
-        manage,compute
+        manage,compute,gateway
       {%- else -%}
-        manage
+        manage,gateway
       {%- endif -%}
     {%- endif -%}
   {%- else -%}

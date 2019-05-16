@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[[ $DEBUG ]] && set -ex
+[[ $DEBUG ]] && set -ex || set -e
 
 node_role=$1
 node_hostname=$2
@@ -26,7 +26,14 @@ node_uuid=$6
 get_port=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep install_ssh_port | awk '{print $2}')
 node_port=${get_port:-22}
 
-[ -z "$node_uuid" ] && echo "node uuid is null" && exit 1
+
+SCRIPTSPATH="/opt/rainbond/rainbond-ansible"
+
+if [ -f "${SCRIPTSPATH}/scripts/installer/functions.sh" ]; then
+	source "${SCRIPTSPATH}/scripts/installer/functions.sh" || notice "not found functions.sh"
+fi
+
+[ -z "$node_uuid" ] && notice "node uuid is null" 
 
 ssh_key_copy()
 {
@@ -36,7 +43,7 @@ ssh_key_copy()
     # start copy 
     expect -c "
     set timeout 100
-    spawn ssh-copy-id root@$1 -p $3
+    spawn ssh-copy-id root@$1 -p $3 -f
     expect {
     \"yes/no\"   { send \"yes\n\"; exp_continue; }
     \"password\" { send \"$2\n\"; }
@@ -59,12 +66,12 @@ check_ip_reachable(){
     ping -c2 $1 >/dev/null 2>&1 
     echo $?
 }
-echo "check ip if reachable"
-[ "$(check_ip_reachable $node_ip)" -ne 0 ] && echo "Destination Host ${node_ip} Unreachable..." && exit 1
+info "check ip if reachable"
+[ "$(check_ip_reachable $node_ip)" -ne 0 ] && notice "Destination Host ${node_ip} Unreachable..." 
 
 if [ "$login_type" == "pass" ]; then
-    echo "configure ssh for secure login"
-    ssh_key_copy $node_ip $login_key $node_port
+    info "configure ssh for secure login"
+    run ssh_key_copy $node_ip $login_key $node_port
 fi
 
 check_exist(){
@@ -80,10 +87,12 @@ check_exist(){
 
 # 新添加节点
 new_node(){
-    echo "add new node: ${node_ip}:${node_port} ---> ${node_uuid}"
+    info "add new node ${node_role}: ${node_ip}:${node_port} ---> ${node_uuid}"
     sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ansible_port=$node_port ip=$node_ip port=$node_port" inventory/hosts
     if [ "$node_role" == "compute" ]; then
         sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
+    elif [ "$node_role" == "gateway" ]; then
+        sed -i "/\[lb\]/a$node_uuid" inventory/hosts  
     else
         sed -i "/\[new-master\]/a$node_uuid" inventory/hosts  
     fi
@@ -95,7 +104,7 @@ EOF
 # 已存在节点
 exist_node(){
     old_node_uuid=$(cat /opt/rainbond/.init/node.uuid | grep "$node_ip" | awk -F: '{print $2}')
-    echo "update node: ${node_ip} ${old_node_uuid} ---> ${node_uuid}"
+    info "update node ${node_role}: ${node_ip} ${old_node_uuid} ---> ${node_uuid}"
     sed -i "s#${old_node_uuid}#${node_uuid}#g" inventory/hosts
     sed -i "s#${old_node_uuid}#${node_uuid}#g" /opt/rainbond/.init/node.uuid
 }
@@ -111,19 +120,25 @@ deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
 
 [ "$(check_exist $node_uuid $node_ip)" -eq 0 ] && new_node || exist_node
 
-echo "check ip if ssh"
-[ "$(check_ssh $node_uuid)" -ne 0 ] && echo "Make sure you can SSH in ${node_ip}" && exit 1
+info "check ip if ssh"
+[ "$(check_ssh $node_uuid)" -ne 0 ] && notice "Make sure you can SSH in ${node_ip}"
 
 if [ "$node_role" == "compute" ]; then
     if [ "$deploy_type" == "thirdparty" ]; then
-        ansible-playbook -i inventory/hosts hack/thirdparty/addnode.yml --limit $node_uuid
+        run ansible-playbook -i inventory/hosts hack/thirdparty/addnode.yml --limit $node_uuid
     else
-        ansible-playbook -i inventory/hosts addnode.yml --limit $node_uuid
+        run ansible-playbook -i inventory/hosts addnode.yml --limit $node_uuid
+    fi
+elif [ "$node_role" == "gateway" ]; then
+    if [ "$deploy_type" == "thirdparty" ]; then
+        notice "not support thirdparty k8s"
+    else
+        run ansible-playbook -i inventory/hosts lb.yml --limit $node_uuid
     fi
 else
     if [ "$deploy_type" == "thirdparty" ]; then
-        ansible-playbook -i inventory/hosts hack/thirdparty/addmaster.yml --limit $node_uuid
+        run ansible-playbook -i inventory/hosts hack/thirdparty/addmaster.yml --limit $node_uuid
     else
-        ansible-playbook -i inventory/hosts addmaster.yml --limit $node_uuid
+        run ansible-playbook -i inventory/hosts addmaster.yml --limit $node_uuid
     fi
 fi

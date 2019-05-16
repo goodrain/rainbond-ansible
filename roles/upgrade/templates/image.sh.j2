@@ -52,6 +52,8 @@ upgrade_rainbond(){
 upgrade_db(){
     docker cp /tmp/5.1.3-5.1.4.sql rbd-db:/root/5.1.3-5.1.4.sql
     docker exec rbd-db mysql -e "use console;source /root/5.1.3-5.1.4.sql;"
+    docker cp /tmp/region.sql rbd-db:/root/region.sql
+    docker exec rbd-db mysql -e "use region;source /root/region.sql;"
 }
 
 upgrade_dns(){

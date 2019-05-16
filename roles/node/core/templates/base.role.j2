@@ -31,8 +31,7 @@ services:
   health:
     name: rbd-repo
     model: http
-    address: {% if install_type == "online" %}lang.goodrain.me{% else %}127.0.0.1:8081/artifactory/{% endif %}
-
+    address: 127.0.0.1:8081/artifactory/
     max_errors_num: 3
     time_interval: 60
   after:

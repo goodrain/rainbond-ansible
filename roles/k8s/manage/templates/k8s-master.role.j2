@@ -45,10 +45,6 @@ services:
   restart_sec: 10
 
 - name: kube-scheduler
-  endpoints:
-  - name: SCHEDULER_ENDPOINTS
-    protocol: http
-    port:
   health:
     name: kube-scheduler
     model: tcp

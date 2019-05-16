@@ -5,10 +5,16 @@
     dest: /tmp/upgradeimage.sh
     mode: 0777
 
-- name: Upgrade | Copy Upgrade db sql
+- name: Upgrade | Copy Upgrade console db sql
   template:
     src: 5.1.3-5.1.4.sql.j2
     dest: /tmp/5.1.3-5.1.4.sql
+    mode: 0777
+
+- name: Upgrade | Copy Upgrade region db sql
+  template:
+    src: region.sql.j2
+    dest: /tmp/region.sql
     mode: 0777
 
 - name: Upgrade | Upgrade images to goodrain.me
