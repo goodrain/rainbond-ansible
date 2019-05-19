@@ -77,6 +77,17 @@ if [ -f "$INSTALL_SCRIPT" ];then
     #sed -i -r  "s/(^default_dns_local: ).*/\1$default_dns_local/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     version=$(cat /opt/rainbond/rainbond-ansible/version)
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
+
+## region
+region_name: "rainbond"
+region_alias: "默认私有数据中心"
+region_url: "https://region.goodrain.me:8443"
+region_desc: "当前数据中心是默认安装添加的数据中心"
+ssl_ca_cert: "{{ region_ca_dir }}/ca.pem"
+client_cert_file: "{{ region_ca_dir }}/client.key.pem"
+client_key_file: "{{ region_ca_dir }}/client.pem"
+EOF
 else
     exit 1
 fi
