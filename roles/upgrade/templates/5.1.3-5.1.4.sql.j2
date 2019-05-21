@@ -87,6 +87,7 @@ create table `app_upgrade_record`
     `group_key`   varchar(32) not null,
     `group_name`  varchar(64) not null,
     `version`     varchar(20) not null,
+    `old_version` varchar(20) not null,
     `status`      tinyint     not null,
     `create_time` timestamp   not null default current_timestamp,
     `update_time` timestamp   not null default current_timestamp on update current_timestamp(3),
@@ -103,6 +104,7 @@ create table `service_upgrade_record`
     `app_upgrade_record_id`    int          not null,
     `service_id`               varchar(32)  not null,
     `service_cname`            varchar(100) not null,
+    `upgrade_type`             varchar(20)  not null,
     `event_id`                 varchar(32)  not null,
     `update`                   longtext     not null,
     `status`                   tinyint      not null,
@@ -129,5 +131,6 @@ CREATE TABLE `tenant_service_backup` (
 ) ENGINE=InnoDB AUTO_INCREMENT=250 DEFAULT CHARSET=utf8;
 
 -- **2019-05-15 增加唯一索引
-alter table gateway_custom_configuration modify rule_id varchar(32) unique not null;
+alter table gateway_custom_configuration
+    modify rule_id varchar(32) unique not null;
 alter table tenant_service modify `version` varchar(255);
