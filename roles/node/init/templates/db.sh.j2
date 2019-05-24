@@ -28,7 +28,7 @@ else
 fi
 
 DOCKER_CMD_CS="docker run -i --rm --net=host -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} goodrain.me/r6dctl:sqlclient"
-
+# UI_INIT_CMD="docker run -i --rm --network host -e MYSQL_HOST={{ db_host }} -e MYSQL_PORT={{ db_port }} -e MYSQL_USER={{ db_user }} -e MYSQL_PASS={{ db_pass }} -e MYSQL_DB=console -i goodrain.me/{{ rbd_app_ui }} python /app/ui/manage.py migrate"
 
 generate_region_sql(){
     rinfopath="/opt/rainbond/.init/.regioninfo"

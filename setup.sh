@@ -161,6 +161,9 @@ precheck::check_port(){
     local check_fail_num=0
     for port in ${portlist[@]}; do
         netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" >> /tmp/install/check_port_log && ((check_fail_num+=1)) || sleep 1
+        if [ "$check_fail_num" != 0 ]; then
+            notice "port ${port} is already used"
+        fi
     done
     if [ "$check_fail_num" == 0 ]; then
 	    touch /opt/rainbond/.init/.port_check
