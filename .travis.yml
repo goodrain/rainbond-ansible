@@ -23,6 +23,6 @@ script:
   - bash -vn setup.sh
   - make main
   - make build_ansible
-  - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push rainbond/rainspray:5.0 ;fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push rainbond/rainspray:5.x ;fi'
 
 
