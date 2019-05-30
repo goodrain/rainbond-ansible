@@ -41,9 +41,9 @@ generate_region_sql(){
 INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`,\`create_time\`) VALUES('asdasdasdasdasdasdasdasdas', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file','0000-00-00 00:00:00.000000');
 EOF
 
-    token="region_name={{ region_name }}&&region_alias={{ region_alias }}&&url={{ region_url }}&&desc={{ region_desc }}&&wsurl=ws://$IP:6060&&httpdomain={{ app_domain }}&&tcpdomain=$IP&&ssl_ca_cert=${ssl_ca_cert}&&key_file=${key_file}&&cert_file=${cert_file}"
+    token="region_name#{{ region_name }}&&region_alias#{{ region_alias }}&&url#{{ region_url }}&&desc#{{ region_desc }}&&wsurl#ws://$IP:6060&&httpdomain#{{ app_domain }}&&tcpdomain#$IP&&ssl_ca_cert#${ssl_ca_cert}&&key_file#${key_file}&&cert_file#${cert_file}"
     encode_token=$(echo $token | base64)
-    ssl_token="ssl_ca_cert=${ssl_ca_cert}&&key_file=${key_file}&&cert_file=${cert_file}"
+    ssl_token="ssl_ca_cert#${ssl_ca_cert}&&key_file#${key_file}&&cert_file#${cert_file}"
     encode_ssl=$(echo $ssl_token | base64)
     cat > /opt/rainbond/.init/token <<EOF
 $encode_token
