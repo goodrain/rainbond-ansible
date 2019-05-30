@@ -46,9 +46,13 @@ EOF
     ssl_token="ssl_ca_cert#${ssl_ca_cert}&&key_file#${key_file}&&cert_file#${cert_file}"
     encode_ssl=$(echo $ssl_token | base64)
     cat > /opt/rainbond/.init/token <<EOF
+-------------------------token start -----------------------------------------
 $encode_token
------------------------------------------
+-------------------------token   end -----------------------------------------
+
+-------------------------ssl   start -----------------------------------------
 $encode_ssl
+-------------------------ssl     end -----------------------------------------
 EOF
 
     cat > $rinfopath <<EOF
