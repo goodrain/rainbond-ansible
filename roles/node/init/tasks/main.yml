@@ -51,7 +51,14 @@
 
 - name: init rainbond 
   shell: "bash /opt/rainbond/.init/initr6d.sh > /tmp/install/init.r6d.log"
-  register: prepare_db_ok
-  until: prepare_db_ok is succeeded
+  register: init_r6d_ok
+  until: init_r6d_ok is succeeded
+  retries: 5
+  ignore_errors: true
+
+- name: check init rainbond 
+  shell: "bash /opt/rainbond/.init/updatedb.sh config > /tmp/install/check.init.r6d.log"
+  register: check_init_r6d_ok
+  until: check_init_r6d_ok is succeeded
   retries: 5
   ignore_errors: true
