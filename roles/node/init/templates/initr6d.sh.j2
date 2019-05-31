@@ -31,6 +31,7 @@ DOCKER_CMD_CS="docker run -i --rm --net=host -v /opt/rainbond/.init:/opt/rainbon
 # UI_INIT_CMD="docker run -i --rm --network host -e MYSQL_HOST={{ db_host }} -e MYSQL_PORT={{ db_port }} -e MYSQL_USER={{ db_user }} -e MYSQL_PASS={{ db_pass }} -e MYSQL_DB=console -i goodrain.me/{{ rbd_app_ui }} python /app/ui/manage.py migrate"
 
 generate_region_sql(){
+    echo "generate region sql"
     rinfopath="/opt/rainbond/.init/.regioninfo"
     IP=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk -F ': ' '{print $2}')
     ssl_ca_cert=$(cat {{ ssl_ca_cert }})
@@ -73,7 +74,7 @@ EOF
 
 prepare(){
     local fail_num=0
-    for ((i=1;i<=6;i++))
+    for ((i=1;i<=10;i++))
     do
         db_num=$(curl -s --connect-timeout 5 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
         if [ "$db_num" == 1 ]; then
@@ -103,12 +104,12 @@ prepare(){
             sleep 10
         fi
     done
-    [ "$fail_num" == 6 ] && echo "prepare failed" && exit 1 || echo "prepare ok" && exit 0
+    [ "$fail_num" == 10 ] && echo "prepare failed" && exit 1 || echo "prepare ok" 
 }
 
 migrate_ui(){
     local fail_num=0
-    for ((i=1;i<=6;i++))
+    for ((i=1;i<=10;i++))
     do
         sleep 10
         ui_num=$(docker ps | grep rbd-app-ui | wc -l)
@@ -124,12 +125,12 @@ migrate_ui(){
             sleep 10
         fi
     done
-    [ "$fail_num" == 6 ] && echo "migrate ui failed" && exit 1 || echo "migrate ui ok" && exit 0
+    [ "$fail_num" ==10 ] && echo "migrate ui failed" && exit 1 || echo "migrate ui ok" 
 }
 
 init_config(){
     local fail_num=0
-    for ((i=1;i<=6;i++))
+    for ((i=1;i<=10;i++))
     do
         check=$($DOCKER_CMD_CS "select wsurl from console.region_info where region_id='asdasdasdasdasdasdasdasdas';")
         if [ -z "$check" ]; then
@@ -150,24 +151,14 @@ init_config(){
         ((fail_num+=1))
         sleep 5
     done
-    [ "$fail_num" == 6 ] && echo "init config failed" && exit 1 || echo "init config ok" && exit 0
+    [ "$fail_num" == 10 ] && echo "init config failed" && exit 1 || echo "init config ok" 
 }
 
 case $1 in
-    prepare)
+    *)
         generate_region_sql
         prepare
-    ;;
-    migrate)
         migrate_ui 
-    ;;
-    config)
-        for ((i=1;i<=6;i++))
-        do
-            init_config
-        done
-    ;;
-    *)
-        :
+        init_config
     ;;
 esac
