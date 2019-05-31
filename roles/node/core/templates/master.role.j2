@@ -28,7 +28,7 @@ services:
     -v {{ rbd_dir }}/logs/rbd-api:/logs
     -i goodrain.me/{{ api }}
     --etcd=${ETCD_ENDPOINTS}
-    --api-addr-ssl={{ nodeip }}:8443
+    --api-addr-ssl=0.0.0.0:8443
     --api-addr=127.0.0.1:8888
     --log-level=info
     --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region"
