@@ -10,35 +10,48 @@
     src: init.sql.j2
     dest: /opt/rainbond/.init/init.sql
 
-- name: Prepare db
-  shell: "bash /opt/rainbond/.init/updatedb.sh prepare >> /tmp/install/db.prepare.log"
+- name: Copy init rainbond script
+  template:
+    src: initr6d.sh.j2
+    dest: /opt/rainbond/.init/initr6d.sh
+    mode: 0777
+    
+#- name: create database
+#  shell: "bash /opt/rainbond/.init/updatedb.sh prepare >> /tmp/install/db.prepare.log"
+#  register: prepare_db_ok
+#  until: prepare_db_ok is succeeded
+#  retries: 5
+
+#- name: Migrate ui if prepare_db_ok is succeeded
+#  shell: "bash /opt/rainbond/.init/updatedb.sh migrate >> /tmp/install/db.ui.migrate.log"
+#  register: migrate_ui_ok
+#  until: migrate_ui_ok is succeeded
+#  retries: 5
+#  when:
+#    - prepare_db_ok is succeeded
+
+#- name: Init Data Region if migrate_ui_ok is succeeded
+#  shell: "bash /opt/rainbond/.init/updatedb.sh config >> /tmp/install/db.init.config.log"
+#  register: region_init_result
+#  until: region_init_result is succeeded
+#  retries: 5
+#  when:
+#    - prepare_db_ok is succeeded
+#    - migrate_ui_ok is succeeded
+
+#- name: Check init db if succeeded
+#  shell: "bash /opt/rainbond/.init/updatedb.sh check >> /tmp/install/check.db.log"
+#  register: checkdb_task_result
+#  until: checkdb_task_result is succeeded
+#  retries: 3
+#  when:
+#    - prepare_db_ok is succeeded
+#    - migrate_ui_ok is succeeded
+#    - region_init_result is succeeded
+
+- name: init rainbond 
+  shell: "bash /opt/rainbond/.init/initr6d.sh > /tmp/install/init.r6d.log"
   register: prepare_db_ok
   until: prepare_db_ok is succeeded
   retries: 5
-
-- name: Migrate ui if prepare_db_ok is succeeded
-  shell: "bash /opt/rainbond/.init/updatedb.sh migrate >> /tmp/install/db.ui.migrate.log"
-  register: migrate_ui_ok
-  until: migrate_ui_ok is succeeded
-  retries: 5
-  when:
-    - prepare_db_ok is succeeded
-
-- name: Init Data Region if migrate_ui_ok is succeeded
-  shell: "bash /opt/rainbond/.init/updatedb.sh config >> /tmp/install/db.init.config.log"
-  register: region_init_result
-  until: region_init_result is succeeded
-  retries: 5
-  when:
-    - prepare_db_ok is succeeded
-    - migrate_ui_ok is succeeded
-
-- name: Check init db if succeeded
-  shell: "bash /opt/rainbond/.init/updatedb.sh check >> /tmp/install/check.db.log"
-  register: checkdb_task_result
-  until: checkdb_task_result is succeeded
-  retries: 3
-  when:
-    - prepare_db_ok is succeeded
-    - migrate_ui_ok is succeeded
-    - region_init_result is succeeded
+  ignore_errors: true
