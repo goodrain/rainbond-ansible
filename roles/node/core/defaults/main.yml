@@ -13,6 +13,8 @@ noderule: |-
         manage,gateway
       {%- endif -%}
     {%- endif -%}
+  {%- elif inventory_hostname in groups['new-worker'] + groups['lb'] -%}
+      compute,gateway
   {%- else -%}
       compute
   {%- endif -%}
