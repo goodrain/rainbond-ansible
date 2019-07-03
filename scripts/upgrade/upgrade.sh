@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.4.tgz"
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.5.tgz"
 #IMAGE_BASE_LOCAL="/grdata/services/offline/runtime.upgrade.5.1.4.tgz"
 
 IMAGE_PATH="/grdata/services/offline/upgrade"
 
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.4.tgz"
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.5.tgz"
 
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
 
@@ -60,11 +60,11 @@ if [ "$DISK_STATUS" -ne '0' ]; then
 fi
 
 if [ -f "$INSTALL_SCRIPT" ];then
-    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_5.1.3
+    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_5.1.4
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond
     rm -rf /opt/rainbond/rainbond-ansible/inventory
-    cp -a /opt/rainbond/rainbond-ansible_5.1.3/inventory /opt/rainbond/rainbond-ansible
-    cp -a /opt/rainbond/rainbond-ansible_5.1.3/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    cp -a /opt/rainbond/rainbond-ansible_5.1.4/inventory /opt/rainbond/rainbond-ansible
+    cp -a /opt/rainbond/rainbond-ansible_5.1.4/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     #secretkey=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep secretkey | awk '{print $2}')
     #db_pass=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep db_pass | awk '{print $2}')
     #pod_cidr=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep pod_cidr | awk '{print $2}')
@@ -105,10 +105,10 @@ done
 
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|latest)" | grep -E  "(-release)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
-mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.3
-mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.3
+mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.4
+mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.4
 
-docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_v5.1.4-release tar zxf /pkg.tgz -C /sysdir
+docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 
