@@ -103,7 +103,7 @@ for ((i=1;i<=60;i++));do
     [ "$?" -eq 0 ] && export readyok="ok"  && break
 done
 
-[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|latest)" | grep -E  "(-release)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
+[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|kube)" | grep -E  "($version|rbd-mesh-data-panel)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.4
 mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.4
