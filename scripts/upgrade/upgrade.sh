@@ -45,9 +45,9 @@ fi
 
 #Mark the update version into db
 current_version=$(grctl version | cut -f3 -d " " | awk -F "-*" '{print $1}' | sed 's/^.//')
-docker exec rbd-db mysql -e "select RAINBOND_VERSION from console.console_sys_config;" >/dev/null 2>&1
+docker exec rbd-db mysql -e "select \`key\`,\`value\` from console.console_sys_config;" | grep RAINBOND_VERSION  >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-    docker exec rbd-db mysql -e "insert console.console_sys_config(`key`,`value`) values("RAINBOND_VERSION", "${current_version}");"
+docker exec rbd-db mysql -D console -e "insert \`console_sys_config\`(\`key\`, \`value\`) values(\"RAINBOND_VERSION\", \"${current_version}\");"
 fi
 
 #echo "clean old endpoints"
