@@ -43,6 +43,13 @@ if [ "$version_check" -eq 0 ]; then
     exit 1
 fi
 
+#Mark the update version into db
+current_version=$(grctl version | cut -f3 -d " " | awk -F "-*" '{print $1}' | sed 's/^.//')
+docker exec rbd-db mysql -e "select RAINBOND_VERSION from console.console_sys_config;" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    docker exec rbd-db mysql -e "insert console.console_sys_config(`key`,`value`) values("RAINBOND_VERSION", "${current_version}");"
+fi
+
 #echo "clean old endpoints"
 #kubectl get ns | grep -vE '(default|kube-public|kube-system|rainbond|NAME)' | awk '{print $1}' | xargs -I {} kubectl delete ep -l service-kind="third_party",creater="Rainbond" -n {}
 
