@@ -1,2 +1,2 @@
 INSERT INTO `console_sys_config` (`ID`,`key`,`type`, `value`, `desc`, `enable`, `create_time`) VALUES(NULL, 'REGION_SERVICE_API', 'json', '  [{\"url\": \"{{ region_url }}\", \"token\": null, \"enable\": true, \"region_name\": \"{{ region_name }}\", \"region_alias\": \"{{ region_alias }}\"}]', '', 1, '2018-02-05 14:00:00.000000');
-INSERT INTO `console_sys_config` (`key`, `value`) VALUES ('RAINBOND_VERSION', '{{ rainbond_version }}');
+INSERT INTO `console_sys_config` (`key`, `type`, `value`, `enable`, `create_time`) VALUES ('RAINBOND_VERSION', 'string', '{{ rainbond_version }}', '1', '2018-02-05 14:00:00.000000');
