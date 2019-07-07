@@ -92,9 +92,12 @@ new_node(){
     if [ "$node_role" == "compute" ]; then
         sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
     elif [ "$node_role" == "gateway" ]; then
-        sed -i "/\[lb\]/a$node_uuid" inventory/hosts  
+        sed -i "/\[lb\]/a$node_uuid" inventory/hosts
+    elif [[ "$node_role" =~ "compute" ]] && [[ "$node_role" =~ "gateway" ]]; then
+        sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
+        sed -i "/\[lb\]/a$node_uuid" inventory/hosts
     else
-        sed -i "/\[new-master\]/a$node_uuid" inventory/hosts  
+        sed -i "/\[new-master\]/a$node_uuid" inventory/hosts
     fi
     cat >> /opt/rainbond/.init/node.uuid <<EOF
 $node_ip:$node_uuid
