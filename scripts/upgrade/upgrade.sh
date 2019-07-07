@@ -15,7 +15,7 @@
 # limitations under the License.
 
 IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.5.tgz"
-#IMAGE_BASE_LOCAL="/grdata/services/offline/runtime.upgrade.5.1.4.tgz"
+#IMAGE_BASE_LOCAL="/grdata/services/offline/rainbond.base.upgrade.5.1.5.tgz"
 
 IMAGE_PATH="/grdata/services/offline/upgrade"
 
@@ -30,12 +30,12 @@ else
     exit 1
 fi
 
-#echo "tar xf runtime "
-#if [ -f "$IMAGE_BASE_LOCAL" ]; then
-#    tar xf ${IMAGE_BASE_LOCAL} -C ${IMAGE_PATH}
-#else
-#    exit 1
-#fi
+#echo "tar xf base "
+# if [ -f "$IMAGE_BASE_LOCAL" ]; then
+#     tar xf ${IMAGE_BASE_LOCAL} -C ${IMAGE_PATH}
+# else
+#     exit 1
+# fi
 
 version_check=$(grctl version | grep "5.1." | wc -l)
 if [ "$version_check" -eq 0 ]; then
