@@ -7,13 +7,15 @@ noderule: |-
     {%- if deploy_type == "thirdparty" -%}
       manage,gateway
     {%- else -%}
-      {%- if inventory_hostname in groups['worker'] -%}
+      {%- if (inventory_hostname in groups['worker']) and (inventory_hostname in groups['lb'])  -%}
         manage,compute,gateway
-      {%- else -%}
+      {%- elif (inventory_hostname not in groups['worker']) and (inventory_hostname in groups['lb'])  -%}
         manage,gateway
+      {%- elif (inventory_hostname not in groups['worker']) and (inventory_hostname not in groups['lb'])  -%}
+        manage  
       {%- endif -%}
     {%- endif -%}
-  {%- elif inventory_hostname in groups['new-worker'] + groups['lb'] -%}
+  {%- elif (inventory_hostname in groups['new-worker']) and (inventory_hostname in groups['lb']) -%}s
       compute,gateway
   {%- else -%}
       compute
