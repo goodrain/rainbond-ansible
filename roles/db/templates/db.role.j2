@@ -19,7 +19,7 @@ services:
     docker run --name rbd-db
     --network host
     -e MYSQL_ALLOW_EMPTY_PASSWORD="yes"
-    -v {{ rbd_dir }}/data:/data
+    -v {{ rbd_dir }}/data/mysql:/data
     -i goodrain.me/{{ rbd_db_image }}
   stop: docker stop rbd-db
   restart_policy: always
