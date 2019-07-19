@@ -131,10 +131,13 @@ init::offline(){
     lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
     case "$lsb_dist" in
 		ubuntu|debian)
+            mv /etc/apt/sources.list /etc/apt/sources.list.bak > /dev/null 2>&1
             cat > /etc/apt/sources.list.d/local_rainbond.list <<EOF
-deb file:/opt/rainbond/offline/pkgs/debian/9/ rainbond 5.0
+deb file:///opt/rainbond/offline/pkgs/debian/ 9/
 EOF
             touch /opt/rainbond/.init/.offline
+            run apt-get update -q
+            run apt-get install -y -q sshpass python-pip uuid-runtime pwgen expect curl net-tools git
 		;;
 		centos|neokylin)
             offline::centos
