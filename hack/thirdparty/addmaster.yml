@@ -7,6 +7,6 @@
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
     - { role: etcd/manage, tags: etcd }
-    - { role: lb, tags: lb }
+    - { role: gateway, tags: gateway }
     - { role: monitor, tags: monitor }
     - { role: node/core, tags: node }

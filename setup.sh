@@ -623,7 +623,7 @@ do_install::ok(){
 do_install::r6d(){
     progress "Initialize the data center"
     if [ -z "$DRY_RUN" ]; then
-        run ansible-playbook -i inventory/hosts setup.yml
+        run ansible-playbook -i inventory/hosts -e noderule=$ROLE setup.yml
         if [ "$?" -eq 0 ]; then
             curl -Is 127.0.0.1:7070 | head -1 | grep 200 > /dev/null && progress "Congratulations on your successful installation" || sleep 1
             do_install::ok

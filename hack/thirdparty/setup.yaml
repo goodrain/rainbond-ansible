@@ -10,7 +10,7 @@
     - { role: rainvar, tags: default }
     - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
 
-- hosts: master:worker:lb
+- hosts: master:worker:gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
@@ -37,10 +37,10 @@
     - { role: rainvar, tags: default }
     - { role: db, tags: db }
 
-- hosts: lb
+- hosts: gateway
   roles:
     - { role: rainvar, tags: default }
-    - { role: lb, tags: lb }
+    - { role: gateway, tags: gateway }
 
 - hosts: master:worker
   roles:

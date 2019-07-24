@@ -4,7 +4,7 @@
     - { role: rainvar, tags: default }
     - { role: prepare, tags: prepare }
 
-- hosts: deploy:master:worker:lb
+- hosts: deploy:master:worker:gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: docker, tags: docker }
@@ -35,7 +35,7 @@
     - { role: rainvar, tags: default }
     - { role: health, tags: health }
 
-- hosts: master:worker:lb
+- hosts: master:worker:gateway
   roles:
   - { role: rainvar, tags: default }
   - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
@@ -51,15 +51,15 @@
     - { role: rainvar, tags: default }
     - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
 
-- hosts: master:worker:lb
+- hosts: master:worker:gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
 
-- hosts: lb
+- hosts: gateway
   roles:
     - { role: rainvar, tags: default }
-    - { role: lb, tags: lb }
+    - { role: gateway, tags: gateway }
 
 - hosts: master:worker
   roles:
