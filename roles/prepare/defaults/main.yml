@@ -21,15 +21,3 @@ nodeip: "{{hostvars[inventory_hostname]['ip']}}"
 # 节点模式
 run_mode: |-
   {%- if inventory_hostname in groups['master'] -%}master{%- else -%}worker{%- endif -%}
-
-# 节点属性
-noderule: |-
-  {%- if inventory_hostname in groups['master'] -%}
-    {%- if inventory_hostname in groups['worker'] -%}
-      manage,compute
-    {%- else -%}
-      manage
-    {%- endif -%}
-  {%- else -%}
-      compute
-  {%- endif -%}

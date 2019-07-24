@@ -3,7 +3,7 @@
   - deploy
   - master
   - worker
-  - lb
+  - gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: docker, tags: docker }

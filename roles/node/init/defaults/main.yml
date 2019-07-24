@@ -1,2 +1,2 @@
 ---
-lbip: "{{hostvars[groups['lb'][0]]['ip']}}"
+gatewayip: "{{hostvars[groups['gateway'][0]]['ip']}}"

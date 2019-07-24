@@ -16,7 +16,7 @@ node1
 [storage]
 node1
 
-[lb]
+[gateway]
 node1
 
 [new-master]
