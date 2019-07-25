@@ -23,6 +23,9 @@ login_type=$4
 login_key=$5
 node_uuid=$6
 
+declare -A yml_dict
+role_choice="manage gateway compute"
+yml_dict=(['manage']="addmaster.yml" ['gateway']="gateway.yml" ['compute']="addnode.yml")
 get_port=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep install_ssh_port | awk '{print $2}')
 node_port=${get_port:-22}
 
@@ -88,17 +91,20 @@ check_exist(){
 # 新添加节点
 new_node(){
     info "add new node ${node_role}: ${node_ip}:${node_port} ---> ${node_uuid}"
-    sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ansible_port=$node_port ip=$node_ip port=$node_port" inventory/hosts
-    if [ "$node_role" == "compute" ]; then
-        sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
-    elif [ "$node_role" == "gateway" ]; then
-        sed -i "/\[lb\]/a$node_uuid" inventory/hosts
-    elif [[ "$node_role" =~ "compute" ]] && [[ "$node_role" =~ "gateway" ]]; then
-        sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
-        sed -i "/\[lb\]/a$node_uuid" inventory/hosts
-    else
-        sed -i "/\[new-master\]/a$node_uuid" inventory/hosts
-    fi
+    sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ansible_port=$node_port ip=$node_ip port=$node_port role=$node_role" inventory/hosts
+    OLD_IFS=$IFS
+    IFS=','
+    for role in $node_role;do
+        echo "role $role"
+        if [ "$role" == "compute" ]; then
+            sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
+        elif [ "$role" == "gateway" ]; then
+            sed -i "/\gateway\]/a$node_uuid" inventory/hosts
+        else
+            sed -i "/\[new-master\]/a$node_uuid" inventory/hosts
+        fi
+    done
+    IFS=$OLD_IFS
     cat >> /opt/rainbond/.init/node.uuid <<EOF
 $node_ip:$node_uuid
 EOF
@@ -126,22 +132,22 @@ deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
 info "check ip if ssh"
 [ "$(check_ssh $node_uuid)" -ne 0 ] && notice "Make sure you can SSH in ${node_ip}"
 
-if [ "$node_role" == "compute" ]; then
-    if [ "$deploy_type" == "thirdparty" ]; then
-        run ansible-playbook -i inventory/hosts hack/thirdparty/addnode.yml --limit $node_uuid
-    else
-        run ansible-playbook -i inventory/hosts addnode.yml --limit $node_uuid
+# 检查Role角色状态
+check_var(){
+    local role type
+    role=$1
+    role_type=$2
+    echo ${role} | grep ${role_type} >/dev/null 2>&1
+    echo $?
+}
+
+# 根据Role执行Ansible剧本
+for role in $role_choice; do
+    if [ "$(check_var $node_role $role)" -eq 0 ]; then
+        if [ "$deploy_type" == "thirdparty" ]; then
+            run ansible-playbook -i inventory/hosts hack/thirdparty/${yml_dict[$role]} -e noderule=$node_role --limit $node_uuid
+        else
+            run ansible-playbook -i inventory/hosts ${yml_dict[$role]} -e noderule=$node_role --limit $node_uuid
+        fi
     fi
-elif [ "$node_role" == "gateway" ]; then
-    if [ "$deploy_type" == "thirdparty" ]; then
-        notice "not support thirdparty k8s"
-    else
-        run ansible-playbook -i inventory/hosts lb.yml --limit $node_uuid
-    fi
-else
-    if [ "$deploy_type" == "thirdparty" ]; then
-        run ansible-playbook -i inventory/hosts hack/thirdparty/addmaster.yml --limit $node_uuid
-    else
-        run ansible-playbook -i inventory/hosts addmaster.yml --limit $node_uuid
-    fi
-fi
+done
