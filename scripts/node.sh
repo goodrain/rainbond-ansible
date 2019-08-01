@@ -24,7 +24,7 @@ login_key=$5
 node_uuid=$6
 
 get_port=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep install_ssh_port | awk '{print $2}')
-node_port=${get_port:-22}
+node_port=${get_port:-50022}
 
 
 SCRIPTSPATH="/opt/rainbond/rainbond-ansible"
