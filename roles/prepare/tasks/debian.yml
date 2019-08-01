@@ -37,6 +37,16 @@
     - https_proxy is defined
     - need_https_proxy.rc != 0
 
+- name: Copy local_rainbond.list into /etc/apt/sources.list.d
+  template:
+    src: /etc/apt/sources.list.d/local_rainbond.list
+    dest: /etc/apt/sources.list.d/local_rainbond.list
+
+- name: Copy repo into /opt/rainbond/offline
+  copy:
+    src: /opt/rainbond/offline/pkgs
+    dest: /opt/rainbond/offline
+
 - name: rm ubuntu lxd & ufw package
   apt: 
     name: 
@@ -53,7 +63,7 @@
 - name: install ubuntu package
   apt: 
     name:
-      - nfs-common          
+      - nfs-common
       - conntrack           
       - jq                  
       - socat               # port forwarding
@@ -63,8 +73,10 @@
       - ipvsadm
       - net-tools
       - expect
+      - docker-ce
     update_cache: yes
     autoclean: yes
+    force: yes
     state: latest
 
 - name: configuration ulimits

@@ -5,7 +5,11 @@
 
 - name: Rainbond | Install ansible Offline
   shell: "yum install -y sshpass python-pip ansible"
-  when: install_type != "online"
+  when: install_type != "online" and  ansible_distribution == "CentOS"
+
+- name: Rainbond | Install ansible Offline
+  shell: "apt-get -y install sshpass python-pip ansible  --allow-unauthenticated"
+  when: install_type != "online" and  ansible_distribution == "Ubuntu"
 
 - name: Storage | check init 
   stat: path=/tmp/.grdata.share
