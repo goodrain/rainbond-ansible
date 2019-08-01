@@ -3,7 +3,7 @@
   blockinfile:
     dest: /etc/hosts
     block: |-
-      {{hostvars[groups['master'][0]]['ip']}}  {{ rainbond_domain }}
+      {{hostvars[groups['manage'][0]]['ip']}}  {{ rainbond_domain }}
     state: present
     create: yes
     backup: yes

@@ -15,35 +15,35 @@
     that: ansible_distribution in [ 'CentOS','RedHat','Debian','Ubuntu']
   ignore_errors: false
 
-- name: Stop if cpu is sufficient for masters
+- name: Stop if cpu is sufficient for manages
   fail:
     msg: "This machine does not have sufficient CPU to run Rainbond, at least {{ r6d_min_cpu }} cores."
   when:
-    - inventory_hostname in groups['master'] 
+    - inventory_hostname in groups['manage'] 
     - enable_check == "enable" 
     - ansible_processor_vcpus < r6d_min_cpu|int
 
-- name: Stop if cpu is sufficient for workers
+- name: Stop if cpu is sufficient for computes
   fail:
     msg: "This machine does not have sufficient CPU to run Rainbond, at least {{ r6d_min_cpu }} cores."
   when:
-    - inventory_hostname in groups['worker'] 
+    - inventory_hostname in groups['compute'] 
     - enable_check == "enable" 
     - ansible_processor_vcpus < r6d_min_cpu|int
 
-- name: Stop if memory is too small for masters
+- name: Stop if memory is too small for manages
   fail:
     msg: "This machine does not have sufficient RAM to run Rainbond, at least {{ r6d_min_ram }} MB."
   when: 
-    - inventory_hostname in groups['master'] 
+    - inventory_hostname in groups['manage'] 
     - enable_check == "enable" 
     - ansible_memtotal_mb < r6d_min_ram|int
 
-- name: Stop if memory is too small for workers
+- name: Stop if memory is too small for computes
   fail:
     msg: "This machine does not have sufficient RAM to run Rainbond, at least {{ r6d_min_ram }} MB."
   when: 
-    - inventory_hostname in groups['worker'] 
+    - inventory_hostname in groups['compute'] 
     - enable_check == "enable" 
     - ansible_memtotal_mb < r6d_min_ram|int
 
