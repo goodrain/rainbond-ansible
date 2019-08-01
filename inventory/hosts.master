@@ -1,5 +1,5 @@
 [all]
-node1 ansible_host=10.10.10.13  ansible_port=22 ip=10.10.10.13 port=22
+node1 ansible_host=10.10.10.13  ansible_port=22 ip=10.10.10.13 port=50022
 
 [deploy]
 node1 NTP_ENABLED=no
