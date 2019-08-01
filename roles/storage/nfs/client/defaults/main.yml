@@ -1,5 +1,5 @@
 ---
-nfsserver: "{{hostvars[groups['master'][0]]['ip']}}"
+nfsserver: "{{hostvars[groups['manage'][0]]['ip']}}"
 nfspath: "/grdata"
 nfsmount: "/grdata"
 nfsoptions: "rw"
