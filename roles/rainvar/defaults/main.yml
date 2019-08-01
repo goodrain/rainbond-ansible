@@ -90,7 +90,7 @@ CLUSTER_NETWORK: calico
 service_cidr: 11.1.0.1/12
 pod_cidr: 10.20.0.0/16
 
-install_ssh_port: 50022
+install_ssh_port: 22
 app_domain: pass.example.com
 
 storage_type: nfs
