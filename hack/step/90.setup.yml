@@ -4,17 +4,17 @@
     - { role: rainvar, tags: default }
     - { role: prepare, tags: prepare }
 
-- hosts: deploy:master:worker:gateway
+- hosts: master:worker:gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: docker, tags: docker }
 
-- hosts: deploy
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: image, tags: image }
 
-- hosts: etcd
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: etcd, tags: etcd }

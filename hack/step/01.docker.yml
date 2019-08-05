@@ -1,8 +1,7 @@
 # to install docker service
 - hosts:
-  - deploy
-  - master
-  - worker
+  - manage
+  - compute
   - gateway
   roles:
     - { role: rainvar, tags: default }

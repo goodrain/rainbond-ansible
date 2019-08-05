@@ -17,12 +17,12 @@
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
 
-- hosts: deploy
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: docker/image, tags: image-thirdparty }
 
-- hosts: etcd
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: etcd/manage, tags: etcd }

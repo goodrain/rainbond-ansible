@@ -5,7 +5,7 @@
     - { role: bootstrap, tags: bootstrap }
     - { role: prepare, tags: prepare }
 
-- hosts: storage
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
     - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
@@ -17,17 +17,17 @@
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
 
-- hosts: deploy:manage:compute:gateway
+- hosts: manage:compute:gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: docker/install, tags: docker }
 
-- hosts: deploy
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: docker/image, tags: image }
 
-- hosts: etcd
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: etcd/manage, tags: etcd }
@@ -69,7 +69,7 @@
     - { role: rainvar, tags: default }
     - { role: node/core, tags: node }
 
-- hosts: deploy
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
     - { role: node/init, tags: nodeinit}

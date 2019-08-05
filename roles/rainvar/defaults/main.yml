@@ -106,9 +106,6 @@ etcd_port_c1: 2379
 etcd_port_c2: 4001
 etcd_port_s1: 2380
 
-# 安装完自动上线节点
-autoreg_node: disable
-
 install_logs_dir: "/tmp/install"
 
 ## eid
