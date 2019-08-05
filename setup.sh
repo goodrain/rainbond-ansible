@@ -132,7 +132,7 @@ init::offline(){
     case "$lsb_dist" in
 		ubuntu|debian)
             cat > /etc/apt/sources.list.d/local_rainbond.list <<EOF
-deb file:/opt/rainbond/offline/pkgs/debian/9/ rainbond 5.0
+deb file:///opt/rainbond/offline/pkgs/debian/ 9/
 EOF
             touch /opt/rainbond/.init/.offline
 		;;
