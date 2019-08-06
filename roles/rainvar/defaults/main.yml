@@ -127,3 +127,5 @@ base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/off
 
 rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-07-12-5.1.5.tgz"
 rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-07-12-5.1.5.sha256sum.txt"
+
+install_ui: true

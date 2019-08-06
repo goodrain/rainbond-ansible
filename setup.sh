@@ -493,6 +493,13 @@ config::region(){
         sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
     fi
 }
+# Config UI install
+config::rbd-app-ui(){
+    if [ ! -z "$INSTALL_UI" ];then
+        sed -i -r  "s/(^install_ui: ).*/\1${INSTALL_UI}/" roles/rainvar/defaults/main.yml
+    fi
+}
+
 
 # Dev Mode
 detect_dev_mode(){
@@ -503,6 +510,51 @@ detect_dev_mode(){
         info "Notice" "检测到本地已存储离线镜像文件，将优先使用本地离线文件"
     else
         info "Notice" "将从互联网下载离线镜像文件(约2GB)，下载速度取决于当前机器网络带宽"
+    fi
+}
+
+# 检查Role角色状态
+check_var(){
+    local role type
+    role=$1
+    role_type=$2
+    echo ${role} | grep ${role_type} >/dev/null 2>&1
+    echo $?
+}
+
+config::hosts(){
+    if [ -f "inventory/hosts" ]; then
+      rm -f inventory/hosts
+    fi
+    touch inventory/hosts
+    INSTALL_SSH_PORT=${INSTALL_SSH_PORT:-22}
+    hname=$(cat /opt/rainbond/.init/uuid)
+    cat >> inventory/hosts << EOF
+[all]
+$hname ansible_host=$IIP  ansible_port=$INSTALL_SSH_PORT ip=$IIP port=$INSTALL_SSH_PORT
+
+[etcd]
+$hname
+
+EOF
+    if [ "$(check_var $ROLE manage)" -eq 0 ]; then
+        cat >> inventory/hosts << EOF
+[manage]
+$hname
+
+EOF
+    elif [ "$(check_var $ROLE compute)" -eq 0 ]; then
+        cat >> inventory/hosts << EOF
+[compute]
+$hname
+
+EOF
+    elif [ "$(check_var $ROLE gateway)" -eq 0 ]; then
+        cat >> inventory/hosts << EOF
+[gateway]
+$hname
+
+EOF
     fi
 }
 
@@ -533,23 +585,14 @@ prepare::general(){
     config::docker
     config::install_deploy
     config::storage
-    
+    config::rbd-app-ui
+    config::hosts
+
     [ ! -z "$EIP" ] && config::domain $EIP $VIP || config::domain $IIP $VIP
-    if [ "$ROLE" == "master" -o "$ROLE" == "manage" ]; then 
-        cp inventory/hosts.master inventory/hosts
-    else
-        cp inventory/hosts.all inventory/hosts
-    fi
     INSTALL_SSH_PORT=${INSTALL_SSH_PORT:-22}
     info "install ssh port" $INSTALL_SSH_PORT
     sed -i -r  "s/(^install_ssh_port: ).*/\1${INSTALL_SSH_PORT}/" roles/rainvar/defaults/main.yml
-    hname=$(cat /opt/rainbond/.init/uuid)
-    sed -i "s#node1#$hname#g" inventory/hosts
-    sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
-    sed -i "s#port=22#port=$INSTALL_SSH_PORT#g" inventory/hosts
-    
     sed -i -r  "s/(^r6d_version: ).*/\1${r6d_version}/" roles/rainvar/defaults/main.yml
-
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
     config::region
 }

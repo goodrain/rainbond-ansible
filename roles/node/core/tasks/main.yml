@@ -95,7 +95,7 @@
   template:
     src: ui.role.j2
     dest: "{{ node_role_dir }}/ui.yaml"
-  when: inventory_hostname in groups['manage']
+  when: inventory_hostname in groups['manage'] and install_ui == true
 
 - name: add manage node base.yaml
   template:
