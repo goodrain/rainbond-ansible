@@ -546,7 +546,7 @@ $hname
 [gateway]
 
 EOF
-    role_choice="manage gateway compute"
+    role_choice="gateway compute"
     for s_role in $role_choice; do
     if [ "$(check_var $ROLE $s_role)" -eq 0 ]; then
         cat >> inventory/hosts << EOF

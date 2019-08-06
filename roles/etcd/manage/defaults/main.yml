@@ -12,10 +12,10 @@ etcd_peer_url: "http://{{ etcd_access_address }}:{{ etcd_port_s1 }}"
 etcd_client_url: "http://{{ etcd_access_address }}:{{ etcd_port_c1 }},http://{{ etcd_access_address }}:{{ etcd_port_c2 }}"
 
 etcd_peer_addresses: |-
-  {%- for item in groups['etcd'] + groups['new-manage'] -%}
+  {%- for item in groups['etcd'] -%}
     {{ "etcd"+loop.index|string }}=http://{{ hostvars[item]['ip'] }}:{{ etcd_port_s1 }}{%- if not loop.last -%},{%- endif -%}
   {%- endfor -%}
 etcd_access_addresses: |-
-  {%- for item in groups['etcd'] + groups['new-manage'] -%}
+  {%- for item in groups['etcd'] -%}
   http://{{ hostvars[item]['ip'] }}:{{ etcd_port_c1 }}{%- if not loop.last -%},{%- endif -%}
   {%- endfor -%}

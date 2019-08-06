@@ -3,16 +3,16 @@
   file: name={{ item }} state=directory
   with_items:
     - "{{ rbd_dir }}/etc/rbd-gateway/ssl"
-  when: inventory_hostname in groups['gateway']
+  when: inventory_hostname in groups['new-gateway']
 
 - name: LB | Copy goodrain.me certificate
   copy: src={{ item }} dest={{ rbd_dir }}/etc/rbd-gateway/ssl owner=root mode=644
   with_fileglob:
     - "{{ base_dir }}/hack/files/ssl/goodrain.me/*"
-  when: inventory_hostname in groups['gateway']
+  when: inventory_hostname in groups['new-gateway']
 
 - name: LB | Copy LB Role
   template:
     src: gateway.role.j2
     dest: "{{ node_role_dir }}/gateway.yaml"
-  when: inventory_hostname in groups['gateway']
+  when: inventory_hostname in groups['new-gateway']
