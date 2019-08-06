@@ -526,6 +526,9 @@ config::hosts(){
     if [ -f "inventory/hosts" ]; then
       rm -f inventory/hosts
     fi
+    if [ ! -d "inventory" ];then
+      mkdir inventory
+    fi
     touch inventory/hosts
     INSTALL_SSH_PORT=${INSTALL_SSH_PORT:-22}
     hname=$(cat /opt/rainbond/.init/uuid)
