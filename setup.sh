@@ -545,6 +545,8 @@ $hname
 
 [gateway]
 
+[new-manage]
+
 EOF
     role_choice="gateway compute"
     for s_role in $role_choice; do
