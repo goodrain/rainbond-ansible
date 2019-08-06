@@ -51,7 +51,6 @@ kube_dns_server: "{{ kube_service_addresses|ipaddr(10)|ipaddr('address') }}"
 rainbond_domain: "kubeapi.goodrain.me goodrain.me repo.goodrain.me lang.goodrain.me maven.goodrain.me region.goodrain.me"
 
 master_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
-
 kube_apiserver: "https://kubeapi.goodrain.me:6443"
 
 # k8s
@@ -129,3 +128,4 @@ rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5
 rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-07-12-5.1.5.sha256sum.txt"
 
 install_ui: true
+master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"

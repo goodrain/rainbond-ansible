@@ -599,6 +599,8 @@ prepare::general(){
     INSTALL_SSH_PORT=${INSTALL_SSH_PORT:-22}
     info "install ssh port" $INSTALL_SSH_PORT
     sed -i -r  "s/(^install_ssh_port: ).*/\1${INSTALL_SSH_PORT}/" roles/rainvar/defaults/main.yml
+    [ ! -z "$EIP" ] && sed -i -r  "s/(^master_external_ip: ).*/\1${EIP}/" roles/rainvar/defaults/main.yml
+    [ ! -z "$VIP" ] && sed -i -r  "s/(^master_external_ip: ).*/\1${VIP}/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^r6d_version: ).*/\1${r6d_version}/" roles/rainvar/defaults/main.yml
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
     config::region
