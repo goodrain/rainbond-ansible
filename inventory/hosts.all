@@ -2,20 +2,19 @@
 node1 ansible_host=10.10.10.13  ansible_port=22 ip=10.10.10.13 port=22
 
 [etcd]
-node1 NODE_NAME=etcd1
-
-[master]
 node1
 
-[worker]
+[manage]
 node1
 
-[storage]
+[compute]
 node1
 
 [gateway]
 node1
 
-[new-master]
+[new-manage]
 
-[new-worker]
+[new-compute]
+
+[new-gateway]

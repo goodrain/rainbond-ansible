@@ -18,6 +18,19 @@
   template: src=rainbond.repo.j2 dest=/etc/yum.repos.d/rainbond.repo
   when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
 
+- name: Copy local_rainbond.list into /etc/apt/sources.list.d
+  template:
+    src: /etc/apt/sources.list.d/local_rainbond.list
+    dest: /etc/apt/sources.list.d/local_rainbond.list
+  when: ansible_distribution == "Ubuntu" and offline_repo.stat.isreg is not defined
+
+- name: Copy repo into /opt/rainbond/offline
+  copy:
+    src: /opt/rainbond/offline/pkgs
+    dest: /opt/rainbond/offline
+  when: ansible_distribution == "Ubuntu" and offline_repo.stat.isreg is not defined
+
+
 - name: Clear default cache
   command: yum clean all
   args:
