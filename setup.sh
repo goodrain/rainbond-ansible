@@ -539,26 +539,28 @@ $hname ansible_host=$IIP  ansible_port=$INSTALL_SSH_PORT ip=$IIP port=$INSTALL_S
 [etcd]
 $hname
 
-EOF
-    if [ "$(check_var $ROLE manage)" -eq 0 ]; then
-        cat >> inventory/hosts << EOF
 [manage]
 $hname
-
-EOF
-    elif [ "$(check_var $ROLE compute)" -eq 0 ]; then
-        cat >> inventory/hosts << EOF
 [compute]
+
+[gateway]
+
+EOF
+    role_choice="manage gateway compute"
+    for s_role in $role_choice; do
+    if [ "$(check_var $ROLE $s_role)" -eq 0 ]; then
+        cat >> inventory/hosts << EOF
+[new-$s_role]
 $hname
 
 EOF
-    elif [ "$(check_var $ROLE gateway)" -eq 0 ]; then
+    else
         cat >> inventory/hosts << EOF
-[gateway]
-$hname
+[new-$s_role]
 
 EOF
     fi
+    done
 }
 
 # General preparation before installation

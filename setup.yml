@@ -26,15 +26,7 @@
   roles:
     - { role: rainvar, tags: default }
     - { role: docker/image, tags: image }
-
-- hosts: manage
-  roles:
-    - { role: rainvar, tags: default }
     - { role: etcd/manage, tags: etcd }
-
-- hosts: manage
-  roles:
-    - { role: rainvar, tags: default }
     - { role: k8s/manage, tags: kube-master }
 
 - hosts: compute
@@ -63,10 +55,6 @@
   roles:
     - { role: rainvar, tags: default }
     - { role: monitor, tags: monitor }
-
-- hosts: manage:compute
-  roles:
-    - { role: rainvar, tags: default }
     - { role: node/core, tags: node }
 
 - hosts: manage[0]
