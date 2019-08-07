@@ -3,43 +3,6 @@
 version={{ r6d_version }}
 rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-eventlog rbd-gateway)
 
-init_show(){
-
-    rinfopath="/opt/rainbond/.init/.regioninfo"
-    IP=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk -F ': ' '{print $2}')
-    ssl_ca_cert=$(cat {{ ssl_ca_cert }})
-    key_file=$(cat {{ client_cert_file }})
-    cert_file=$(cat {{ client_key_file }})
-    DOMAIN={{ app_domain }}
-
-    token="region_name={{ region_name }}&&region_alias={{ region_alias }}&&url={{ region_url }}&&desc={{ region_desc }}&&wsurl=ws://$IP:6060&&httpdomain={{ app_domain }}&&tcpdomain=$IP&&ssl_ca_cert=${ssl_ca_cert}&&key_file=${key_file}&&cert_file=${cert_file}"
-    encode_token=$(echo $token | base64)
-    ssl_token="ssl_ca_cert=${ssl_ca_cert}&&key_file=${key_file}&&cert_file=${cert_file}"
-    encode_ssl=$(echo $ssl_token | base64)
-    cat > /opt/rainbond/.init/token <<EOF
-$encode_token
------------------------------------------
-$encode_ssl
-EOF
-
-    [ -f "$rinfopath" ] || (
-            cat > $rinfopath <<EOF
-region_name: {{ region_name }}
-region_alias: {{ region_alias }}
-url: {{ region_url }}
-desc: {{ region_desc }}
-wsurl: ws://$IP:6060
-httpdomain: {{ app_domain }}
-tcpdomain: $IP
-token path: /opt/rainbond/.init/token
-ssl_ca_cert path: {{ ssl_ca_cert }}
-cert_file path: {{ client_cert_file }}
-key_file path: {{ client_key_file }}
-EOF
-
-    )
-}
-
 upgrade_dns(){
     docker pull goodrain.me/rbd-dns:${version}
     systemctl restart rbd-dns

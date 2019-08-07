@@ -34,25 +34,24 @@ generate_region_sql(){
     rinfopath="/opt/rainbond/.init/.regioninfo"
     IP=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk -F ': ' '{print $2}')
     ssl_ca_cert=$(cat {{ ssl_ca_cert }})
+    ssl_ca_cert_base=$(echo $ssl_ca_cert | base64)
     key_file=$(cat {{ client_cert_file }})
+    key_file_base=$(echo $key_file | base64)
     cert_file=$(cat {{ client_key_file }})
+    cert_file_base=$(echo $cert_file | base64)
     DOMAIN={{ app_domain }}
     cat > /opt/rainbond/.init/region_info.sql <<EOF
 INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`,\`create_time\`) VALUES('{{ region_id }}', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file','0000-00-00 00:00:00.000000');
 EOF
-
-    token="region_name#{{ region_name }}&&region_alias#{{ region_alias }}&&url#{{ region_url }}&&desc#{{ region_desc }}&&wsurl#ws://$IP:6060&&httpdomain#{{ app_domain }}&&tcpdomain#$IP&&ssl_ca_cert#${ssl_ca_cert}&&key_file#${key_file}&&cert_file#${cert_file}"
-    encode_token=$(echo $token | base64)
-    ssl_token="ssl_ca_cert#${ssl_ca_cert}&&key_file#${key_file}&&cert_file#${cert_file}"
-    encode_ssl=$(echo $ssl_token | base64)
     cat > /opt/rainbond/.init/token <<EOF
--------------------------token start -----------------------------------------
-$encode_token
--------------------------token   end -----------------------------------------
-
--------------------------ssl   start -----------------------------------------
-$encode_ssl
--------------------------ssl     end -----------------------------------------
+url: "{{ region_url }}"
+desc: "{{ region_desc }}"
+wsurl: "ws://$IP:6060"
+httpdomain: "{{ app_domain }}"
+tcpdomain: "$IP"
+ssl_ca_cert: "$ssl_ca_cert_base"
+key_file: "$key_file_base"
+cert_file: "cert_file_base"
 EOF
 
     cat > $rinfopath <<EOF
@@ -68,7 +67,6 @@ ssl_ca_cert path: {{ ssl_ca_cert }}
 cert_file path: {{ client_cert_file }}
 key_file path: {{ client_key_file }}
 EOF
-
 }
 
 prepare(){
