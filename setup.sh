@@ -222,7 +222,6 @@ precheck::check_ip(){
         echo "$IIP" | grep -E '^172.30' && notice "内网ip所在内网IP段与docker0的内网段(172.30.0.0/16)冲突."
     fi
     info "prepare check ip cidr" "passed"
-
 }
 
 # check user uid

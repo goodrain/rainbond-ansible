@@ -16,12 +16,40 @@
 
 [[ $DEBUG ]] && set -ex || set -e
 
-node_role=$1
-node_hostname=$2
-node_ip=$3
-login_type=$4
-login_key=$5
-node_uuid=$6
+node_role=""
+node_ip=""
+login_type=""
+login_key=""
+node_uuid=""
+
+while getopts ":r:i:t:k:u:" opt
+do
+    case $opt in
+        r)
+        node_role=$OPTARG
+        [ -z "$node_role" ] && notice "node role is null" 
+        ;;
+        i)
+        node_ip=$OPTARG
+        [ -z "$node_ip" ] && notice "node ip is null" 
+        ;;
+        t)
+        login_type=$OPTARG
+        [ -z "$login_type" ] && notice "node ssh login type is null" 
+        ;;
+        k)
+        login_key=$OPTARG
+        [ -z "$login_key" ] && notice "node ssh login key is null" 
+        ;;
+        u)
+        node_uuid=$OPTARG
+        [ -z "$node_uuid" ] && notice "node uuid is null" 
+        ;;
+        ?)
+        echo "Unknown parameter:-$opt [-r node_role] [-i node_ip] [-t login_type] [-k login_key] [-u node_uuid]"
+        exit 1;;
+    esac
+done
 
 declare -A yml_dict
 role_choice="manage gateway compute"
