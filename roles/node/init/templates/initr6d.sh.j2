@@ -52,7 +52,7 @@ httpdomain: "{{ app_domain }}"
 tcpdomain: "$IP"
 ssl_ca_cert: "$ssl_ca_cert_base"
 key_file: "$key_file_base"
-cert_file: "cert_file_base"
+cert_file: "$cert_file_base"
 EOF
 
     cat > $rinfopath <<EOF
