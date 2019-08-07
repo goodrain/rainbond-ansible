@@ -478,8 +478,7 @@ config::install_deploy(){
 
 # Config Region info
 config::region_url(){
-    region_url = "https://$1:8443"
-    region_url=$(echo $token | tr '&' '\n' | grep region_url | awk -F= '{print $2}')
+    region_url="https://$1:8443"
     sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
 }
 
