@@ -478,12 +478,12 @@ config::install_deploy(){
 
 # Config Region info
 config::region_url(){
-    region_url="https://$1:8443"
+    region_url="https:\/\/$1:8443"
     sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
 }
 
 config::region_id(){
-    region_id = $(uuidgen)
+    region_id=$(uuidgen)
     sed -i -r  "s/(^region_id: ).*/\1${region_id}/" roles/rainvar/defaults/main.yml
 }
 
