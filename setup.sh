@@ -478,21 +478,17 @@ config::install_deploy(){
 }
 
 # Config Region info
-config::region(){
-    # eg INSTALL_TOKEN region_name=test&region_alias=alihz&region_desc="阿里杭州"&region_url=https://alihz.dev.grpps.cn
-    if [ ! -z "$INSTALL_TOKEN" ]; then
-        info "Notice" "自定义数据中心信息"
-        local token=$(get_token $INSTALL_TOKEN)
-        region_name=$(echo $token | tr '&' '\n' | grep region_name | awk -F= '{print $2}')
-        region_alias=$(echo $token | tr '&' '\n' | grep region_alias | awk -F= '{print $2}')
-        region_desc=$(echo $token | tr '&' '\n' | grep region_desc | awk -F= '{print $2}')
-        region_url=$(echo $token | tr '&' '\n' | grep region_url | awk -F= '{print $2}')
-        sed -i -r  "s/(^region_name: ).*/\1${region_name}/" roles/rainvar/defaults/main.yml
-        sed -i -r  "s/(^region_alias: ).*/\1${region_alias}/" roles/rainvar/defaults/main.yml
-        sed -i -r  "s/(^region_desc: ).*/\1${region_desc}/" roles/rainvar/defaults/main.yml
-        sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
-    fi
+config::region_url(){
+    region_url = "https://$1:8443"
+    region_url=$(echo $token | tr '&' '\n' | grep region_url | awk -F= '{print $2}')
+    sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
 }
+
+config::region_id(){
+    region_id = $(uuidgen)
+    sed -i -r  "s/(^region_id: ).*/\1${region_id}/" roles/rainvar/defaults/main.yml
+}
+
 # Config UI install
 config::rbd-app-ui(){
     if [ ! -z "$INSTALL_UI" ];then
@@ -603,7 +599,9 @@ prepare::general(){
     [ ! -z "$VIP" ] && sed -i -r  "s/(^master_external_ip: ).*/\1${VIP}/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^r6d_version: ).*/\1${r6d_version}/" roles/rainvar/defaults/main.yml
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
-    config::region
+    [ ! -z "$EIP" ] && config::region_url $EIP
+    [ ! -z "$VIP" ] && config::region_url $VIP
+    config::region_id
 }
 
 # 域名解析生效

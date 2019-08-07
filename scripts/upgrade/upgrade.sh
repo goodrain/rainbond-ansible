@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.5.tgz"
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.6.tgz"
 #IMAGE_BASE_LOCAL="/grdata/services/offline/rainbond.base.upgrade.5.1.5.tgz"
 
 IMAGE_PATH="/grdata/services/offline/upgrade"
 
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.5.tgz"
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.6.tgz"
 
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
 
@@ -67,26 +67,23 @@ if [ "$DISK_STATUS" -ne '0' ]; then
 fi
 
 if [ -f "$INSTALL_SCRIPT" ];then
-    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_5.1.4
+    mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_$current_version
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond
-    rm -rf /opt/rainbond/rainbond-ansible/inventory
-    cp -a /opt/rainbond/rainbond-ansible_5.1.4/inventory /opt/rainbond/rainbond-ansible
-    cp -a /opt/rainbond/rainbond-ansible_5.1.4/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    #secretkey=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep secretkey | awk '{print $2}')
-    #db_pass=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep db_pass | awk '{print $2}')
-    #pod_cidr=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep pod_cidr | awk '{print $2}')
-    #app_domain=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep app_domain | awk '{print $2}')
-    #default_dns_local=$(cat /opt/rainbond/rainbond-ansible_5.1.0/roles/rainvar/defaults/main.yml | grep default_dns_local | awk '{print $2}')
-    #sed -i -r  "s/(^secretkey: ).*/\1$secretkey/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    #sed -i -r  "s/(^db_pass: ).*/\1$db_pass/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    #sed -i -r  "s#(^pod_cidr: ).*#\1$pod_cidr#" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    #sed -i -r  "s/(^app_domain: ).*/\1$app_domain/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    #sed -i -r  "s/(^default_dns_local: ).*/\1$default_dns_local/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    cp -a /opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    if 
     version=$(cat /opt/rainbond/rainbond-ansible/version)
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
+    master_ip=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep master_ip | awk '{print $2}')
+    if [ ! -n $master_ip ];then
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
-
+master_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
+EOF
+    fi
+    region_name=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep region_name | awk '{print $2}')
+    if [ ! -n $region_name ];then
+    cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
 ## region
+region_id: "1234567890"
 region_name: "rainbond"
 region_alias: "默认私有数据中心"
 region_url: "https://region.goodrain.me:8443"
@@ -94,6 +91,13 @@ region_desc: "当前数据中心是默认安装添加的数据中心"
 ssl_ca_cert: "{{ region_ca_dir }}/ca.pem"
 client_cert_file: "{{ region_ca_dir }}/client.key.pem"
 client_key_file: "{{ region_ca_dir }}/client.pem"
+
+EOF
+    fi
+    if 
+    cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
+install_ui: true
+master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
 EOF
 else
     exit 1
@@ -112,8 +116,8 @@ done
 
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|kube)" | grep -E  "($version|rbd-mesh-data-panel)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
-mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.5.1.4
-mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.5.1.4
+mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.$current_version
+mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.$current_version
 
 docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
 

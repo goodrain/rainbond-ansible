@@ -112,6 +112,7 @@ enterprise_id: "5887587af6dafeefb192b1dbff6c518d"
 dev_mode: debug
 
 ## region
+region_id: "1234567890"
 region_name: "rainbond"
 region_alias: "默认私有数据中心"
 region_url: "https://region.goodrain.me:8443"

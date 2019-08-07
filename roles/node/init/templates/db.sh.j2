@@ -38,7 +38,7 @@ generate_region_sql(){
     cert_file=$(cat {{ client_key_file }})
     DOMAIN={{ app_domain }}
     cat > /opt/rainbond/.init/region_info.sql <<EOF
-INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`,\`create_time\`) VALUES('asdasdasdasdasdasdasdasdas', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file','0000-00-00 00:00:00.000000');
+INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`,\`create_time\`) VALUES('{{ region_id }}', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file','0000-00-00 00:00:00.000000');
 EOF
 
     token="region_name#{{ region_name }}&&region_alias#{{ region_alias }}&&url#{{ region_url }}&&desc#{{ region_desc }}&&wsurl#ws://$IP:6060&&httpdomain#{{ app_domain }}&&tcpdomain#$IP&&ssl_ca_cert#${ssl_ca_cert}&&key_file#${key_file}&&cert_file#${cert_file}"
