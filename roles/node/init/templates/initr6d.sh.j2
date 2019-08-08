@@ -35,11 +35,11 @@ generate_region_sql(){
     rinfopath="/opt/rainbond/.init/.regioninfo"
     IP=$(cat /opt/rainbond/.init/domain.yaml | grep iip | awk -F ': ' '{print $2}')
     ssl_ca_cert=$(cat {{ ssl_ca_cert }})
-    ssl_ca_cert_base=echo "${ssl_ca_cert}" | base64 |xargs echo | sed s/[[:space:]]//g
+    ssl_ca_cert_base=$(echo "${ssl_ca_cert}" | base64 |xargs echo | sed s/[[:space:]]//g)
     key_file=$(cat {{ client_cert_file }})
-    key_file_base=echo "${key_file}" | base64 |xargs echo | sed s/[[:space:]]//g
+    key_file_base=$(echo "${key_file}" | base64 |xargs echo | sed s/[[:space:]]//g)
     cert_file=$(cat {{ client_key_file }})
-    cert_file_base=echo "${cert_file}" | base64 |xargs echo | sed s/[[:space:]]//g
+    cert_file_base=$(echo "${cert_file}" | base64 |xargs echo | sed s/[[:space:]]//g)
     DOMAIN={{ app_domain }}
     cat > /opt/rainbond/.init/region_info.sql <<EOF
 INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`,\`create_time\`) VALUES('asdasdasdasdasdasdasdasdas', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file','0000-00-00 00:00:00.000000');
@@ -75,7 +75,7 @@ prepare(){
     local fail_num=0
     for ((i=1;i<=10;i++))
     do
-        db_num=$(curl -s --connect-timeout 5 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
+        db_num=$(curl -s --connect-timeout 10 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
         if [ "$db_num" == 1 ]; then
             if [ "$ENABLE_CONSOLE" == "true" ]; then
                 $DOCKER_CMD "grant all on *.* to '{{ dbcs_user }}'@'%' identified by '{{ dbcs_pass }}' with grant option; flush privileges";
@@ -103,7 +103,7 @@ prepare(){
             sleep 10
         fi
     done
-    [ "$fail_num" == 10 ] && echo "prepare failed" && exit 1 || echo "prepare ok" 
+    [ "$fail_num" == 10 ] && echo "prepare db failed" && exit 1 || echo "prepare ok" 
 }
 
 migrate_ui(){
