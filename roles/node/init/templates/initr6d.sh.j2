@@ -114,10 +114,10 @@ migrate_ui(){
         sleep 10
         ui_num=$(docker ps | grep rbd-app-ui | wc -l)
         if [ "$ui_num" == 1 ]; then
-            status=$(docker exec rbd-app-ui python /app/ui/manage.py migrate >/dev/null 2>&1 && echo 0 || echo 1 )
+            status=$(docker exec rbd-app-ui ./entrypoint.sh init >/dev/null 2>&1 && echo 0 || echo 1 )
             [ "$status" -eq 0 ] && break || (
                 echo "migrate ui try $i" >> /tmp/migrate.ui.log
-                docker exec rbd-app-ui python /app/ui/manage.py migrate --fake >> /tmp/migrate.ui.log
+                docker exec rbd-app-ui ./entrypoint.sh init >> /tmp/migrate.ui.log
                 ((fail_num+=1))
             )
         else
