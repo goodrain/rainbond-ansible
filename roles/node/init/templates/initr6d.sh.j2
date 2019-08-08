@@ -11,14 +11,6 @@ NET_TYPE={{ net_type }}
 ENABLE_CONSOLE={{ enable_console }}
 
 if [ "$NET_TYPE" == "internal" ]; then
-    if [ ! -f "/tmp/install/waiting.db" ]; then
-        for ((i=1;i<=6;i++))
-        do
-            num=$(curl -s --connect-timeout 30 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
-            [ "$num" -ne 0 ] && echo "db is ok" && touch /tmp/install/waiting.db && break
-            sleep 5
-        done
-    fi
     DOCKER_CMD="docker exec rbd-db mysql -e"
 else
     DOCKER_CMD="docker run -i --rm --net=host -v /opt/rainbond/.init:/opt/rainbond/.init -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_PASS=${DB_PASS} -e DB_USER=${DB_USER} goodrain.me/r6dctl:sqlclient"
@@ -73,9 +65,18 @@ EOF
 
 prepare(){
     local fail_num=0
+    local fail_num=0
+    if [ ! -f "/tmp/install/waiting.db" ]; then
+        for ((i=1;i<=6;i++))
+        do
+            num=$(curl -s --connect-timeout 30 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
+            [ "$num" -ne 0 ] && echo "db is ok" && touch /tmp/install/waiting.db && break
+            sleep 5
+        done
+    fi
     for ((i=1;i<=6;i++))
     do
-        db_num=$(curl -s --connect-timeout 30 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
+        db_num=$(curl -s --connect-timeout 5 $DB_HOST:$DB_PORT > /dev/null  && echo 1 || echo 0)
         if [ "$db_num" == 1 ]; then
             if [ "$ENABLE_CONSOLE" == "true" ]; then
                 $DOCKER_CMD "grant all on *.* to '{{ dbcs_user }}'@'%' identified by '{{ dbcs_pass }}' with grant option; flush privileges";
