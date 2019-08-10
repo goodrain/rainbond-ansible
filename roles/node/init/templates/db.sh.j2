@@ -88,8 +88,10 @@ prepare(){
                 check_region_db=$($DOCKER_CMD_REGION "show databases" | grep region | wc -l)
                 [ "$check_console_db" -ne 0 ] && [ "$check_region_db" -ne 0 ] && break
             else
-                $DOCKER_CMD "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";
-                $DOCKER_CMD "delete from mysql.user where user=''; flush privileges"
+                if [ "$NET_TYPE" == "internal" ]; then
+                    $DOCKER_CMD "grant all on *.* to '{{ db_user }}'@'%' identified by '{{ db_pass }}' with grant option; flush privileges";
+                    $DOCKER_CMD "delete from mysql.user where user=''; flush privileges"
+                fi
                 $DOCKER_CMD "CREATE DATABASE IF NOT EXISTS region DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
                 $DOCKER_CMD "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
                 check_db=$($DOCKER_CMD "show databases" | grep console | wc -l)
