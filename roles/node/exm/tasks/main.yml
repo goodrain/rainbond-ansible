@@ -20,8 +20,8 @@
     src: share.sh.j2
     dest: /tmp/share.sh
     mode: 0777
-  when: check_manage_share.stat.isreg is not defined
+  when: check_manage_share.stat.isreg is not defined and storage_type == "nfs"
 
 - name: Rainbond | Run share
   shell: bash /tmp/share.sh
-  when: check_manage_share.stat.isreg is not defined
+  when: check_manage_share.stat.isreg is not defined and storage_type == "nfs"
