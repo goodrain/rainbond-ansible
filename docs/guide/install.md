@@ -53,7 +53,7 @@ iip: 当前节点的内网ip，默认服务都是监听绑定此ip，如果未�
 rainbond-version: 指定安装使用的源码分支。默认是5.0，可选开发测试分支devel
 install-type: 默认是在线安装online，可选参数为offline，离线需要提前准备好相关依赖包和镜像文件
 deploy-type: 部署类型，默认是单节点，主要使用场景是HA模式，目前仅支持单节点
-domain: 自定义域名，需要自行将自定义域名解析到iip上或者lb所在节点的ip上
+domain: 自定义域名，需要自行将自定义域名解析到iip上或者gateway所在节点的ip上
 pod-cidr: 自定义应用分配的cidr，不指定会使用默认值 calico 192.168.0.0/16 flannel 10.244.0.0/16
 network: 开源版支持 calico/flannel两种类型网络
 ```

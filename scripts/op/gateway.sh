@@ -71,10 +71,10 @@ check_exist(){
 
 # 新添加节点
 new_node(){
-    echo "add new lb node: ${node_ip}:${node_port} ---> ${node_uuid}"
+    echo "add new gateway node: ${node_ip}:${node_port} ---> ${node_uuid}"
     sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ansible_port=$node_port ip=$node_ip port=$node_port" inventory/hosts
 
-    sed -i "/\[lb\]/a$node_uuid" inventory/hosts  
+    sed -i "/\gateway\]/a$node_uuid" inventory/hosts  
 
     cat >> /opt/rainbond/.init/node.uuid <<EOF
 $node_ip:$node_uuid
@@ -84,7 +84,7 @@ EOF
 # 已存在节点
 exist_node(){
     old_node_uuid=$(cat /opt/rainbond/.init/node.uuid | grep "$node_ip" | awk -F: '{print $2}')
-    echo "update lb node: ${node_ip} ${old_node_uuid} ---> ${node_uuid}"
+    echo "update gateway node: ${node_ip} ${old_node_uuid} ---> ${node_uuid}"
     sed -i "s#${old_node_uuid}#${node_uuid}#g" inventory/hosts
     sed -i "s#${old_node_uuid}#${node_uuid}#g" /opt/rainbond/.init/node.uuid
 }
@@ -103,12 +103,12 @@ deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
 echo "check ip if ssh"
 [ "$(check_ssh $node_uuid)" -ne 0 ] && echo "Make sure you can SSH in ${node_ip}" && exit 1
 
-if [ "$node_role" == "lb" ]; then
+if [ "$node_role" == "gateway" ]; then
     if [ "$deploy_type" == "thirdparty" ]; then
         echo "not support thirdparty k8s"
     else
-        ansible-playbook -i inventory/hosts lb.yml --limit $node_uuid
+        ansible-playbook -i inventory/hosts gateway.yml --limit $node_uuid
     fi
 else
-    echo "only support node rule lb"
+    echo "only support node rule gateway"
 fi

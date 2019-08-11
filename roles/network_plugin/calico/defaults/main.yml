@@ -4,7 +4,7 @@
 #ETCD_ENDPOINTS: "{{ TMP_ENDPOINTS.rstrip(',') }}"
 CALICO_IPV4POOL_IPIP: "Always"
 FELIX_LOG_LVL: "warning"
-IP_AUTODETECTION_METHOD: "can-reach={{ groups.deploy[0] }}"
+IP_AUTODETECTION_METHOD: "can-reach={{ groups.manage[0] }}"
 NODE_WITH_MULTIPLE_NETWORKS: "true"
 
 NODEIP: "{{hostvars[inventory_hostname]['ip']}}"

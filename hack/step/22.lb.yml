@@ -12,7 +12,7 @@
 #    - { role: worker, tags: worker-node }
 
 - hosts:
-  - lb
+  - gateway
   roles:
     - { role: rainvar, tags: default }
-    - { role: lb, tags: lb }
+    - { role: gateway, tags: gateway }

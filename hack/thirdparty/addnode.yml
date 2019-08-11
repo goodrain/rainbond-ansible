@@ -1,5 +1,5 @@
 ---
-- hosts: new-worker
+- hosts: new-compute
   roles:
     - { role: rainvar, tags: default }
     - { role: prepare, tags: prepare }
@@ -8,8 +8,3 @@
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
     - { role: etcd/compute, tags: etcd-proxy }
     - { role: node/core, tags: node }
-
-- hosts: deploy
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: node/up, when: "autoreg_node == 'enable'" }

@@ -9,56 +9,51 @@
   template:
     src: init.sql.j2
     dest: /opt/rainbond/.init/init.sql
+# 5.1.5
+# - name: Copy init rainbond script
+#   template:
+#     src: initr6d.sh.j2
+#     dest: /opt/rainbond/.init/initr6d.sh
+#     mode: 0777
 
-- name: Copy init rainbond script
-  template:
-    src: initr6d.sh.j2
-    dest: /opt/rainbond/.init/initr6d.sh
-    mode: 0777
-    
-#- name: create database
-#  shell: "bash /opt/rainbond/.init/updatedb.sh prepare >> /tmp/install/db.prepare.log"
-#  register: prepare_db_ok
-#  until: prepare_db_ok is succeeded
-#  retries: 5
+# - name: init rainbond 
+#   shell: "bash /opt/rainbond/.init/initr6d.sh > /tmp/install/init.r6d.log"
+#   register: init_r6d_ok
+#   until: init_r6d_ok is succeeded
+#   retries: 5
+#   ignore_errors: true
 
-#- name: Migrate ui if prepare_db_ok is succeeded
-#  shell: "bash /opt/rainbond/.init/updatedb.sh migrate >> /tmp/install/db.ui.migrate.log"
-#  register: migrate_ui_ok
-#  until: migrate_ui_ok is succeeded
-#  retries: 5
-#  when:
-#    - prepare_db_ok is succeeded
-
-#- name: Init Data Region if migrate_ui_ok is succeeded
-#  shell: "bash /opt/rainbond/.init/updatedb.sh config >> /tmp/install/db.init.config.log"
-#  register: region_init_result
-#  until: region_init_result is succeeded
-#  retries: 5
-#  when:
-#    - prepare_db_ok is succeeded
-#    - migrate_ui_ok is succeeded
-
-#- name: Check init db if succeeded
-#  shell: "bash /opt/rainbond/.init/updatedb.sh check >> /tmp/install/check.db.log"
-#  register: checkdb_task_result
-#  until: checkdb_task_result is succeeded
-#  retries: 3
-#  when:
-#    - prepare_db_ok is succeeded
-#    - migrate_ui_ok is succeeded
-#    - region_init_result is succeeded
-
-- name: init rainbond 
-  shell: "bash /opt/rainbond/.init/initr6d.sh > /tmp/install/init.r6d.log"
-  register: init_r6d_ok
-  until: init_r6d_ok is succeeded
+- name: Prepare db
+  shell: "bash /opt/rainbond/.init/updatedb.sh prepare >> /tmp/install/db.prepare.log"
+  register: prepare_db_ok
+  until: prepare_db_ok is succeeded
   retries: 5
-  ignore_errors: true
 
-- name: check init rainbond 
-  shell: "bash /opt/rainbond/.init/updatedb.sh config > /tmp/install/check.init.r6d.log"
-  register: check_init_r6d_ok
-  until: check_init_r6d_ok is succeeded
+- name: Migrate ui if prepare_db_ok is succeeded
+  shell: "bash /opt/rainbond/.init/updatedb.sh migrate >> /tmp/install/db.ui.migrate.log"
+  register: migrate_ui_ok
+  until: migrate_ui_ok is succeeded
   retries: 5
-  ignore_errors: true
+  when:
+    - install_ui==true
+    - prepare_db_ok is succeeded
+
+- name: Init Data Region if migrate_ui_ok is succeeded
+  shell: "bash /opt/rainbond/.init/updatedb.sh config >> /tmp/install/db.init.config.log"
+  register: region_init_result
+  until: region_init_result is succeeded
+  retries: 5
+  when:
+    - install_ui==true
+    - prepare_db_ok is succeeded
+    - migrate_ui_ok is succeeded
+
+- name: Check init db if succeeded
+  shell: "bash /opt/rainbond/.init/updatedb.sh check >> /tmp/install/check.db.log"
+  register: checkdb_task_result
+  until: checkdb_task_result is succeeded
+  retries: 3
+  when:
+    - prepare_db_ok is succeeded
+    - install_ui==true and migrate_ui_ok is succeeded
+    - install_ui==true and region_init_result is succeeded

@@ -132,7 +132,7 @@ init::offline(){
     case "$lsb_dist" in
 		ubuntu|debian)
             cat > /etc/apt/sources.list.d/local_rainbond.list <<EOF
-deb file:/opt/rainbond/offline/pkgs/debian/9/ rainbond 5.0
+deb file:///opt/rainbond/offline/pkgs/debian/ 9/
 EOF
             touch /opt/rainbond/.init/.offline
 		;;
@@ -222,7 +222,6 @@ precheck::check_ip(){
         echo "$IIP" | grep -E '^172.30' && notice "内网ip所在内网IP段与docker0的内网段(172.30.0.0/16)冲突."
     fi
     info "prepare check ip cidr" "passed"
-
 }
 
 # check user uid
@@ -478,21 +477,23 @@ config::install_deploy(){
 }
 
 # Config Region info
-config::region(){
-    # eg INSTALL_TOKEN region_name=test&region_alias=alihz&region_desc="阿里杭州"&region_url=https://alihz.dev.grpps.cn
-    if [ ! -z "$INSTALL_TOKEN" ]; then
-        info "Notice" "自定义数据中心信息"
-        local token=$(get_token $INSTALL_TOKEN)
-        region_name=$(echo $token | tr '&' '\n' | grep region_name | awk -F= '{print $2}')
-        region_alias=$(echo $token | tr '&' '\n' | grep region_alias | awk -F= '{print $2}')
-        region_desc=$(echo $token | tr '&' '\n' | grep region_desc | awk -F= '{print $2}')
-        region_url=$(echo $token | tr '&' '\n' | grep region_url | awk -F= '{print $2}')
-        sed -i -r  "s/(^region_name: ).*/\1${region_name}/" roles/rainvar/defaults/main.yml
-        sed -i -r  "s/(^region_alias: ).*/\1${region_alias}/" roles/rainvar/defaults/main.yml
-        sed -i -r  "s/(^region_desc: ).*/\1${region_desc}/" roles/rainvar/defaults/main.yml
-        sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
+config::region_url(){
+    region_url="https:\/\/$1:8443"
+    sed -i -r  "s/(^region_url: ).*/\1${region_url}/" roles/rainvar/defaults/main.yml
+}
+
+config::region_id(){
+    region_id=$(uuidgen)
+    sed -i -r  "s/(^region_id: ).*/\1${region_id}/" roles/rainvar/defaults/main.yml
+}
+
+# Config UI install
+config::rbd-app-ui(){
+    if [ ! -z "$INSTALL_UI" ];then
+        sed -i -r  "s/(^install_ui: ).*/\1${INSTALL_UI}/" roles/rainvar/defaults/main.yml
     fi
 }
+
 
 # Dev Mode
 detect_dev_mode(){
@@ -504,6 +505,58 @@ detect_dev_mode(){
     else
         info "Notice" "将从互联网下载离线镜像文件(约2GB)，下载速度取决于当前机器网络带宽"
     fi
+}
+
+# 检查Role角色状态
+check_var(){
+    local role type
+    role=$1
+    role_type=$2
+    echo ${role} | grep ${role_type} >/dev/null 2>&1
+    echo $?
+}
+
+config::hosts(){
+    if [ -f "inventory/hosts" ]; then
+      rm -f inventory/hosts
+    fi
+    if [ ! -d "inventory" ];then
+      mkdir inventory
+    fi
+    touch inventory/hosts
+    INSTALL_SSH_PORT=${INSTALL_SSH_PORT:-22}
+    hname=$(cat /opt/rainbond/.init/uuid)
+    cat >> inventory/hosts << EOF
+[all]
+$hname ansible_host=$IIP  ansible_port=$INSTALL_SSH_PORT ip=$IIP port=$INSTALL_SSH_PORT
+
+[etcd]
+$hname
+
+[manage]
+$hname
+[compute]
+
+[gateway]
+
+[new-manage]
+
+EOF
+    role_choice="gateway compute"
+    for s_role in $role_choice; do
+    if [ "$(check_var $ROLE $s_role)" -eq 0 ]; then
+        cat >> inventory/hosts << EOF
+[new-$s_role]
+$hname
+
+EOF
+    else
+        cat >> inventory/hosts << EOF
+[new-$s_role]
+
+EOF
+    fi
+    done
 }
 
 # General preparation before installation
@@ -533,25 +586,20 @@ prepare::general(){
     config::docker
     config::install_deploy
     config::storage
-    
+    config::rbd-app-ui
+    config::hosts
+
     [ ! -z "$EIP" ] && config::domain $EIP $VIP || config::domain $IIP $VIP
-    if [ "$ROLE" == "master" -o "$ROLE" == "manage" ]; then 
-        cp inventory/hosts.master inventory/hosts
-    else
-        cp inventory/hosts.all inventory/hosts
-    fi
     INSTALL_SSH_PORT=${INSTALL_SSH_PORT:-22}
     info "install ssh port" $INSTALL_SSH_PORT
     sed -i -r  "s/(^install_ssh_port: ).*/\1${INSTALL_SSH_PORT}/" roles/rainvar/defaults/main.yml
-    hname=$(cat /opt/rainbond/.init/uuid)
-    sed -i "s#node1#$hname#g" inventory/hosts
-    sed -i "s#10.10.10.13#$IIP#g" inventory/hosts
-    sed -i "s#port=22#port=$INSTALL_SSH_PORT#g" inventory/hosts
-    
+    [ ! -z "$EIP" ] && sed -i -r  "s/(^master_external_ip: ).*/\1${EIP}/" roles/rainvar/defaults/main.yml
+    [ ! -z "$VIP" ] && sed -i -r  "s/(^master_external_ip: ).*/\1${VIP}/" roles/rainvar/defaults/main.yml
     sed -i -r  "s/(^r6d_version: ).*/\1${r6d_version}/" roles/rainvar/defaults/main.yml
-
     [ ! -z "$ENABLE_CHECK" ] && sed -i -r  "s/(^enable_check: ).*/\1$ENABLE_CHECK/" roles/rainvar/defaults/main.yml || echo ""
-    config::region
+    [ ! -z "$EIP" ] && config::region_url $EIP
+    [ ! -z "$VIP" ] && config::region_url $VIP
+    config::region_id
 }
 
 # 域名解析生效
@@ -623,7 +671,7 @@ do_install::ok(){
 do_install::r6d(){
     progress "Initialize the data center"
     if [ -z "$DRY_RUN" ]; then
-        run ansible-playbook -i inventory/hosts setup.yml
+        run ansible-playbook -i inventory/hosts -e noderule=$ROLE setup.yml
         if [ "$?" -eq 0 ]; then
             curl -Is 127.0.0.1:7070 | head -1 | grep 200 > /dev/null && progress "Congratulations on your successful installation" || sleep 1
             do_install::ok

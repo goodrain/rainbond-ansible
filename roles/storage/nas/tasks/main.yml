@@ -55,7 +55,7 @@
 - name: deploy check ssh
   stat: path="/root/.ssh/id_rsa.pub"
   register: deploy_check_ssh
-  delegate_to: "{{ groups.deploy[0] }}"
+  delegate_to: "{{ groups.manage[0] }}"
 
 - name: Copy ssh pub key as builder pub key
   copy:

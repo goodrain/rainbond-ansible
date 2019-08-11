@@ -5,7 +5,11 @@
 
 - name: Rainbond | Install ansible Offline
   shell: "yum install -y sshpass python-pip ansible"
-  when: install_type != "online"
+  when: install_type != "online" and  ansible_distribution == "CentOS"
+
+- name: Rainbond | Install ansible Offline
+  shell: "apt-get -y install sshpass python-pip ansible  --allow-unauthenticated"
+  when: install_type != "online" and  ansible_distribution == "Ubuntu"
 
 - name: Storage | check init 
   stat: path=/tmp/.grdata.share
@@ -16,8 +20,8 @@
     src: share.sh.j2
     dest: /tmp/share.sh
     mode: 0777
-  when: check_manage_share.stat.isreg is not defined
+  when: check_manage_share.stat.isreg is not defined and storage_type == "nfs"
 
 - name: Rainbond | Run share
   shell: bash /tmp/share.sh
-  when: check_manage_share.stat.isreg is not defined
+  when: check_manage_share.stat.isreg is not defined and storage_type == "nfs"

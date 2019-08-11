@@ -6,3 +6,8 @@
   unarchive:
     src: "{{ local_offline }}/rpm.tgz"
     dest: /grdata/services/offline/pkgs/
+    
+- name: Extract deb.tgz into /opt/rainbond/offline/pkgs
+  unarchive:
+    src: "{{ local_offline }}/deb.tgz"
+    dest: /opt/rainbond/offline/pkgs/

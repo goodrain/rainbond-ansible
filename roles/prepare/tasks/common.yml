@@ -33,13 +33,13 @@
     - /etc/docker/certs.d/goodrain.me
     - "{{ install_logs_dir }}"
   tags:
-    - master
+    - manage
 
 - name: populate inventory into hosts file
   blockinfile:
     dest: /etc/hosts
     block: |-
-      {% for item in (groups['master'] + groups['worker'] + groups['etcd'] + groups['lb'] + groups['new-master'] + groups['new-worker'] |default([]))|unique -%}
+      {% for item in (groups['manage'] + groups['compute'] + groups['etcd'] + groups['gateway'] + groups['new-manage'] + groups['new-compute'] + groups['new-gateway'] |default([]))|unique -%}
       {{hostvars[item]['ip']}} {{ item }}
       {% endfor %}
     state: present

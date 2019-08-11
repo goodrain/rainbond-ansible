@@ -30,7 +30,7 @@
   when: cni_is_done.stat.isreg is not defined
 
 - name: Generate certificate
-  shell: docker run --rm -v {{ ca_dir }}:{{ ca_dir }} -v {{ region_ca_dir }}:{{ region_ca_dir }} -v {{ kubecfg_dir }}:{{ kubecfg_dir }} -v /grdata/kubernetes:/grdata/kubernetes rainbond/r6dctl:docker-cfg-certs kip {{ master_ip }}
+  shell: docker run --rm -v {{ ca_dir }}:{{ ca_dir }} -v {{ region_ca_dir }}:{{ region_ca_dir }} -v {{ kubecfg_dir }}:{{ kubecfg_dir }} -v /grdata/kubernetes:/grdata/kubernetes rainbond/r6dctl:docker-cfg-certs kip {{ master_external_ip }}
   register: generate_certificate_task_result
   until: generate_certificate_task_result is succeeded
   retries: 5
