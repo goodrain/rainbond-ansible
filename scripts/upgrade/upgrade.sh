@@ -74,14 +74,16 @@ if [ -f "$INSTALL_SCRIPT" ];then
     cp -a /opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     master_ip=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep master_ip | awk '{print $2}')
-    if [ ! -n $master_ip ];then
+    if [ ! -n "$master_ip" ];then
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
+
 master_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
 EOF
     fi
     region_name=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep region_name | awk '{print $2}')
-    if [ ! -n $region_name ];then
+    if [ ! -n "$region_name" ];then
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
+
 ## region
 region_id: "1234567890"
 region_name: "rainbond"
@@ -95,10 +97,12 @@ client_key_file: "{{ region_ca_dir }}/client.pem"
 EOF
     fi
     install_ui=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep install_ui | awk '{print $2}')
-    if [ ! -n $install_ui ];then    
+    if [ ! -n "$install_ui" ];then    
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
+
 install_ui: true
 master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
+
 EOF
     fi
 else
