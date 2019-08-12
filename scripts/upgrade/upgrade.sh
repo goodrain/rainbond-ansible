@@ -123,8 +123,7 @@ done
 echo "start load new version docker images"
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|kube)" | grep -E  "($version|rbd-mesh-data-panel)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 if [ $? -ne 0 ]; then
-    echo "start load new version docker images failure"
-    exit 1
+    echo "start load new version docker images failure, continue"
 else
     echo "load new version docker images success"
 fi
