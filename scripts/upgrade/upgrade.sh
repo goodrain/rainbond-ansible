@@ -69,6 +69,7 @@ fi
 version=$(cat /opt/rainbond/rainbond-ansible/version)
 if [ -f "$INSTALL_SCRIPT" ];then
     mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_$current_version
+    mkdir -p /opt/rainbond/rainbond-ansible
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond/rainbond-ansible
     cp -a /opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
@@ -101,6 +102,7 @@ master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
 EOF
     fi
 else
+    echo "$INSTALL_SCRIPT not exist"
     exit 1
 fi
 
@@ -114,20 +116,37 @@ for ((i=1;i<=60;i++));do
     curl -sk --connect-timeout 10 --max-time 30 -I  https://goodrain.me/v2/ | head -1 | grep 200
     [ "$?" -eq 0 ] && export readyok="ok"  && break
 done
-
+echo "start load new version docker images"
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|kube)" | grep -E  "($version|rbd-mesh-data-panel)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
-
+if [ $? -ne 0 ]; then
+    echo "start load new version docker images failure"
+    exit 1
+else
+    echo "load new version docker images success"
+fi
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.$current_version
 mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.$current_version
 
+echo "start load new version grctl and node"
 docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
-
+if [ $? -ne 0 ]; then
+    echo "load new version grctl and node failure"
+    exit 1
+else
+    echo "load new version grctl and node success"
+fi
 export ANSIBLE_HOST_KEY_CHECKING=False
 # rewrite ansible hosts
-grctl ansible hosts
+mkdir -p /opt/rainbond/rainbond-ansible/inventory
+/opt/rainbond/etc/tools/bin/grctl ansible hosts
 
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml
-
+if [ $? -ne 0 ]; then
+    echo "ansible upgrade all node failure"
+    exit 1
+else
+    echo "success upgrade by ansible"
+fi
 rm -rf ${IMAGE_R6D_LOCAL}
 rm -rf ${IMAGE_BASE_LOCAL}
 rm -rf ${IMAGE_PATH}
