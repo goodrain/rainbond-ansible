@@ -27,6 +27,7 @@ echo "tar xf rainbond.images "
 if [ -f "$IMAGE_R6D_LOCAL" ]; then
     tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH}
 else
+    echo "$IMAGE_R6D_LOCAL not exist, please redownload and upgrade."
     exit 1
 fi
 
@@ -65,13 +66,11 @@ if [ "$DISK_STATUS" -ne '0' ]; then
     echo "!!! 磁盘(/grdata)至少可用空间大于6GB(now ${disk}GB)"
     exit 1
 fi
-
+version=$(cat /opt/rainbond/rainbond-ansible/version)
 if [ -f "$INSTALL_SCRIPT" ];then
     mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_$current_version
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond
     cp -a /opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    if 
-    version=$(cat /opt/rainbond/rainbond-ansible/version)
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     master_ip=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep master_ip | awk '{print $2}')
     if [ ! -n $master_ip ];then
@@ -94,11 +93,13 @@ client_key_file: "{{ region_ca_dir }}/client.pem"
 
 EOF
     fi
-    if 
+    install_ui=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep install_ui | awk '{print $2}')
+    if [ ! -n $install_ui ];then    
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
 install_ui: true
 master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
 EOF
+    fi
 else
     exit 1
 fi
