@@ -69,7 +69,7 @@ fi
 version=$(cat /opt/rainbond/rainbond-ansible/version)
 if [ -f "$INSTALL_SCRIPT" ];then
     mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_$current_version
-    tar xf ${INSTALL_SCRIPT} -C /opt/rainbond
+    tar xf ${INSTALL_SCRIPT} -C /opt/rainbond/rainbond-ansible
     cp -a /opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     master_ip=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep master_ip | awk '{print $2}')
