@@ -1,5 +1,5 @@
 ---
-- hosts: new-worker
+- hosts: new-compute
   roles:
     - { role: rainvar, tags: default }
     - { role: bootstrap, tags: bootstrap }
@@ -14,8 +14,3 @@
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
     - { role: gateway, tags: gateway }
     - { role: node/core, tags: node }
-
-- hosts: deploy
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: node/up, when: "autoreg_node == 'enable'" }

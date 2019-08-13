@@ -71,11 +71,6 @@
     dest: "{{ bin_dir }}/node"
     mode: 0755
 
-- name: copy node uuid
-  copy:
-    src: /opt/rainbond/.init/node.uuid
-    dest: /tmp/install/node.uuid
-
 - name: prepare check node uuid
   template:
     src: node_uuid.sh.j2
@@ -89,25 +84,25 @@
   template:
     src: master.role.j2
     dest: "{{ node_role_dir }}/master.yaml"
-  when: inventory_hostname in groups['master'] + groups['new-master']
+  when: inventory_hostname in groups['manage'] + groups['new-manage']
 
 - name: add manage node ui.yaml
   template:
     src: ui.role.j2
     dest: "{{ node_role_dir }}/ui.yaml"
-  when: inventory_hostname in groups['master']
+  when: inventory_hostname in groups['manage'] and install_ui == true
 
 - name: add manage node base.yaml
   template:
     src: base.role.j2
     dest: "{{ node_role_dir }}/base.yaml"
-  when: inventory_hostname in groups['master'] + groups['new-master']
+  when: inventory_hostname in groups['manage'] + groups['new-manage']
 
 #- name: Rainbond | Copy Master Worker Role
 #  template:
 #    src: worker.role.j2
 #    dest: "{{ node_role_dir }}/worker.yaml"
-#  when: inventory_hostname in groups['worker']
+#  when: inventory_hostname in groups['compute']
 
 - name: Thirdparty | check k8s master
   stat: path=/etc/kubernetes/manifests/kube-apiserver.yaml

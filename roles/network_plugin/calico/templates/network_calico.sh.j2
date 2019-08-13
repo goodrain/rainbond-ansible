@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-docker ps  | grep calico > /dev/null
+docker ps  | grep calico | grep Up > /dev/null
 if [ "$?" -eq 0 ];then
     exit 0
 else

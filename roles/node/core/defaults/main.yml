@@ -1,4 +1,5 @@
 ---
 nodeip: "{{hostvars[inventory_hostname]['ip']}}"
+nodeid: "{{ inventory_hostname }}"
 run_mode: |-
-  {%- if inventory_hostname in groups['master'] + groups['new-master'] -%}master{%- else -%}worker{%- endif -%}
+  {%- if inventory_hostname in groups['manage'] + groups['new-manage'] -%}master{%- else -%}worker{%- endif -%}

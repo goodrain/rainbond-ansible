@@ -16,12 +16,40 @@
 
 [[ $DEBUG ]] && set -ex || set -e
 
-node_role=$1
-node_hostname=$2
-node_ip=$3
-login_type=$4
-login_key=$5
-node_uuid=$6
+node_role=""
+node_ip=""
+login_type=""
+login_key=""
+node_uuid=""
+
+while getopts ":r:i:t:k:u:" opt
+do
+    case $opt in
+        r)
+        node_role=$OPTARG
+        [ -z "$node_role" ] && notice "node role is null" 
+        ;;
+        i)
+        node_ip=$OPTARG
+        [ -z "$node_ip" ] && notice "node ip is null" 
+        ;;
+        t)
+        login_type=$OPTARG
+        [ -z "$login_type" ] && notice "node ssh login type is null" 
+        ;;
+        k)
+        login_key=$OPTARG
+        [ -z "$login_key" ] && notice "node ssh login key is null" 
+        ;;
+        u)
+        node_uuid=$OPTARG
+        [ -z "$node_uuid" ] && notice "node uuid is null" 
+        ;;
+        ?)
+        echo "Unknown parameter:-$opt [-r node_role] [-i node_ip] [-t login_type] [-k login_key] [-u node_uuid]"
+        exit 1;;
+    esac
+done
 
 declare -A yml_dict
 role_choice="manage gateway compute"
@@ -56,15 +84,6 @@ ssh_key_copy()
     "
 }
 
-#check_first_node(){
-#    getuuid=$(cat /opt/rainbond/rainbond-ansible/inventory/hosts | grep "$1" | awk '{print $1}')
-#    cat /opt/rainbond/rainbond-ansible/inventory/hosts | grep "NTP_ENABLED" | grep $getuuid > /dev/null 2>&1
-#    echo $?
-#}
-
-#echo "Check whether the node is the first management node"
-#[ "$(check_first_node $node_ip)" -ne 0 ] && echo "First management node ${node_ip} not allow..." && exit 1
-
 check_ip_reachable(){
     ping -c2 $1 >/dev/null 2>&1 
     echo $?
@@ -77,47 +96,6 @@ if [ "$login_type" == "pass" ]; then
     run ssh_key_copy $node_ip $login_key $node_port
 fi
 
-check_exist(){
-    local check_status=0
-    cat /opt/rainbond/rainbond-ansible/inventory/hosts | grep ansible | awk '{print $1}' | sort -ru | grep "$1" > /dev/null
-    [ "$?" -eq 0 ] && check_status=1
-    cat /opt/rainbond/rainbond-ansible/inventory/hosts | grep ansible | awk -F'[ =]' '{print $3}' | sort -ru | grep "$2" > /dev/null
-    [ "$?" -eq 0 ] && check_status=2
-    cat /opt/rainbond/.init/node.uuid | grep "$2" > /dev/null
-    [ "$?" -eq 0 ] && check_status=3
-    echo $check_status 
-}
-
-# 新添加节点
-new_node(){
-    info "add new node ${node_role}: ${node_ip}:${node_port} ---> ${node_uuid}"
-    sed -i "/\[all\]/a$node_uuid ansible_host=$node_ip ansible_port=$node_port ip=$node_ip port=$node_port role=$node_role" inventory/hosts
-    OLD_IFS=$IFS
-    IFS=','
-    for role in $node_role;do
-        echo "role $role"
-        if [ "$role" == "compute" ]; then
-            sed -i "/\[new-worker\]/a$node_uuid" inventory/hosts
-        elif [ "$role" == "gateway" ]; then
-            sed -i "/\gateway\]/a$node_uuid" inventory/hosts
-        else
-            sed -i "/\[new-master\]/a$node_uuid" inventory/hosts
-        fi
-    done
-    IFS=$OLD_IFS
-    cat >> /opt/rainbond/.init/node.uuid <<EOF
-$node_ip:$node_uuid
-EOF
-}
-
-# 已存在节点
-exist_node(){
-    old_node_uuid=$(cat /opt/rainbond/.init/node.uuid | grep "$node_ip" | awk -F: '{print $2}')
-    info "update node ${node_role}: ${node_ip} ${old_node_uuid} ---> ${node_uuid}"
-    sed -i "s#${old_node_uuid}#${node_uuid}#g" inventory/hosts
-    sed -i "s#${old_node_uuid}#${node_uuid}#g" /opt/rainbond/.init/node.uuid
-}
-
 check_ssh(){
     ansible -i /opt/rainbond/rainbond-ansible/inventory/hosts $1  -a 'uptime' | grep rc=0 >/dev/null
     echo $?
@@ -126,8 +104,6 @@ check_ssh(){
 cd /opt/rainbond/rainbond-ansible
 
 deploy_type=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep "deploy" | awk '{print $2}')
-
-[ "$(check_exist $node_uuid $node_ip)" -eq 0 ] && new_node || exist_node
 
 info "check ip if ssh"
 [ "$(check_ssh $node_uuid)" -ne 0 ] && notice "Make sure you can SSH in ${node_ip}"

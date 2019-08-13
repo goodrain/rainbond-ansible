@@ -10,7 +10,7 @@ services:
     model: http
     address: 127.0.0.1:8888/v2/health
     max_errors_num: 3
-    time_interval: 5
+    time_interval: 10
   after:
     - docker
   type: simple
@@ -49,7 +49,7 @@ services:
     model: http
     address: 127.0.0.1:3228/v2/builder/health
     max_errors_num: 3
-    time_interval: 5
+    time_interval: 10
   after:
     - docker
   type: simple
@@ -79,7 +79,7 @@ services:
     model: http
     address: 127.0.0.1:6301/health
     max_errors_num: 3
-    time_interval: 5
+    time_interval: 10
   after:
     - docker
   type: simple
@@ -102,7 +102,7 @@ services:
     model: http
     address: 127.0.0.1:7171/health
     max_errors_num: 3
-    time_interval: 5
+    time_interval: 10
   after:
     - docker
   type: simple
@@ -127,7 +127,7 @@ services:
     model: http
     address: 127.0.0.1:6369/worker/health
     max_errors_num: 3
-    time_interval: 5
+    time_interval: 10
   after:
     - docker
   type: simple

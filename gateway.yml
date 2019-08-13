@@ -1,4 +1,5 @@
-- hosts: gateway
+---
+- hosts: new-gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: bootstrap, tags: bootstrap }

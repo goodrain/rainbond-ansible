@@ -11,11 +11,6 @@
     dest: "{{ bin_dir }}/node"
     mode: 0755
 
-- name: Rainbond | Copy node uuid
-  copy:
-    src: /opt/rainbond/.init/node.uuid
-    dest: /tmp/install/node.uuid
-
 - name: Rainbond | Prepare check node uuid
   template:
     src: node_uuid.sh.j2

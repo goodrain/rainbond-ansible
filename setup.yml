@@ -5,71 +5,59 @@
     - { role: bootstrap, tags: bootstrap }
     - { role: prepare, tags: prepare }
 
-- hosts: storage
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
     - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
 
-- hosts: master:worker:gateway
+- hosts: manage:new-compute:new-gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
 
-- hosts: deploy:master:worker:gateway
+- hosts: manage:new-compute:new-gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: docker/install, tags: docker }
 
-- hosts: deploy
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: docker/image, tags: image }
-
-- hosts: etcd
-  roles:
-    - { role: rainvar, tags: default }
     - { role: etcd/manage, tags: etcd }
-
-- hosts: master
-  roles:
-    - { role: rainvar, tags: default }
     - { role: k8s/manage, tags: kube-master }
 
-- hosts: worker
+- hosts: new-compute
   roles:
     - { role: rainvar, tags: default }
     - { role: k8s/compute, tags: kube-worker }
     - { role: etcd/compute, tags: etcd-proxy }
 
-- hosts: master:worker:gateway
+- hosts: manage:new-compute:new-gateway
   roles:
   - { role: rainvar, tags: default }
   - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
   - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
 
-- hosts: master[0]
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
     - { role: db, tags: db, when: "net_type == 'internal'" }
 
-- hosts: gateway
+- hosts: new-gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: gateway, tags: gateway }
 
-- hosts: master:worker
+- hosts: manage:new-compute
   roles:
     - { role: rainvar, tags: default }
     - { role: monitor, tags: monitor }
-
-- hosts: master:worker
-  roles:
-    - { role: rainvar, tags: default }
     - { role: node/core, tags: node }
 
-- hosts: deploy
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
     - { role: node/init, tags: nodeinit}

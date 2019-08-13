@@ -41,7 +41,7 @@
 - name: Network | Run Init flanneld 
   shell: "bash {{ env_dir }}/init-flanneld.sh > /tmp/install/init-flanneld.log"
   run_once: true
-  delegate_to: "{{ groups['master'][0] }}"
+  delegate_to: "{{ groups['manage'][0] }}"
 
 #- name: Network | start flanneld
 #  shell: "systemctl daemon-reload && systemctl enable flanneld && systemctl start flanneld"

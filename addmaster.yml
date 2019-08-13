@@ -1,5 +1,5 @@
 ---
-- hosts: new-master
+- hosts: new-manage
   roles:
     - { role: rainvar, tags: default }
     - { role: bootstrap, tags: bootstrap }
@@ -10,7 +10,6 @@
     - { role: docker/install, tags: docker }
     - { role: k8s/manage, tags: kube-master }
     - { role: etcd/manage, tags: etcd }
-    - { role: gateway, tags: gateway }
     - { role: monitor, tags: monitor }
     - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }

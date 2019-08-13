@@ -9,8 +9,8 @@ services:
     name: rbd-db
     model: tcp
     address: 127.0.0.1:3306
-    max_errors_num: 3
-    time_interval: 10
+    max_errors_num: 5
+    time_interval: 60
   after:
     - docker
   type: simple

@@ -1,5 +1,5 @@
 ---
-- hosts: new-master
+- hosts: new-manage
   roles:
     - { role: rainvar, tags: default }
     - { role: prepare, tags: health-thirdparty }

@@ -11,6 +11,7 @@
   until: migrate_ui_ok is succeeded
   retries: 5
   when:
+    - install_ui==true
     - prepare_db_ok is succeeded
 
 - name: Init Data Region if migrate_ui_ok is succeeded
@@ -19,6 +20,7 @@
   until: region_init_result is succeeded
   retries: 5
   when:
+    - install_ui==true
     - prepare_db_ok is succeeded
     - migrate_ui_ok is succeeded
 
@@ -29,5 +31,5 @@
   retries: 3
   when:
     - prepare_db_ok is succeeded
-    - migrate_ui_ok is succeeded
-    - region_init_result is succeeded
+    - install_ui==true and migrate_ui_ok is succeeded
+    - install_ui==true and region_init_result is succeeded

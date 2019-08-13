@@ -10,29 +10,29 @@
     - { role: rainvar, tags: default }
     - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
 
-- hosts: master:worker:gateway
+- hosts: manage:compute:gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
     - { role: storage/nas, when: "storage_type == 'nas'" }
     - { role: storage/gfs, when: "storage_type == 'gfs'" }
 
-- hosts: deploy
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: docker/image, tags: image-thirdparty }
 
-- hosts: etcd
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
     - { role: etcd/manage, tags: etcd }
 
-- hosts: worker
+- hosts: compute
   roles:
     - { role: rainvar, tags: default }
     - { role: etcd/compute, tags: etcd-proxy }
 
-- hosts: master[0]
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
     - { role: db, tags: db }
@@ -42,12 +42,12 @@
     - { role: rainvar, tags: default }
     - { role: gateway, tags: gateway }
 
-- hosts: master:worker
+- hosts: manage:compute
   roles:
     - { role: rainvar, tags: default }
     - { role: monitor, tags: monitor }
 
-- hosts: master:worker
+- hosts: manage:compute
   roles:
     - { role: rainvar, tags: default }
     - { role: node/core, tags: node }
