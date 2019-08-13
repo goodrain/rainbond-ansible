@@ -18,17 +18,21 @@
   template: src=rainbond.repo.j2 dest=/etc/yum.repos.d/rainbond.repo
   when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
 
-- name: Copy local_rainbond.list into /etc/apt/sources.list.d
+- name: Delete default Ubuntu source
+  shell: mv -f /etc/apt/sources.list /etc/apt/sources.list.bak && touch /opt/rainbond/.init/.offline
+  when: ansible_distribution == "Ubuntu" and offline_repo.stat.isreg is not defined
+
+- name: Add Offline Ubuntu Repository
   template:
     src: /etc/apt/sources.list.d/local_rainbond.list
     dest: /etc/apt/sources.list.d/local_rainbond.list
   when: ansible_distribution == "Ubuntu" and offline_repo.stat.isreg is not defined
 
-- name: Copy repo into /opt/rainbond/offline
+- name: Copy pkgs into /opt/rainbond/offline
   copy:
     src: /opt/rainbond/offline/pkgs
     dest: /opt/rainbond/offline
-  when: ansible_distribution == "Ubuntu" and offline_repo.stat.isreg is not defined
+  when: offline_repo.stat.isreg is not defined
 
 
 - name: Clear default cache

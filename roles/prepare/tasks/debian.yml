@@ -48,6 +48,7 @@
       - nscd
       - dnsmasq
     state: absent
+    force: yes
   tags: prepare
 
 - name: install ubuntu package
@@ -66,6 +67,7 @@
     update_cache: yes
     autoclean: yes
     state: latest
+    force: yes
 
 - name: configuration ulimits
   lineinfile:

@@ -37,7 +37,7 @@ do_install() {
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
 	case "$lsb_dist" in
 		ubuntu|debian)
-			apt-get install -y -qq --no-install-recommends docker-ce >/dev/null
+			apt-get install -y -qq --no-install-recommends --allow-unauthenticated docker-ce >/dev/null
 			exit 0
 			;;
 		centos)
