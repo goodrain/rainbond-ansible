@@ -14,6 +14,7 @@ services:
   after:
     - docker
   type: simple
+  is_init_start: true
   pre_start: docker rm etcd
   start: ETCD_MASTER={{  etcd_access_addresses }} {{ rbd_dir }}/scripts/start-etcd-proxy.sh
   stop: docker stop etcd

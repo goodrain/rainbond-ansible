@@ -15,6 +15,7 @@ services:
     - docker
   type: simple
   pre_start: docker rm etcd
+  is_init_start: true
   start: {{ rbd_dir }}/scripts/start-etcd.sh
   stop: docker stop etcd
   restart_policy: always
