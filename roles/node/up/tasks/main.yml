@@ -32,7 +32,7 @@
 
 - name: The next task may take some time to execute
   debug:
-    msg: "The next task may take some time to execute: Waiting Pushing local images to goodrain.me"
+    msg: "The next task may take some time to execute: Waiting Pushing images to local image registry"
   when: check_goodrainme_done.stat.isreg is defined
 
 - name: Rainbond | Push images to local image registry
