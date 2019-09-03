@@ -121,12 +121,12 @@ ssl_ca_cert: "{{ region_ca_dir }}/ca.pem"
 client_cert_file: "{{ region_ca_dir }}/client.key.pem"
 client_key_file: "{{ region_ca_dir }}/client.pem"
 
-base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-08-30-5.1.7-beta2.tgz"
-base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-08-30-5.1.7-beta2.sha256sum.txt"
+base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-09-03-5.1.7.tgz"
+base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-09-03-5.1.7.sha256sum.txt"
 # rainbond.image.tgz.url
 
-rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-08-30-5.1.7-beta2.tgz"
-rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-08-30-5.1.7-beta2.sha256sum.txt"
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-09-03-5.1.7.tgz"
+rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-09-03-5.1.7.sha256sum.txt"
 
 install_ui: true
 master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
