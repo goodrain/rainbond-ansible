@@ -17,27 +17,6 @@
 IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.7.tgz"
 IMAGE_PATH="/grdata/services/offline/upgrade"
 INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.7.tgz"
-[ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
-echo "tar xf rainbond.images "
-if [ -f "$IMAGE_R6D_LOCAL" ]; then
-    tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH}
-else
-    echo "$IMAGE_R6D_LOCAL not exist, please redownload and upgrade."
-    exit 1
-fi
-
-version_check=$(grctl version | grep -c "5.1.")
-if [ "$version_check" -eq 0 ]; then
-    echo "请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803"
-    exit 1
-fi
-
-#Mark the update version into db
-current_version=$(grctl version | cut -f3 -d " " | awk -F "-*" '{print $1}' | sed 's/^.//')
-docker exec rbd-db mysql -e "select \`key\`,\`value\` from console.console_sys_config;" | grep RAINBOND_VERSION  >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-docker exec rbd-db mysql -D console -e "insert \`console_sys_config\`(\`key\`, \`value\`) values(\"RAINBOND_VERSION\", \"${current_version}\");"
-fi
 
 # check /grdata disk remaining space
 check_grdata=$(df -h | grep -c "/grdata$")
@@ -52,11 +31,34 @@ if [ "$DISK_STATUS" -ne '0' ]; then
     echo "!!! 磁盘(/grdata)至少可用空间大于6GB(now ${disk}GB)"
     exit 1
 fi
-version=$(cat /opt/rainbond/rainbond-ansible/version)
+
+version_check=$(grctl version | grep -c "5.1.")
+if [ "$version_check" -eq 0 ]; then
+    echo "请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803"
+    exit 1
+fi
+
+[ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
+echo "tar xf rainbond.images, Please wait for completion."
+if [ -f "$IMAGE_R6D_LOCAL" ]; then
+    tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH}
+else
+    echo "$IMAGE_R6D_LOCAL not exist, please redownload and upgrade."
+    exit 1
+fi
+
+#Mark the update version into db
+current_version=$(grctl version | cut -f3 -d " " | awk -F "-*" '{print $1}' | sed 's/^.//')
+docker exec rbd-db mysql -e "select \`key\`,\`value\` from console.console_sys_config;" | grep RAINBOND_VERSION  >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+docker exec rbd-db mysql -D console -e "insert \`console_sys_config\`(\`key\`, \`value\`) values(\"RAINBOND_VERSION\", \"${current_version}\");"
+fi
+
 if [ -f "$INSTALL_SCRIPT" ];then
     mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_$current_version
     mkdir -p /opt/rainbond/rainbond-ansible
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond/rainbond-ansible
+    version=$(cat /opt/rainbond/rainbond-ansible/version)
     cp -a "/opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     master_ip=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep master_ip | awk '{print $2}')
@@ -108,15 +110,12 @@ for ((i=1;i<=60;i++));do
 done
 echo "start load new version docker images"
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|kube)" | grep -E  "($version|rbd-mesh-data-panel)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
-if [ $? -ne 0 ]; then
-    echo "start load new version docker images failure, continue"
-else
-    echo "load new version docker images success"
-fi
+
+echo "load new version docker images success"
+echo "start load new version grctl and node"
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.$current_version
 mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.$current_version
 
-echo "start load new version grctl and node"
 docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
 if [ $? -ne 0 ]; then
     echo "load new version grctl and node failure"
@@ -128,6 +127,12 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 # rewrite ansible hosts
 mkdir -p /opt/rainbond/rainbond-ansible/inventory
 /opt/rainbond/etc/tools/bin/grctl ansible hosts
+if [ $? -ne 0 ]; then
+    echo "Generate the ansible host list failure, Verify that the cluster is normal."
+    exit 1
+else
+    echo "Generate the ansible host list successfully"
+fi
 
 # ansible upgrade all node
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml
