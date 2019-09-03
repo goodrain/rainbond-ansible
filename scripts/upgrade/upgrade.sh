@@ -14,28 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.6.tgz"
-#IMAGE_BASE_LOCAL="/grdata/services/offline/rainbond.base.upgrade.5.1.5.tgz"
-
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.7.tgz"
 IMAGE_PATH="/grdata/services/offline/upgrade"
-
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.6.tgz"
-
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.7.tgz"
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
-
 echo "tar xf rainbond.images "
 if [ -f "$IMAGE_R6D_LOCAL" ]; then
     tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH}
 else
     exit 1
 fi
-
-#echo "tar xf base "
-# if [ -f "$IMAGE_BASE_LOCAL" ]; then
-#     tar xf ${IMAGE_BASE_LOCAL} -C ${IMAGE_PATH}
-# else
-#     exit 1
-# fi
 
 version_check=$(grctl version | grep "5.1." | wc -l)
 if [ "$version_check" -eq 0 ]; then
@@ -50,9 +38,7 @@ if [ $? -ne 0 ]; then
 docker exec rbd-db mysql -D console -e "insert \`console_sys_config\`(\`key\`, \`value\`) values(\"RAINBOND_VERSION\", \"${current_version}\");"
 fi
 
-#echo "clean old endpoints"
-#kubectl get ns | grep -vE '(default|kube-public|kube-system|rainbond|NAME)' | awk '{print $1}' | xargs -I {} kubectl delete ep -l service-kind="third_party",creater="Rainbond" -n {}
-
+# check /grdata disk remaining space
 check_grdata=$(df -h | grep "/grdata$" | wc -l)
 if [ "$check_grdata" == 0 ]; then
     disk=$(df | grep "/$" | awk '{print $4}' | tr 'G' ' ')
@@ -116,6 +102,9 @@ done
 
 [ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|kube)" | grep -E  "($version|rbd-mesh-data-panel)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
+# upgrade plugin image 
+docker push goodrain.me/tcm
+# upgrade grctl and node binary
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.$current_version
 mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.$current_version
 
@@ -123,8 +112,8 @@ docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} t
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 
+# ansible upgrade all node
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml
 
-rm -rf ${IMAGE_R6D_LOCAL}
-rm -rf ${IMAGE_BASE_LOCAL}
+# clear data
 rm -rf ${IMAGE_PATH}
