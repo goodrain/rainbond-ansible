@@ -25,7 +25,7 @@ else
     exit 1
 fi
 
-version_check=$(grctl version | grep "5.1." | wc -l)
+version_check=$(grctl version | grep -c "5.1.")
 if [ "$version_check" -eq 0 ]; then
     echo "请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803"
     exit 1
@@ -39,14 +39,14 @@ docker exec rbd-db mysql -D console -e "insert \`console_sys_config\`(\`key\`, \
 fi
 
 # check /grdata disk remaining space
-check_grdata=$(df -h | grep "/grdata$" | wc -l)
+check_grdata=$(df -h | grep -c "/grdata$")
 if [ "$check_grdata" == 0 ]; then
     disk=$(df | grep "/$" | awk '{print $4}' | tr 'G' ' ')
 else
     disk=$(df | grep "/grdata$" | awk '{print $4}' | tr 'G' ' ')
 fi
 DISK_LIMIT=6000000
-DISK_STATUS=$(awk -v num1=$disk -v num2=$DISK_LIMIT 'BEGIN{print(num1>=num2)?"0":"1"}')
+DISK_STATUS=$(awk -v num1="$disk" -v num2=$DISK_LIMIT 'BEGIN{print(num1>=num2)?"0":"1"}')
 if [ "$DISK_STATUS" -ne '0' ]; then
     echo "!!! 磁盘(/grdata)至少可用空间大于6GB(now ${disk}GB)"
     exit 1
@@ -55,18 +55,17 @@ fi
 if [ -f "$INSTALL_SCRIPT" ];then
     mv /opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible_$current_version
     tar xf ${INSTALL_SCRIPT} -C /opt/rainbond
-    cp -a /opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
-    if 
+    cp -a "/opt/rainbond/rainbond-ansible_$current_version/roles/rainvar/defaults/main.yml" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     version=$(cat /opt/rainbond/rainbond-ansible/version)
     sed -i -r "s/(^r6d_version: ).*/\1$version/" /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml
     master_ip=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep master_ip | awk '{print $2}')
-    if [ ! -n $master_ip ];then
+    if [[ -z $master_ip ]];then
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
 master_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
 EOF
     fi
     region_name=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep region_name | awk '{print $2}')
-    if [ ! -n $region_name ];then
+    if [[ -z $region_name ]];then
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
 ## region
 region_id: "1234567890"
@@ -80,19 +79,21 @@ client_key_file: "{{ region_ca_dir }}/client.pem"
 
 EOF
     fi
-    if 
+    install_ui=$(cat /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml | grep install_ui | awk '{print $2}')
+    if [[ -z $install_ui ]];then
     cat >> /opt/rainbond/rainbond-ansible/roles/rainvar/defaults/main.yml <<EOF
 install_ui: true
 master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
 EOF
+    fi
 else
     exit 1
-fi
+fi    
 
 echo "start load docker image"
-pushd $IMAGE_PATH
+pushd $IMAGE_PATH || exit 1
 ls | grep tgz | xargs -I {} docker load -i ./{}
-popd
+popd || exit 1
 
 for ((i=1;i<=60;i++));do
     sleep 1

@@ -11,3 +11,5 @@ syntax_check:
 
 local-test: build_ansible
 	docker run -it --rm rainbond/rainspray:5.x bash
+archive:
+	git archive --output rainbond-ansible.upgrade.5.1.7.tgz `git symbolic-ref --short -q HEAD`
