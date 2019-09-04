@@ -16,6 +16,16 @@
     dest: "{{ bin_dir }}/node"
     mode: 0755
 
+- name: Tools | Copy Rainbond Tools
+  copy: src={{ item }} dest={{ bin_dir }} owner=root mode=777
+  with_fileglob:
+    - "{{ base_dir }}/hack/files/bin/grtools/*"
+
+- name: Upgrade | start node service
+  systemd:
+    state: started
+    name: node
+
 - name: Upgrade | Copy Image Upgrade Script
   template:
     src: image.sh.j2
@@ -27,13 +37,3 @@
   register: upgrade50x_task_result
   until: upgrade50x_task_result is succeeded
   retries: 5
-
-- name: Tools | Copy Rainbond Tools
-  copy: src={{ item }} dest={{ bin_dir }} owner=root mode=777
-  with_fileglob:
-    - "{{ base_dir }}/hack/files/bin/grtools/*"
-
-- name: Upgrade | start node service
-  systemd:
-    state: started
-    name: node
