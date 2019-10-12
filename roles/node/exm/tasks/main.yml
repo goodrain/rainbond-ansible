@@ -1,7 +1,7 @@
 ---
 - name: Rainbond | Install pip Online
   shell: "yum -y install python-pip"
-  when: install_type == "online"
+  when: install_type != "online" and  ansible_distribution == "CentOS"
   
 - name: Rainbond | Install ansible Online
   shell: "pip install ansible"
