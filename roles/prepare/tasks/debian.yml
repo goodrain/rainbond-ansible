@@ -37,6 +37,10 @@
     - https_proxy is defined
     - need_https_proxy.rc != 0
 
+- name: install python-apt offline
+  raw: apt-get update && apt-get install python-apt -y -q --allow-unauthenticated
+  when: ansible_distribution == "Ubuntu" and install_type == "offline"
+
 - name: rm ubuntu lxd & ufw package
   apt: 
     name: 
