@@ -28,3 +28,29 @@ services:
   stop: docker stop rbd-monitor
   restart_policy: always
   restart_sec: 10
+
+- name: kube-state-metrics
+  endpoints:
+  - name: METRICS_ENDPOINTS
+    protocol: http
+    port: 98080
+  health:
+    name: ksm-health  
+    model: http
+    address: 127.0.0.1:98080/healthz
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm kube-state-metrics
+  start: >-
+    docker run --name kube-state-metrics
+    --network host
+    -v /opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig:/admin.kubeconfig
+    -i goodrain.me/ksm
+    /kube-state-metrics --kubeconfig /admin.kubeconfig
+  stop: docker stop rbd-monitor
+  restart_policy: always
+  restart_sec: 10
+
