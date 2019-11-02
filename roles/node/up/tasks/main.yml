@@ -23,7 +23,7 @@
     dest: /tmp/install/check_registries.sh
     mode: 0777
 
-- name: Rainbond | Check goodrain.me
+- name: Rainbond | Check local image registry
   shell: "bash /tmp/install/check_registries.sh > /tmp/install/check_registries.log"
 
 - name: Rainbond | Check check_ok
@@ -32,10 +32,10 @@
 
 - name: The next task may take some time to execute
   debug:
-    msg: "The next task may take some time to execute: Waiting Pushing local images to goodrain.me"
+    msg: "The next task may take some time to execute: Waiting Pushing images to local image registry"
   when: check_goodrainme_done.stat.isreg is defined
 
-- name: Rainbond | Push local images to goodrain.me
+- name: Rainbond | Push images to local image registry
   shell: "bash /tmp/install/pushimage.sh > /tmp/install/pushimage.log"
   register: pushimage_task_result
   until: pushimage_task_result is succeeded

@@ -1,20 +1,4 @@
 #!/bin/bash
 
-version={{ r6d_version }}
-rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-eventlog rbd-gateway)
-
-upgrade_dns(){
-    docker pull goodrain.me/rbd-dns:${version}
-    systemctl restart rbd-dns
-}
-
-case $1 in
-    *)
-        grep ":5.1.0$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#5.1.0#${version}#g"
-        grep ":5.1.1$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#5.1.1#${version}#g"
-        grep ":v5.1.2-release$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#v5.1.2-release#${version}#g"
-        grep ":v5.1.3-release$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#v5.1.3-release#${version}#g"
-        grep ":v5.1.4-release$" /opt/rainbond/conf -R | awk -F: '{print $1}' | uniq | grep -vE '(db|dns)' |  xargs sed -i "s#v5.1.4-release#${version}#g"
-        node service update
-    ;;
-esac
+node upgrade -v {{ r6d_version }}
+node service update

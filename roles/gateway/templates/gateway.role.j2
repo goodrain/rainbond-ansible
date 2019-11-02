@@ -14,6 +14,7 @@ services:
   start: >-
     docker run --name rbd-gateway
     --network host
+    --privileged
     -v {{ rbd_dir }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -v {{ rbd_dir }}/etc/rbd-gateway/ssl:/run/nginx/rainbond/ssl
     -v /grdata/services/offline:/grdata/services/offline
