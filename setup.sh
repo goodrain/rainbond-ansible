@@ -110,7 +110,7 @@ init::online(){
 		;;
     esac
     export LC_ALL=C
-    run pip install ansible -i https://pypi.tuna.tsinghua.edu.cn/simple
+    run pip install ansible==2.8.5 -i https://pypi.tuna.tsinghua.edu.cn/simple
 }
 
 # Support for CentOS offline deployment
