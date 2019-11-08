@@ -23,7 +23,7 @@
 - name: DB | Copy DB Conf
   template:
     src: my.cnf.j2
-    dest: "{{ rbd_dir }}/etc/rbd-db/my.cnf"
+    dest: "{{ rbd_dir }}/etc/rbd-db/mysqld.cnf"
 
 - name: DB | Copy DB Init Script
   template:
