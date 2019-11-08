@@ -24,7 +24,7 @@ services:
     -v {{ rbd_dir }}/data/prom:/prometheusdata
     -v {{ rbd_dir }}/etc/prom/config:/etc/prometheus/config
     -i goodrain.me/{{ monitor }}
-    --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ nodeip }}:9999 --alertmanager-address={{ nodeip }}:9093  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/config/prometheus.yml --rules-config.file=/etc/prometheus/config/rules.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info --kube-state-metrics={{ nodeip }}:9980
+    --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ nodeip }}:9999 --alertmanager-address={{ nodeip }}:9093  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/config/prometheus.yml --rules-config.file=/etc/prometheus/config/rules.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info --kube-state-metrics={{ nodeip }}:9105 --mysqld-exporter={{ nodeip }}:9104
   stop: docker stop rbd-monitor
   restart_policy: always
   restart_sec: 10
@@ -33,11 +33,11 @@ services:
   endpoints:
   - name: METRICS_ENDPOINTS
     protocol: http
-    port: 9980
+    port: 9105
   health:
     name: ksm-health
     model: http
-    address: 127.0.0.1:9980/healthz
+    address: 127.0.0.1:9105/healthz
     max_errors_num: 3
     time_interval: 5
   after:
@@ -49,8 +49,8 @@ services:
     --network host
     -v {{ kubecfg_dir }}/admin.kubeconfig:/admin.kubeconfig
     -i goodrain.me/ksm
-    /kube-state-metrics --kubeconfig /admin.kubeconfig
-  stop: docker stop rbd-monitor
+    /kube-state-metrics --kubeconfig /admin.kubeconfig --port 9105 --telemetry-port 9981
+  stop: docker stop kube-state-metrics
   restart_policy: always
   restart_sec: 10
 
