@@ -1,13 +1,24 @@
 ---
-- name: Network | Copy flanneld Service
+#- name: Network | Copy flanneld Service
+#  template:
+#    src: flanneld.service.j2
+#    dest: /etc/systemd/system/flanneld.service
+
+- name: Rainbond | Copy Network Role
   template:
-    src: flanneld.service.j2
-    dest: /etc/systemd/system/flanneld.service
+    src: network.role.j2
+    dest: "{{ node_role_dir }}/network.yaml"
 
 - name: Network | Copy flanneld Service
   template:
     src: mk-docker-opts.sh.j2
     dest: "{{ env_dir }}/mk-docker-opts.sh"
+    mode: 0755
+
+- name: Network | prepare check etcdctl
+  copy:
+    src: "{{ local_tools }}/bin/etcdctl"
+    dest: "{{ bin_dir }}/etcdctl"
     mode: 0755
 
 - name: Network | Copy Init flanneld 
@@ -22,10 +33,22 @@
     dest: "{{ bin_dir }}/flanneld"
     mode: 0755
 
-- name: Network | Run Init flanneld 
-  shell: "bash {{ env_dir }}/init-flanneld.sh"
-  run_once: true
-  delegate_to: "{{ groups['master'][0] }}"
+- name: Network | Copy flannel conf
+  template:
+    src: 10-flannel.conflist.j2
+    dest: /opt/rainbond/etc/cni/10-flannel.conflist
 
-- name: Network | start flanneld
-  shell: "systemctl daemon-reload && systemctl enable flanneld && systemctl start flanneld"
+- name: Network | Run Init flanneld 
+  shell: "bash {{ env_dir }}/init-flanneld.sh > /tmp/install/init-flanneld.log"
+  run_once: true
+  delegate_to: "{{ groups['manage'][0] }}"
+
+#- name: Network | start flanneld
+#  shell: "systemctl daemon-reload && systemctl enable flanneld && systemctl start flanneld"
+
+- name: Add flannel Health Check
+  template:
+    src: "network_{{ CLUSTER_NETWORK }}.sh.j2"
+    dest: "{{ rbd_dir }}/health/network.sh"
+    mode: 0777
+  tags: health

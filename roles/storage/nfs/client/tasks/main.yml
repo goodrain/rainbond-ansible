@@ -1,53 +1,18 @@
 ---
-- name: check nfs server
-  shell: "ls /etc/exports"
-  register: check_server
+- name: Nfs | copy check storage
+  template:
+    src: check_storage.sh.j2
+    dest: /tmp/install/check_storage.sh
+    mode: 0777
 
-- name: debug
-  debug: var=check_server
+- name: Nfs | run check storage
+  shell: "bash /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
 
-- name: install nfs client
-  action: apt pkg=nfs-common state=present
-  when: is_debian_or_ubuntu and check_server.rc != 0
-  tags:
-    - nfs
+- name: Nfs | check grdata
+  stat: path=/tmp/.grdata.init
+  register: check_grdata
 
-- name: install nfs client
-  action: yum pkg=nfs-utils state=present
-  when: is_centos and check_server.rc != 0
-  tags:
-    - nfs
+- import_tasks: setup.yml
 
-- name: Ensure rpcbind is running (CentOS)
-  action: service name=rpcbind state=started enabled=yes
-  when: is_centos and check_server.rc != 0
-
-- name: Ensure portmap is running (Ubuntu prior to Trusty Thar)
-  action: service name=portmap state=started enabled=yes
-  when: is_ubuntu|bool and ansible_lsb.major_release is defined and ansible_lsb.major_release|int < 14 and check_server.rc != 0
-
-- name: Ensure rpcbind is running (Ubuntu Trusty Tahr or newer)
-  action: service name=rpcbind state=started enabled=yes
-  when: is_ubuntu|bool and ansible_lsb.major_release is defined and ansible_lsb.major_release|int >= 14 and check_server.rc != 0
-
-- name: Ensure rpcbind is running (Debian)
-  action: service name=rpcbind state=started enabled=yes
-  when: is_debian and check_server.rc != 0
-
-- name: Ensure {{nfsmount}} directory exists
-  action: file path={{nfsmount}} state=directory
-  tags: 
-    - nfs
-
-- shell: if [ -z "$nfsoptions" ]; then  echo rw,sync,nfsvers=3; else echo $nfsoptions; fi
-  register: _nfsopts
-  sudo: false
-  connection: local
-  tags:
-    - nfs
-
-- name: configure /etc/fstab on clients
-  action: mount name={{nfsmount}} src={{nfsserver}}:{{nfspath}} fstype=nfs opts={{_nfsopts.stdout}} state=mounted
-  when: check_server.rc != 0
-  tags:
-    - nfs
+- import_tasks: config.yml
+  when: check_grdata.stat.isreg is not defined

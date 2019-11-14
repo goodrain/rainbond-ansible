@@ -1,0 +1,6 @@
+#!/bin/bash
+
+nodeip={{ nodeip }}
+nodeid={{ nodeid }}
+[ -f "/opt/rainbond/etc/node/node_host_uuid.conf" ] && rm -rf /opt/rainbond/etc/node/node_host_uuid.conf
+echo "host_uuid=$nodeid" > /opt/rainbond/etc/node/node_host_uuid.conf

@@ -1,0 +1,12 @@
+---
+- hosts: new-manage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: prepare, tags: health-thirdparty }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: storage/nas, when: "storage_type == 'nas'" }
+    - { role: storage/gfs, when: "storage_type == 'gfs'" }
+    - { role: etcd/manage, tags: etcd }
+    - { role: gateway, tags: gateway }
+    - { role: monitor, tags: monitor }
+    - { role: node/core, tags: node }

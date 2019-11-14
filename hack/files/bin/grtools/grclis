@@ -1,116 +1,124 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
-version=$(yq r /srv/pillar/rainbond.sls rbd-version)
+# Copyright 2019 The Goodrain Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-func(){
-    local ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
-    systemctl $1 node
-    systemctl daemon-reload
-    for service in ${ALL_SERVICES[@]}
-    do
-        [ -f "/etc/systemd/system/$service.service" ] && (
-            systemctl $1 $service
-            [ "$?" -eq 0 ] && echo "$1 $service successful" || echo "$1 $service failure"
-        ) || (
-            echo "not found.skip $1 $service"
-        )
-    done
-}
+if [ -f "/opt/rainbond/rainbond-ansible/version" ]; then
+    version=$(cat /opt/rainbond/rainbond-ansible/version)
+else
+    echo "not found version info, please check /opt/rainbond/rainbond-ansible/version"
+    exit 1
+fi
+rainbond=(rbd-worker rbd-chaos rbd-api rbd-app-ui rbd-webcli rbd-mq rbd-monitor rbd-gateway rbd-eventlog rbd-dns)
+all=(node rbd-chaos rbd-worker rbd-api rbd-eventlog rbd-db rbd-repo calico kube-controller-manager kube-scheduler rbd-app-ui rbd-monitor rbd-webcli rbd-mq rbd-gateway kube-apiserver rbd-dns rbd-hub etcd)
+plugins=(rbd-init-probe)
 
-core(){
-    local update_img=$1
-    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui rbd-monitor"
-    local time=0
-    for img in ${all[@]}
-    do
-        if [ "$img" == "$update_img" ];then
-            echo "update ${update_img}"
-            docker pull rainbond/${update_img}:${version}
-            docker tag rainbond/${update_img}:${version} goodrain.me/${update_img}:${version}
-            docker push goodrain.me/${update_img}:${version}
-            echo "restart ${update_img}"
-            systemctl restart ${update_img}
-            time=1
-        fi
-    done
-    if [ "$time" != 1 ];then
-        echo "not support ${update_img}"
-        echo "only support ${all}"
+upgrade(){
+    if [ "$1" == "all" ];then
+        echo "will upgrade all image"
+        for img in ${rainbond[@]}; do
+            docker pull rainbond/${img}:${version}
+            docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
+            docker push goodrain.me/${img}:${version}
+            systemctl restart ${img}
+            [ "$?" -eq 0 ] && echo "restart ${img} ok."
+        done
+    elif [ "$1" == "node" ]; then
+            docker pull rainbond/cni:rbd_${version}
+            [ -f "/opt/rainbond/etc/tools/bin/node" ] && mv /opt/rainbond/etc/tools/bin/node /tmp/node_old
+            [ -f "/opt/rainbond/etc/tools/bin/grctl" ] && mv /opt/rainbond/etc/tools/bin/grctl /tmp/grctl_old
+            docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
+            systemctl stop node
+            cp -a /opt/rainbond/etc/tools/bin/node /usr/local/bin/node
+            cp -a /opt/rainbond/etc/tools/bin/grctl /usr/local/bin/grctl
+            systemctl start node
+            [ "$?" -eq 0 ] && echo "restart node ok."
+    elif [ "$1" == "plugins" ]; then
+        for plugin in ${plugins[@]}; do
+            docker pull rainbond/${plugin}:${version}
+            docker tag rainbond/${plugin}:${version} goodrain.me/${plugin}
+            docker push goodrain.me/${plugin}
+            echo "upgrade plugin ${plugin} ok."
+        done
+    else
+        echo "will upgrade $1 image"
+        for img in ${rainbond[@]}; do
+            if [ "$1" == "$img" ]; then
+                docker pull rainbond/${img}:${version}
+                docker tag rainbond/${img}:${version} goodrain.me/${img}:${version}
+                docker push goodrain.me/${img}:${version}
+                systemctl restart ${img}
+                [ "$?" -eq 0 ] && echo "restart ${img} ok."
+            fi
+        done
     fi
 }
 
-update_all(){
-    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui rbd-monitor"
-    for update_img in ${all[@]}
-    do
-        echo "update ${update_img}"
-        docker pull rainbond/${update_img}:${version}
-        docker tag rainbond/${update_img}:${version} goodrain.me/${update_img}:${version}
-        docker push goodrain.me/${update_img}:${version}
-        echo "restart ${update_img}"
-        systemctl restart ${update_img}
-    done
+stop(){
+    [ ! -z "$1" ] && (
+        systemctl stop $1
+        node service stop $1
+    ) || (
+        for s in ${all[@]}
+        do          
+            echo "will stop $s"
+            systemctl stop $s
+        done
+    )
 }
 
-reload(){
-    reload_services="kube-apiserver rbd-eventlog rbd-monitor rbd-worker rbd-webcli rbd-mq rbd-chaos rbd-api rbd-entrance"
-    for reload_service in ${reload_services[@]}
-    do
-        echo "systemctl restart $reload_service" >> /tmp/.reload_services
-        systemctl restart $reload_service
-        [ "$?" -eq 0 ] && (
-            echo "restart $reload_service ok" >> /tmp/.reload_services
-        ) || (
-            echo "restart $reload_service failed" >> /tmp/.reload_services
-        )
-    done
+start(){
+    systemctl start etcd
+    systemctl start node
 }
 
 reset(){
-    local ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd etcd-proxy storage local-dns kubelet"
-    echo "uninstall salt packages"
-    yum remove -y salt-*
-    rm -rf /etc/salt/
-    rm -rf /srv/
-    echo "rm /opt/rainbond"
-    rm -rf /opt/rainbond/
-    rm -rf /root/.kube/
-    rm -rf /root/.rbd/
-    echo "rm /grdata"
-    df -h | grep grdata >/dev/null
-    [ "$?" -eq 0 ] && (
-        umount /grdata
-        #num=$(cat -n  /etc/fstab | grep grdata | awk '{print $1}')
-        sed -i '/grdata/d' /etc/fstab
-    )
-    echo "disable & remove systemd"
-    for service in ${ALL_SERVICES[@]}
-    do
-        [ -f "/etc/systemd/system/$service.service" ] && (
-            systemctl disable $service
-            [ "$?" -eq 0 ] && rm -rf /etc/systemd/system/$service.service
-        )
-    done
-    iptables -F;iptables -X;iptables -Z
-    echo "clean all."
+    systemctl stop node
+    systemctl stop kubelet
+    dps | grep goodrain.me | grep -v 'k8s' | awk '{print $NF}' | xargs -I {} systemctl stop {}
+    cclear
+    rm -rf /tmp/*
+    rm -rf /usr/local/bin/grctl
+    rm -rf /usr/local/bin/node
 }
 
-if [ "$1" == "start" ];then
-    func start
-elif [ "$1" == "stop" ];then
-    func stop
-elif [ "$1" == "reload" ];then
-    reload
-elif [ "$1" == "reset" ];then
-    func stop
-    reset
-elif [ "$1" == "update" ];then
-    if [ "$2" == "all" ];then
-        update_all
-    else
-        core update $2
-    fi
-else
-    echo "grclis <start|stop|update all>"
-fi
+help(){
+    echo "grclis start/stop <服务名>"
+    echo "grclis upgrade <服务名/all/node/plugins>"
+    echo "grclis reset"
+}
+
+case $1 in
+    upgrade)
+        upgrade $2 
+    ;;
+    start)
+        start
+    ;;
+    stop)
+        stop $2
+    ;;
+    reset)
+        read -n1 -p "Are you sure you want to continue resetting node [Y/N]?" answer
+        case $answer in
+        Y | y)
+            reset;;
+        *)
+            echo "";;
+        esac
+    ;;
+    *)
+        help        
+    ;;
+esac

@@ -7,7 +7,7 @@
 - hosts:
     - master
     - worker
-    - lb
+    - gateway
   roles:
     - { role: rainvar, tags: default }
     - { role: storage/nfs/client, when: "storage_type == 'nfs'" }

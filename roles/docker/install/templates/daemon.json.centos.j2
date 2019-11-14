@@ -1,0 +1,16 @@
+{
+  "insecure-registries": ["{{INSECURE_REG}}"],
+  "bip": "{{ BIP }}",
+  "userland-proxy": false,
+  "max-concurrent-downloads": 10,
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ],
+  "log-driver": "{{ LOG_DRIVER }}",
+  "log-level": "{{ LOG_LEVEL }}",
+  "log-opts": {
+    "max-size": "{{ LOG_MAX_SIZE }}",
+    "max-file": "{{ LOG_MAX_FILE }}"
+    }
+}

@@ -1,0 +1,15 @@
+---
+- name: Create offline directory
+  file: path=/grdata/services/offline/pkgs state=directory
+
+- name: Extract rpm.tgz into /grdata/services/offline/pkgs
+  unarchive:
+    src: "{{ local_offline }}/rpm.tgz"
+    dest: /grdata/services/offline/pkgs/
+  when: ansible_distribution == "CentOS"
+    
+- name: Extract deb.tgz into /opt/rainbond/offline/pkgs
+  unarchive:
+    src: "{{ local_offline }}/deb.tgz"
+    dest: /opt/rainbond/offline/pkgs/
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"

@@ -115,3 +115,6 @@ TODO
 
 offline/pkgs/centos
 offline/images/*.tgz
+roles/docker-old
+roles/image-old
+hack/tools/offline.sh

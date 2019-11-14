@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for ((i=1;i<=60;i++));do
+    sleep 1
+    curl -sk --connect-timeout 10 --max-time 30 -I  https://goodrain.me/v2/ | head -1 | grep 200
+    [ "$?" -eq 0 ] && export readyok="ok"  && break
+done
+
+[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -v none | awk '{print $1":"$2}' | xargs -I {} docker push {}

@@ -1,0 +1,59 @@
+---
+- hosts: all
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: prepare, tags: prepare-thirdparty }
+    - { role: thirdparty, tags: thirdparty}
+
+- hosts: storage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
+
+- hosts: manage:compute:gateway
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: storage/nas, when: "storage_type == 'nas'" }
+    - { role: storage/gfs, when: "storage_type == 'gfs'" }
+
+- hosts: manage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: docker/image, tags: image-thirdparty }
+
+- hosts: manage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: etcd/manage, tags: etcd }
+
+- hosts: compute
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: etcd/compute, tags: etcd-proxy }
+
+- hosts: manage[0]
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: db, tags: db }
+
+- hosts: gateway
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: gateway, tags: gateway }
+
+- hosts: manage:compute
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: monitor, tags: monitor }
+
+- hosts: manage:compute
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: node/core, tags: node }
+
+- hosts: deploy
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: node/init, tags: nodeinit}
+    - { role: node/up, tags: nodeup }

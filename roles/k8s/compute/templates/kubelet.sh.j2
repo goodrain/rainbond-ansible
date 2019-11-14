@@ -1,0 +1,38 @@
+#!/bin/bash
+
+{% if CLUSTER_NETWORK == "calico" %}
+NETWROK_ARGS="--network-plugin=cni --cni-bin-dir=/opt/rainbond/bin --cni-conf-dir=/opt/rainbond/etc/cni"
+{% else %}
+NETWROK_ARGS="--network-plugin=cni --cni-bin-dir=/opt/rainbond/bin --cni-conf-dir=/opt/rainbond/etc/cni"
+{% endif %}
+
+KUBE_LOGTOSTDERR="--logtostderr=true"
+KUBE_LOG_LEVEL="--v=2"
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+
+KUBELET_ARGS="
+    --address={{ worker_access_address }} \
+    --node-ip={{ worker_access_address }} \
+    --port=10250 \
+    --hostname_override=${NODE_UUID} \
+    --kubeconfig={{ kubecfg_dir }}/admin.kubeconfig \
+    --cert-dir={{ ca_dir }} \
+    --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge \
+    --cluster-dns={{ worker_access_address }} \
+    --register-node=false \
+    --fail-swap-on=false \
+    --image-gc-high-threshold=90 \
+    --image-gc-low-threshold=80 \
+    --kube-reserved={{ kube_reserved }} \
+    --system-reserved={{ system_reserved }} \
+    --max-pods={{ max_pods }} \
+    --eviction-max-pod-grace-period=40 \
+    --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
+    --maximum-dead-containers-per-container=0"
+
+exec /usr/local/bin/kubelet \
+    $KUBE_LOGTOSTDERR \
+    $KUBE_LOG_LEVEL \
+    $KUBE_ALLOW_PRIV \
+    $NETWROK_ARGS \
+    $KUBELET_ARGS

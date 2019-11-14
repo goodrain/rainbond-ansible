@@ -1,0 +1,136 @@
+-- 2019-02-17创建三方服务endpoints表 third_party_service_endpoints
+
+CREATE TABLE `third_party_service_endpoints` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` varchar(32),
+  `service_cname` varchar(128),
+  `tenant_id` varchar(32),
+  `endpoints_type` varchar(32),
+  `endpoints_info` text DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+
+
+-- 2019-02-25新增三方服务管理权限（开发者以上级别拥有）
+INSERT INTO `tenant_permission_group` (`group_name`) VALUES ('三方服务相关');
+
+INSERT INTO `tenant_user_permission` (`codename`, `per_info`, `is_select`, `per_explanation`, `group`) VALUES ('add_endpoint', '添加实例', 1, NULL, 4);
+INSERT INTO `tenant_user_permission` (`codename`, `per_info`, `is_select`, `per_explanation`, `group`) VALUES ('delete_endpoint', '删除实例', 1, NULL, 4);
+INSERT INTO `tenant_user_permission` (`codename`, `per_info`, `is_select`, `per_explanation`, `group`) VALUES ('put_endpoint', '修改实例上下线', 1, NULL, 4);
+INSERT INTO `tenant_user_permission` (`codename`, `per_info`, `is_select`, `per_explanation`, `group`) VALUES ('health_detection', '编辑健康检测', 1, NULL, 4);
+INSERT INTO `tenant_user_permission` (`codename`, `per_info`, `is_select`, `per_explanation`, `group`) VALUES ('reset_secret_key', '重置秘钥', 1, NULL, 4);
+INSERT INTO `tenant_user_permission` (`codename`, `per_info`, `is_select`, `per_explanation`, `group`) VALUES ('create_three_service', '创建三方服务', 1, NULL, 4);
+
+
+
+
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (1, 31);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (1, 32);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (1, 33);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (1, 34);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (1, 35);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (1, 36);
+
+
+
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (2, 31);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (2, 32);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (2, 33);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (2, 34);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (2, 35);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (2, 36);
+
+
+
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (3, 31);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (3, 32);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (3, 33);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (3, 34);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (3, 35);
+INSERT INTO `tenant_user_role_permission` (`role_id`, `per_id`) VALUES (3, 36);
+
+-- 2019-03-12新增网关自定义配置表
+CREATE TABLE `gateway_custom_configuration` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `rule_id` varchar(32),
+  `value` text,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+
+
+-- **2019-03-18修改云市表唯一索引字段值，删除原有索引，添加新索引
+
+drop index `group_key` on rainbond_center_app;
+
+ALTER TABLE `rainbond_center_app` ADD UNIQUE ( `group_key`, `version`, `enterprise_id`);
+
+-- **2019-04-12在service_source表中增加group_key, version, service_share_uuid字段，用于记录云市信息
+alter table service_source add column group_key varchar(32) null comment "group of service from market";
+alter table service_source add column `version` varchar(32) null comment "version of service from market";
+alter table service_source add column service_share_uuid varchar(65) null comment "unique identification of service from market";
+
+-- **2019-04-10在service_webhooks表中增加trigger字段，用来进行webhook触发匹配
+alter table service_webhooks add `trigger` varchar(256) not null default '';
+
+-- **2019-04-11在compose_group表中增加hub_user,hub_pass字段,统一记录账号密码
+alter table compose_group add `hub_user` varchar(256) not null default '';
+
+alter table compose_group add `hub_pass` varchar(256) not null default '';
+
+
+-- **2019-04-28 增加 云市应用升级记录表、云市服务升级记录表
+create table `app_upgrade_record`
+(
+    `ID`          int         not null auto_increment,
+    `tenant_id`   varchar(33) not null,
+    `group_id`    int         not null,
+    `group_key`   varchar(32) not null,
+    `group_name`  varchar(64) not null,
+    `version`     varchar(20) not null,
+    `old_version` varchar(20) not null,
+    `status`      tinyint     not null,
+    `create_time` timestamp   not null default current_timestamp,
+    `update_time` timestamp   not null default current_timestamp on update current_timestamp(3),
+    primary key (`ID`)
+)
+    ENGINE = InnoDB
+    AUTO_INCREMENT = 38
+    DEFAULT CHARSET = utf8;
+
+
+create table `service_upgrade_record`
+(
+    `ID`                       int          not null auto_increment,
+    `app_upgrade_record_id`    int          not null,
+    `service_id`               varchar(32)  not null,
+    `service_cname`            varchar(100) not null,
+    `upgrade_type`             varchar(20)  not null,
+    `event_id`                 varchar(32)  not null,
+    `update`                   longtext     not null,
+    `status`                   tinyint      not null,
+    `create_time`              timestamp    not null default current_timestamp,
+    `update_time`              timestamp    not null default current_timestamp on update current_timestamp(3),
+    primary key (`ID`)
+)
+    ENGINE = InnoDB
+    AUTO_INCREMENT = 38
+    DEFAULT CHARSET = utf8;
+
+DROP TABLE IF EXISTS `tenant_service_backup`;
+CREATE TABLE `tenant_service_backup` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `region_name` varchar(32) NOT NULL,
+  `tenant_id` varchar(32) NOT NULL,
+  `service_id` varchar(32) NOT NULL,
+  `backup_id` varchar(32) NOT NULL,
+  `backup_data` longtext NOT NULL,
+  `create_time` datetime(6) DEFAULT NULL,
+  `update_time` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `backup_id` (`backup_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=250 DEFAULT CHARSET=utf8;
+
+-- **2019-05-15 增加唯一索引
+alter table gateway_custom_configuration
+    modify rule_id varchar(32) unique not null;
+alter table tenant_service modify `version` varchar(255);

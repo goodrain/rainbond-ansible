@@ -2,72 +2,63 @@
 - hosts: all
   roles:
     - { role: rainvar, tags: default }
+    - { role: bootstrap, tags: bootstrap }
     - { role: prepare, tags: prepare }
 
-- hosts: deploy:master:worker:lb
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
-    - { role: docker, tags: docker }
+    - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
 
-- hosts: deploy
+- hosts: manage:new-compute:new-gateway
   roles:
     - { role: rainvar, tags: default }
-    - { role: image, tags: image }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: storage/nas, when: "storage_type == 'nas'" }
+    - { role: storage/gfs, when: "storage_type == 'gfs'" }
 
-- hosts: etcd
+- hosts: manage:new-compute:new-gateway
   roles:
     - { role: rainvar, tags: default }
-    - { role: etcd, tags: etcd }
+    - { role: docker/install, tags: docker }
 
-- hosts: master
+- hosts: manage
   roles:
     - { role: rainvar, tags: default }
-    - { role: kube-master, tags: kube-master }
+    - { role: docker/image, tags: image }
+    - { role: etcd/manage, tags: etcd }
+    - { role: k8s/manage, tags: kube-master }
 
-- hosts: worker
+- hosts: new-compute
   roles:
     - { role: rainvar, tags: default }
-    - { role: kube-worker, tags: kube-worker }
-    - { role: etcd-proxy, tags: etcd-proxy }
+    - { role: k8s/compute, tags: kube-worker }
+    - { role: etcd/compute, tags: etcd-proxy }
 
-- hosts: master:worker
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: health, tags: health }
-
-- hosts: master:worker:lb
+- hosts: manage:new-compute:new-gateway
   roles:
   - { role: rainvar, tags: default }
   - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
   - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
 
-- hosts: master[0]
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
-    - { role: db, tags: db }
+    - { role: db, tags: db, when: "net_type == 'internal'" }
 
-- hosts: storage
+- hosts: new-gateway
   roles:
     - { role: rainvar, tags: default }
-    - { role: storage/nfs/server, when: "storage_type == 'nfs'" }
+    - { role: gateway, tags: gateway }
 
-- hosts: master:worker:lb
+- hosts: manage:new-compute
   roles:
     - { role: rainvar, tags: default }
-    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: monitor, tags: monitor }
+    - { role: node/core, tags: node }
 
-- hosts: lb
+- hosts: manage[0]
   roles:
     - { role: rainvar, tags: default }
-    - { role: lb, tags: lb }
-
-- hosts: master:worker
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: node, tags: node }
-
-- hosts: deploy
-  roles:
-    - { role: rainvar, tags: default }
-    - { role: nodeinit, tags: nodeinit}
-#    - { role: nodeup, tags: nodeup }
+    - { role: node/init, tags: nodeinit}
+    - { role: node/up, tags: nodeup }

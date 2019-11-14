@@ -1,6 +1,7 @@
-rainbond_version: 5.0
-kubernetes_version: v1.10.11
-docker_version: 17.06.2.ce
+r6d_version: V5.1-dev
+rainbond_version: 5.1.5
+kubernetes_version: v1.10.13
+docker_version: 18.06
 docker_selinux_version: '17.03'
 docker_log_opts: "--log-opt max-size=50m --log-opt max-file=5"
 docker_kernel_min_version: '3.10'
@@ -8,21 +9,33 @@ docker_daemon_graph: "/var/lib/docker"
 etcd_version: v3.2.25
 calico_version: v3.3.1
 install_type: online
+deploy_type: onenode
+enable_check: enable
 bin_dir: "/usr/local/bin"
 rbd_dir: "/opt/rainbond"
 base_dir: "/opt/rainbond/rainbond-ansible"
 ca_dir: "{{ rbd_dir }}/etc/kubernetes/ssl"
 local_tools: "{{ rbd_dir }}/etc/tools"
-local_imgaes: "{{ rbd_dir }}/rainbond-ansible/offline/images"
+local_offline: "{{ rbd_dir }}/offline"
+ex_data: "{{ rbd_dir }}/etc/exdata"
 kubecfg_dir: "{{ rbd_dir }}/etc/kubernetes/kubecfg"
 node_role_dir: "{{ rbd_dir }}/conf"
 env_dir: "{{ rbd_dir }}/envs"
 script_dir: "{{ rbd_dir }}/scripts"
 region_ca_dir: "{{ rbd_dir }}/etc/rbd-api/region.goodrain.me/ssl"
 secretkey: aek0yi7ro5AJaeg5ooRoMie2owu4raeT
-rbd_db_image: rbd-db:{{ rainbond_version }}
+rbd_db_image: rbd-db:latest
 db_user: write
 db_pass: 1833efe4
+db_port: 3306
+db_host: 127.0.0.1
+dbcs_user: write
+dbcs_pass: 1833efe4
+dbcs_port: 3306
+dbcs_host: 127.0.0.1
+db_type: mysql
+net_type: internal
+enable_console: false
 
 override_system_hostname: true
 #kube_pods_subnet: 10.233.64.0/18
@@ -37,9 +50,8 @@ kube_apiserver_ip: "{{ kube_service_addresses|ipaddr(1)|ipaddr('address') }}"
 kube_dns_server: "{{ kube_service_addresses|ipaddr(10)|ipaddr('address') }}"
 rainbond_domain: "kubeapi.goodrain.me goodrain.me repo.goodrain.me lang.goodrain.me maven.goodrain.me region.goodrain.me"
 
-MASTER_IP: "{{hostvars[groups['master'][0]]['ip']|default(hostvars[groups['master'][0]]['ansible_default_ipv4']['address'])}}"
-
-KUBE_APISERVER: "https://kubeapi.goodrain.me:6443"
+master_ip: "{{hostvars[groups['manage'][0]]['ip']}}"
+kube_apiserver: "https://kubeapi.goodrain.me:6443"
 
 # k8s
 etcd_image: etcd:{{ etcd_version }}
@@ -56,32 +68,63 @@ hub: rbd-registry:2.6.2
 kubecfg: kubecfg:dev
 cfssl: cfssl:dev
 
-builder: builder:{{ rainbond_version }}
-runner: runner:{{ rainbond_version }}
-adapter: adapter:{{ rainbond_version }}
-repo: rbd-repo:{{ rainbond_version }}
-api: rbd-api:{{ rainbond_version }}
-worker: rbd-worker:{{ rainbond_version }}
-eventlog: rbd-eventlog:{{ rainbond_version }}
-gateway: rbd-gateway:{{ rainbond_version }}
-chaos: rbd-chaos:{{ rainbond_version }}
-mq: rbd-mq:{{ rainbond_version }}
-webcli: rbd-webcli:{{ rainbond_version }}
-rbd_app_ui: rbd-app-ui:{{ rainbond_version }}
-k8s_cni: cni:k8s_{{ rainbond_version }}
-rbd_cni: cni:rbd_{{ rainbond_version }}
-dns: rbd-dns:{{ rainbond_version }}
-monitor: rbd-monitor:{{ rainbond_version }}
+builder: builder
+runner: runner
+adapter: adapter
+repo: rbd-repo:6.5.9
+api: rbd-api:{{ r6d_version }}
+worker: rbd-worker:{{ r6d_version }}
+eventlog: rbd-eventlog:{{ r6d_version }}
+gateway: rbd-gateway:{{ r6d_version }}
+chaos: rbd-chaos:{{ r6d_version }}
+mq: rbd-mq:{{ r6d_version }}
+webcli: rbd-webcli:{{ r6d_version }}
+rbd_app_ui: rbd-app-ui:{{ r6d_version }}
+k8s_cni: cni:k8s
+rbd_cni: cni:rbd_{{ r6d_version }}
+dns: rbd-dns
+monitor: rbd-monitor:{{ r6d_version }}
 
 CLUSTER_NETWORK: calico
 service_cidr: 11.1.0.1/12
 pod_cidr: 10.20.0.0/16
 
+install_ssh_port: 22
 app_domain: pass.example.com
 
 storage_type: nfs
+storage_path: "/grdata"
+storage_cmd: ""
 default_dns_local: 114.114.114.114 
-DOCKER_BRIDGE_IP: 172.30.42.1
+docker_bridge_ip: 172.30.42.1
 
-#FLANNEL_BACKEND: "vxlan"
-FLANNEL_BACKEND: host-gw
+#flannel_backend: "vxlan"
+flannel_backend: host-gw
+
+etcd_port_c1: 2379
+etcd_port_c2: 4001
+etcd_port_s1: 2380
+
+install_logs_dir: "/tmp/install"
+
+## eid
+enterprise_id: "5887587af6dafeefb192b1dbff6c518d"
+dev_mode: debug
+
+## region
+region_id: "1234567890"
+region_name: "rainbond"
+region_alias: "默认私有数据中心"
+region_url: "https://region.goodrain.me:8443"
+region_desc: "当前数据中心是默认安装添加的数据中心"
+ssl_ca_cert: "{{ region_ca_dir }}/ca.pem"
+client_cert_file: "{{ region_ca_dir }}/client.key.pem"
+client_key_file: "{{ region_ca_dir }}/client.pem"
+
+base_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-10-20-5.1.8.tgz"
+base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2019-10-20-5.1.8.sha256sum.txt"
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-10-20-5.1.8.tgz"
+rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2019-10-20-5.1.8.sha256sum.txt"
+
+install_ui: true
+master_external_ip: "{{hostvars[groups['manage'][0]]['ip']}}"

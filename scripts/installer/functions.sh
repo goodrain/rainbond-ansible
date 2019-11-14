@@ -1,7 +1,23 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Copyright 2019 The Goodrain Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 # make sure we have a UID
 [ -z "${UID}" ] && UID="$(id -u)"
+
+export PATH="${PATH}:/usr/local/bin"
 
 # checking the availability of commands
 
@@ -14,6 +30,8 @@ check_cmd() {
 	which_cmd "${1}" >/dev/null 2>&1 && return 0
 	return 1
 }
+
+# -----------------------------------------------------------------------------
 
 setup_terminal() {
 	TPUT_RESET=""
@@ -78,11 +96,26 @@ setup_terminal() {
 
 	return 0
 }
-
 setup_terminal || echo >/dev/null
 
 progress() {
 	echo >&2 " --- ${TPUT_DIM}${TPUT_BOLD}${*}${TPUT_RESET} --- "
+}
+
+ESCAPED_PRINT_METHOD=
+printf "%q " test >/dev/null 2>&1
+[ $? -eq 0 ] && ESCAPED_PRINT_METHOD="printfq"
+escaped_print() {
+	if [ "${ESCAPED_PRINT_METHOD}" = "printfq" ]; then
+		printf "%q " "${@}"
+	else
+		printf "%s" "${*}"
+	fi
+	return 0
+}
+
+info() {
+	echo >&2 " > ${TPUT_WHITE}${TPUT_BOLD} ${1} ${TPUT_RESET} ${TPUT_GREEN}${2}${TPUT_RESET} "
 }
 
 run_ok() {
@@ -91,6 +124,11 @@ run_ok() {
 
 run_failed() {
 	printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+}
+
+notice() {
+	printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} !!! ${TPUT_RESET} ${*} \n\n"
+	exit 1
 }
 
 run_logfile="/dev/null"
@@ -125,4 +163,16 @@ run() {
 	fi
 
 	return ${ret}
+}
+
+get_default_ip(){
+	ip=$(ip addr | grep inet | grep -Ev 'inet6|docker0| lo' | awk '{print $2}' | awk -F/ '{print $1}' | head -1)
+	echo ${ip}
+}
+
+
+get_token(){
+	local entoken=$1
+	detoken=$(echo -n $entoken | base64 -d)
+	echo ${detoken}
 }

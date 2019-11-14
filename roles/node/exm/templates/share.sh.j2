@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "{{ master_ip }}:/opt/rainbond/etc/tools /opt/rainbond/etc/tools nfs rw 0 0" >> /etc/fstab
+echo "{{ master_ip }}:/opt/rainbond/offline /opt/rainbond/offline nfs rw 0 0" >> /etc/fstab
+echo "{{ master_ip }}:/opt/rainbond/.init /opt/rainbond/.init nfs rw 0 0" >> /etc/fstab
+echo "{{ master_ip }}:/opt/rainbond/rainbond-ansible /opt/rainbond/rainbond-ansible nfs rw 0 0">> /etc/fstab
+
+mount -a
+
+df -h | grep "/opt/rainbond/rainbond-ansible"
+
+if [ "$?" -eq 0 ];then
+    touch /tmp/.grdata.share
+fi

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+exec docker \
+  run \
+  --privileged \
+  --restart=always \
+  --net=host \
+  --name etcd-proxy \
+  goodrain.me/{{ etcd_image }} \
+  /usr/local/bin/etcd \
+  grpc-proxy start \
+  --endpoints={{ etcd_access_addresses }} \
+  --listen-addr=127.0.0.1:{{ etcd_port_c1 }}

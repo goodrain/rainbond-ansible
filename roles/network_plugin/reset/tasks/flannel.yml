@@ -1,0 +1,27 @@
+---
+- name: stop flanneld
+  shell: node service stop flanneld && cclear
+
+- name: disable flanneld
+  shell: systemctl disable flanneld && systemctl stop flanneld
+
+- name: remove flanneld config
+  shell: mv /opt/rainbond/health/network.sh /opt/rainbond/health/network.sh.bak && mv /opt/rainbond/conf/network.yaml /opt/rainbond/conf/network.yaml.bak
+
+- name: down flannel interface
+  shell: ip link del flannel.1;ip link del cni0
+
+- name: remove flannel cni config  
+  shell: mv /opt/rainbond/etc/cni/10-flannel.conflist /tmp/
+
+- name: restart kubelet
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: kubelet
+
+- name: restart node
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: node

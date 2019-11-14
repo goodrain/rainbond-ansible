@@ -1,0 +1,4 @@
+- hosts: all
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: upgrade, tags: upgrade }

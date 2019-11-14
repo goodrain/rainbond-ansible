@@ -1,25 +1,18 @@
 ---
-- name: Rainbond | Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
+- name: Nfs | copy check storage
+  template:
+    src: check_storage.sh.j2
+    dest: /tmp/install/check_storage.sh
+    mode: 0777
 
-- name: Rainbond | Include overrides specific to RHEL 7.
-  include_vars: RedHat-7.yml
-  when:
-    - ansible_os_family == 'RedHat'
-    - ansible_distribution_major_version == "7"
+- name: Nfs | run check storage
+  shell: "bash /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
 
-- include_tasks: setup-RedHat.yml
-  when: ansible_os_family == 'RedHat'
+- name: Nfs | check init 
+  stat: path=/tmp/.grdata.init
+  register: check_grdata_server
 
-- include_tasks: setup-Debian.yml
-  when: ansible_os_family == 'Debian'
-
-- name: Ensure directories to export exist
-  file: 'path="/grdata" state=directory'
-
-
-- name: Ensure nfs is running.
-  service: "name={{ nfs_server_daemon }} state=started enabled=yes"
+- import_tasks: config.yml
 
 - name: Copy exports file.
   template:
@@ -29,18 +22,28 @@
     group: root
     mode: 0644
   notify: reload nfs
+  when: check_grdata_server.stat.isreg is not defined
+
+- name: Copy exports file.
+  template:
+    src: exports.only.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload nfs
+  when: check_grdata_server.stat.isreg is defined
 
 - name: Update exports
   shell: "exportfs -ra"
 
-
 - name: Health | Copy health storage check
   template:
     src: check.sh.j2
-    dest: /tmp/check_storage.sh
+    dest: /tmp/install/check_storage.sh
     owner: root
     group: root
     mode: 0777
 
 - name: Health | Run health storage check
-  shell: "bash /tmp/check_storage.sh"
+  shell: "bash /tmp/install/check_storage.sh > /tmp/install/check_storage.log"

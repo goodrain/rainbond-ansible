@@ -4,7 +4,7 @@ Param(
     [parameter(Mandatory = $false)] $serviceCIDR="10.96.0.0/12",
     [parameter(Mandatory = $false)] $KubeDnsSuffix="svc.cluster.local",
     [parameter(Mandatory = $false)] $InterfaceName="Ethernet",
-    [parameter(Mandatory = $false)] $LogDir = "c:\rainbond",
+    [parameter(Mandatory = $false)] $LogDir = "c:\rainbond\log",
     [parameter(Mandatory = $false)] $HostID = "",
     [ValidateSet("process", "hyperv")] $IsolationType="process",
     $NetworkName = "cbr0",
@@ -141,8 +141,8 @@ Update-CNIConfig $podCIDR
 
 if ($IsolationType -ieq "process")
 {
-    c:\k\kubelet.exe --hostname-override=$HostID --v=2 `
-        --pod-infra-container-image=kubeletwin/pause --resolv-conf="" `
+    c:\rainbond\kubelet.exe --hostname-override=$HostID --v=2 `
+        --pod-infra-container-image=goodrain.me/win-pause:1803 --resolv-conf="" `
         --allow-privileged=true --enable-debugging-handlers `
         --cluster-dns=$KubeDnsServiceIp --cluster-domain=cluster.local `
         --kubeconfig="$WorkingDir\config" --hairpin-mode=promiscuous-bridge `
@@ -152,8 +152,8 @@ if ($IsolationType -ieq "process")
 }
 elseif ($IsolationType -ieq "hyperv")
 {
-    c:\k\kubelet.exe --hostname-override=$HostID --v=2 `
-        --pod-infra-container-image=kubeletwin/pause --resolv-conf="" `
+    c:\rainbond\kubelet.exe --hostname-override=$HostID --v=2 `
+        --pod-infra-container-image=goodrain.me/win-pause:1803 --resolv-conf="" `
         --allow-privileged=true --enable-debugging-handlers `
         --cluster-dns=$KubeDnsServiceIp --cluster-domain=cluster.local `
         --kubeconfig="$WorkingDir\config" --hairpin-mode=promiscuous-bridge `

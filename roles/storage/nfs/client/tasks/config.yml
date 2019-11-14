@@ -1,0 +1,8 @@
+---
+- name: check nfs server
+  stat: path="/grdata/services/storage/health.check"
+  register: check_server
+
+- name: configure /etc/fstab on clients
+  action: mount name={{nfsmount}} src={{nfsserver}}:{{nfspath}} fstype=nfs opts={{nfsoptions}} state=mounted
+  when: check_server.stat.isreg is not defined

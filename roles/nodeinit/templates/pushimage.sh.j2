@@ -1,3 +1,0 @@
-#!/bin/bash
-
-docker images | grep "goodrain.me" | awk '{print $1":"$2}' | xargs -I {} docker push {}

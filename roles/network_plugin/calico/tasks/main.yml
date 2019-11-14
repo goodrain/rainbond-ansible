@@ -1,24 +1,42 @@
 ---
-- name: K8S | pull calico from goodrain.me
+- name: run if image is pulled
+  command: /usr/local/bin/check_img calico
+
+- name: check if image is pulled
+  stat: path="/tmp/install/check_calico_img"
+  register: check_calico_img
+
+- name: pull calico from goodrain.me
   shell: "docker pull goodrain.me/{{ calico_image }}"
-  ignore_errors: "true"
+  when: check_calico_img.stat.isreg is not defined
 
-- name: Rainbond | Copy Calico Service
+- name: delete if nodename is existing
+  file: path=/var/lib/calico/nodename state=absent
+
+- name: Copy Network Role
   template:
-    src: calico.service.j2
-    dest: /etc/systemd/system/calico.service
+    src: network.role.j2
+    dest: "{{ node_role_dir }}/network.yaml"
 
-- name: Rainbond | Copy Calico Service
+- name: Copy calico conf
   template:
     src: calico.conf.j2
     dest: /opt/rainbond/etc/cni/10-calico.conf
 
-
-- name: Rainbond | Copy calicoctl binary from deploy
+- name: Copy calicoctl binary from deploy
   copy:
     src: "{{ local_tools }}/bin/calicoctl"
     dest: "{{ bin_dir }}/calicoctl"
     mode: 0755
 
-- name: Rainbond | start calico
-  shell: "systemctl daemon-reload && systemctl enable calico && systemctl start calico"
+- name: Copy calicoctl cfg
+  template:
+    src: calicoctl.cfg.j2
+    dest: /etc/calico/calicoctl.cfg
+
+- name: Add Calico Health Check
+  template:
+    src: "network_{{ CLUSTER_NETWORK }}.sh.j2"
+    dest: "{{ rbd_dir }}/health/network.sh"
+    mode: 0777
+  tags: health

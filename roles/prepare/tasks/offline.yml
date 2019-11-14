@@ -1,0 +1,42 @@
+---
+- name: Configure the initialization data directory
+  file: path=/opt/rainbond/.init state=directory
+
+- name: Create the yum source backup folder
+  file: path=/etc/yum.repos.d/backup state=directory
+  when: ansible_distribution == "CentOS"
+
+- name: Determines whether the installation type is offline
+  stat: path=/opt/rainbond/.init/.offline
+  register: offline_repo
+
+- name: Delete default CentOS source
+  shell: mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup && touch /opt/rainbond/.init/.offline
+  when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
+
+- name:  Add Offline CentOS Repository
+  template: src=rainbond.repo.j2 dest=/etc/yum.repos.d/rainbond.repo
+  when: ansible_distribution == "CentOS" and offline_repo.stat.isreg is not defined
+
+- name: Delete default Ubuntu source
+  shell: mv -f /etc/apt/sources.list /etc/apt/sources.list.bak && touch /opt/rainbond/.init/.offline
+  when: ansible_distribution == "Ubuntu" and offline_repo.stat.isreg is not defined
+
+- name: Add Offline Ubuntu Repository
+  template:
+    src: /etc/apt/sources.list.d/local_rainbond.list
+    dest: /etc/apt/sources.list.d/local_rainbond.list
+  when: ansible_distribution == "Ubuntu" and offline_repo.stat.isreg is not defined
+
+- name: Copy pkgs into /opt/rainbond/offline
+  copy:
+    src: /opt/rainbond/offline/pkgs
+    dest: /opt/rainbond/offline
+  when: offline_repo.stat.isreg is not defined
+
+
+- name: Clear default cache
+  command: yum clean all
+  args:
+    warn: no
+  when: ansible_distribution == "CentOS"

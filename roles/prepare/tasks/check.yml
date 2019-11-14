@@ -1,36 +1,95 @@
 ---
-- name: Check | Stop if ansible version is too low
+- name: Stop if ansible version is too low
   assert:
     that:
       - ansible_version.full|version_compare('2.3.0', '>=')
   run_once: yes
 
-- name: Check | Stop if non systemd OS type
+- name: Stop if non systemd OS type
   assert:
     that: ansible_service_mgr == "systemd"
-  ignore_errors: "true"
+  ignore_errors: true
 
-- name: Check | Stop if unknown OS
+- name: Stop if unknown OS
   assert:
-    that: ansible_distribution in [ 'CentOS','RedHat','Debian','Ubuntu']
-  ignore_errors: "false"
+    that: ansible_distribution in [ 'CentOS','RedHat','Debian','Ubuntu','redhat-7']
+  ignore_errors: false
 
-- name: Check | Stop if memory is too small for masters
-  assert:
-    that: ansible_memtotal_mb >= 3500
-  ignore_errors: "false"
-  when: inventory_hostname in groups['master']
+- name: Stop if cpu is sufficient for manages
+  fail:
+    msg: "This machine does not have sufficient CPU to run Rainbond, at least {{ r6d_min_cpu }} cores."
+  when:
+    - inventory_hostname in groups['manage'] 
+    - enable_check == "enable" 
+    - ansible_processor_vcpus < r6d_min_cpu|int
 
-- name: Check | Stop if memory is too small for workers
-  assert:
-    that: ansible_memtotal_mb >= 3500
-  ignore_errors: "false"
-  when: inventory_hostname in groups['worker']
+- name: Stop if cpu is sufficient for computes
+  fail:
+    msg: "This machine does not have sufficient CPU to run Rainbond, at least {{ r6d_min_cpu }} cores."
+  when:
+    - inventory_hostname in groups['compute'] 
+    - enable_check == "enable" 
+    - ansible_processor_vcpus < r6d_min_cpu|int
 
-- name: Check | minimum kernel version
+- name: Stop if memory is too small for manages
+  fail:
+    msg: "This machine does not have sufficient RAM to run Rainbond, at least {{ r6d_min_ram }} MB."
+  when: 
+    - inventory_hostname in groups['manage'] 
+    - enable_check == "enable" 
+    - ansible_memtotal_mb < r6d_min_ram|int
+
+- name: Stop if memory is too small for computes
+  fail:
+    msg: "This machine does not have sufficient RAM to run Rainbond, at least {{ r6d_min_ram }} MB."
+  when: 
+    - inventory_hostname in groups['compute'] 
+    - enable_check == "enable" 
+    - ansible_memtotal_mb < r6d_min_ram|int
+
+- name: Determine which mountpoint deploy dir exists on
+  shell: "df / | tail -n1 | awk '{print $NF}'"
+  register: deploy_partition
+  changed_when: False
+
+- set_fact:
+    r6d_disk_alert: "true"
+  when:
+    - item.mount == deploy_partition.stdout
+    - item.size_available < r6d_min_disk|int
+    - enable_check == "enable"
+  with_items: "{{ ansible_mounts }}"
+
+- name: Stop if disk is too small for all
+  debug:
+    msg: 'The file system mounted at {{ deploy_partition.stdout }} does not meet minimum disk space requirement: at least {{ r6d_min_disk/1000000000 }} GB.'
+  when: 
+    - r6d_disk_alert is defined
+    - r6d_disk_alert
+    - enable_check == "enable"
+
+- name: minimum kernel version
   fail:
     msg: >
           docker requires a minimum kernel version of
           {{ docker_kernel_min_version }} on
           {{ ansible_distribution }}-{{ ansible_distribution_version }}
   when: ansible_kernel is version(docker_kernel_min_version, "<")
+
+#- name: Preflight check - Linux OS family and distribution version
+#  fail:
+#    msg: "System versions lower than Red Hat Enterprise Linux / CentOS 7.3 have been deprecated. Please use CentOS 7.3 and above. See https://www.rainbond.com/docs/user-operations/op-guide/recommendation/"
+#  when: 
+#    - ansible_os_family == 'RedHat' 
+#    - ansible_distribution in ['CentOS', 'RedHat']
+#    - ansible_distribution_version != '7'
+
+- name: Preflight check - Check Linux kernel overcommit_memory parameter
+  shell: "sysctl -n vm.overcommit_memory"
+  become: true
+  register: vm_overcommit_memory
+
+- name: Preflight check - Fail when Linux kernel vm.overcommit_memory parameter is set to 2
+  fail:
+    msg: "It is not recommended to set vm.overcommit_memory to 2, set it to 0 or 1."
+  when: vm_overcommit_memory.stdout | int == 2

@@ -1,5 +1,0 @@
----
-- name: Rainbond | Copy LB Role
-  template:
-    src: lb.role.j2
-    dest: "{{ node_role_dir }}/lb.yaml"

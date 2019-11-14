@@ -1,0 +1,9 @@
+---
+worker_access_address: "{{hostvars[inventory_hostname]['ip']}}"
+etcd_endpoints: |-
+  {%- for item in groups['etcd'] -%}
+    {{ "etcd"+loop.index|string }}=http://{{hostvars[item]['ip']}}:{{ etcd_port_c1 }}{%- if not loop.last -%},{%- endif -%}
+  {%- endfor -%}
+kube_reserved: "cpu=300m,memory=512Mi,ephemeral-storage=1Gi"
+system_reserved: "cpu=700m,memory=1024Mi,ephemeral-storage=1Gi"
+max_pods: 10000

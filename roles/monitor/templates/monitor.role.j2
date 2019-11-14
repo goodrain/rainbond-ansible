@@ -1,0 +1,30 @@
+version: '2.1'
+services:
+- name: rbd-monitor
+  endpoints:
+  - name: MONITOR_ENDPOINTS
+    protocol: http
+    port: 3329
+  - name: PROMETHEUS_ENDPOINTS
+    protocol: http
+    port: 9999
+  health:
+    name: rbd-monitor
+    model: http
+    address: 127.0.0.1:3329/monitor/health
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-monitor
+  start: >-
+    docker run --name rbd-monitor
+    --network host
+    -v {{ rbd_dir }}/data/prom:/prometheusdata
+    -v {{ rbd_dir }}/etc/prom/config:/etc/prometheus/config
+    -i goodrain.me/{{ monitor }}
+    --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ nodeip }}:9999 --alertmanager-address={{ nodeip }}:9093  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/config/prometheus.yml --rules-config.file=/etc/prometheus/config/rules.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
+  stop: docker stop rbd-monitor
+  restart_policy: always
+  restart_sec: 10

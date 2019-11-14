@@ -1,0 +1,24 @@
+---
+- name: remove ntp pkg
+  package: name=ntp state=absent
+
+- name: install chrony pkg
+  package: name=chrony state=present
+
+- block:
+  - name: config chrony server 
+    template: src=server-centos.conf.j2 dest=/etc/chrony.conf
+    when: (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7"
+
+  - name: start chrony server
+    service: name=chronyd state=restarted enabled=yes
+    when: (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7"
+
+- block:
+  - name: config chrony client
+    template: src=client-centos.conf.j2 dest=/etc/chrony.conf
+    when: (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7"
+
+  - name: start chrony client 
+    service: name=chronyd state=restarted enabled=yes
+    when: (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7"

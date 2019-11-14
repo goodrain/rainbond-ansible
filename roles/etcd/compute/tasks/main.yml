@@ -1,0 +1,46 @@
+---
+- name: Etcd-proxy | run if image is pulled
+  command: /usr/local/bin/check_img etcd
+
+- name: Etcd-proxy | check if image is pulled
+  stat: path="/tmp/install/check_etcd_img"
+  register: check_etcd_proxy_img
+
+- name: Etcd-proxy | pull etcd from goodrain.me
+  shell: "docker pull goodrain.me/{{ etcd_image }}"
+  when: check_etcd_proxy_img.stat.isreg is not defined
+
+- name: Etcd-proxy | check etcd run status on master
+  stat: path="{{ node_role_dir }}/etcd.yaml"
+  register: etcd_is_on_worker
+
+- name: Etcd-proxy | Copy Etcd Proxy Role
+  template:
+    src: etcd-proxy.role.j2
+    dest: "{{ node_role_dir }}/etcd-proxy.yaml"
+  when: etcd_is_on_worker.stat.isreg is not defined
+
+- name: Etcd-proxy | Copy Etcd Proxy Role Script
+  template:
+    src: start-etcd-proxy.sh.j2
+    dest: "{{ script_dir }}/start-etcd-proxy.sh"
+    mode: 0777
+  when: etcd_is_on_worker.stat.isreg is not defined
+
+- name: Etcd-proxy | Copy Etcd Proxy Service
+  template:
+    src: etcd-proxy.service.j2
+    dest: /etc/systemd/system/etcd-proxy.service
+  when: etcd_is_on_worker.stat.isreg is not defined
+
+- name: Etcd-proxy | Copy etcdctl binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/etcdctl"
+    dest: "{{ bin_dir }}/etcdctl"
+    mode: 0755
+  when: etcd_is_on_worker.stat.isreg is not defined
+
+- name: Etcd-proxy | start etcd-proxy
+  shell: "systemctl daemon-reload && systemctl enable etcd-proxy && systemctl start etcd-proxy"
+  when: etcd_is_on_worker.stat.isreg is not defined
+

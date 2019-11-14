@@ -1,0 +1,5 @@
+---
+- name: Monitor | Copy Monitor Role
+  template:
+    src: monitor.role.j2
+    dest: "{{ node_role_dir }}/monitor.yaml"

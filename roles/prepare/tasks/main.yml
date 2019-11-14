@@ -1,4 +1,17 @@
 ---
+- name: populate rainbond into hosts file
+  blockinfile:
+    dest: /etc/hosts
+    block: |-
+      {{hostvars[groups['manage'][0]]['ip']}}  {{ rainbond_domain }}
+    state: present
+    create: yes
+    backup: yes
+    marker: "# Rainbond hosts {mark}"
+
+- import_tasks: offline.yml
+  when: install_type == "offline"
+
 - import_tasks: check.yml
 
 - import_tasks: debian.yml
@@ -9,5 +22,4 @@
 
 - import_tasks: setup-pipelining.yml
 
-# General configuration
 - import_tasks: common.yml 

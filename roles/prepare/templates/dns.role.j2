@@ -1,0 +1,33 @@
+version: '2.1'
+services:
+- name: rbd-dns
+  endpoints:
+  - name: DNS_ENDPOINTS
+    protocol: udp
+    port: 53
+  health:
+    name: rbd-dns
+    model: tcp
+    address: {{ nodeip }}:53
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-dns
+  start: >-
+    docker run --name rbd-dns
+    --network host
+    -e VERBOSE=true
+    -v {{ kubecfg_dir }}:/opt/rainbond/etc/kubernetes/kubecfg
+    -i goodrain.me/{{ dns }}
+    --kubecfg-file={{ kubecfg_dir }}/admin.kubeconfig
+    --v=2
+    --healthz-port=8089
+    --dns-bind-address={{ nodeip }}
+    --nameservers={{ default_dns_local }},1.2.4.8
+    --recoders=goodrain.me={{ master_ip }},*.goodrain.me={{ master_ip }}{% if install_type == "offline" %},*.{{ app_domain }}={{ master_ip }}{% endif %}
+
+  stop: docker stop rbd-dns
+  restart_policy: always
+  restart_sec: 10

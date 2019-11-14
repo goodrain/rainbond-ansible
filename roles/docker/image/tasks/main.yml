@@ -1,0 +1,14 @@
+---
+- name: online download image tgz
+  import_tasks: dl_image_tgz.yml
+  when: install_type == "online"
+
+- name: import image from local
+  import_tasks: import_images.yml
+
+- name: Copy cni & certificates
+  import_tasks: rsync.yml
+
+- name: Copy offline pkgs
+  import_tasks: import_pkgs.yml
+  when: install_type == "offline"

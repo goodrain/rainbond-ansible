@@ -1,9 +1,0 @@
-#!/bin/bash
-
-uid=$(grctl node list | grep compute | awk '{print $2}')
-
-if [ ! -z "$uid" ];then
-    echo $uid | tr ' ' '\n' | xargs -I {} grctl node up {}
-else
-    exit 0
-fi

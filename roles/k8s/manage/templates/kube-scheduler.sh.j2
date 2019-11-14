@@ -1,0 +1,23 @@
+#!/bin/bash
+
+KUBE_LOGTOSTDERR="--logtostderr=true"
+KUBE_LOG_LEVEL="--v=2"
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+KUBE_MASTER="--master=http://127.0.0.1:8080"
+
+KUBE_SCHEDULER_ARGS="   --address=0.0.0.0 \
+                        --leader-elect=true \
+                        --algorithm-provider=DefaultProvider"
+
+exec  docker \
+    run \
+    --privileged \
+    --restart=always \
+    --net=host \
+    --name kube-scheduler \
+    --volume={{ rbd_dir }}/etc/kubernetes:/opt/rainbond/etc/kubernetes \
+    goodrain.me/{{ kubernetes_image }} scheduler \
+            $KUBE_LOGTOSTDERR \
+            $KUBE_LOG_LEVEL \
+            $KUBE_MASTER \
+            $KUBE_SCHEDULER_ARGS

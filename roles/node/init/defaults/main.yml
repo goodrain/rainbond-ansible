@@ -1,0 +1,2 @@
+---
+gatewayip: "{{hostvars[groups['gateway'][0]]['ip']}}"

@@ -1,0 +1,36 @@
+version: '2.1'
+services:
+- name: rbd-app-ui
+  endpoints:
+  - name: APP_UI_ENDPOINTS
+    protocol: http
+    port: 7070
+  health:
+    name: rbd-app-ui
+    model: http
+    address: 127.0.0.1:7070
+    max_errors_num: 3
+    time_interval: 20
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-app-ui
+  start: >-
+    docker run --name rbd-app-ui
+    --network host
+    -e MANAGE_SECRET_KEY={{ secretkey }} {% if dev_mode == "goodrain" %} -e ENTERPRISE_ID={{ enterprise_id }} {% endif %}
+
+    -e MYSQL_HOST={{ dbcs_host }}
+    -e MYSQL_PORT={{ dbcs_port }}
+    -e MYSQL_USER={{ dbcs_user }}
+    -e MYSQL_PASS={{ dbcs_pass }}
+    -e MYSQL_DB=console
+    -v {{ rbd_dir }}/.init:/initdata
+    -v /grdata/services/console/uidata:/app/ui/data
+    -v /grdata/services/console/data:/data
+    -v {{ rbd_dir }}/etc/rbd-api:/etc/goodrain
+    -v {{ rbd_dir }}/logs/rbd-app-ui:/app/logs
+    -i goodrain.me/{{ rbd_app_ui }}
+  stop: docker stop rbd-app-ui
+  restart_policy: always
+  restart_sec: 10

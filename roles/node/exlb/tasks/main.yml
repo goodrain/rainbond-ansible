@@ -1,0 +1,46 @@
+---
+- name: Rainbond | Copy kubeconfig from deploy
+  copy:
+    src: "{{  kubecfg_dir }}/admin.kubeconfig"
+    dest: "/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig"
+    mode: 0755
+
+- name: Rainbond | Copy node binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/node"
+    dest: "{{ bin_dir }}/node"
+    mode: 0755
+
+- name: Rainbond | Prepare check node uuid
+  template:
+    src: node_uuid.sh.j2
+    dest: /tmp/install/node_uuid.sh
+    mode: 0777
+
+- name: Rainbond | Write node uuid
+  shell: "bash /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
+
+- name: Rainbond | Copy Node Script
+  template:
+    src: start-node.sh.j2
+    dest: "{{ script_dir }}/start-node.sh"
+    mode: 0755
+
+- name: Rainbond | Copy Node Env
+  template:
+    src: node.sh.j2
+    dest: "{{ env_dir }}/node.sh"
+    mode: 0755
+
+- name: Rainbond | Copy Node Services
+  template:
+    src: node.service.j2
+    dest: /etc/systemd/system/node.service
+
+- name: Rainbond | Start Node
+  shell: "systemctl daemon-reload && systemctl enable node && systemctl start node"
+
+- name: Rainbond | Restart Node
+  service:
+    name: node
+    state: restarted

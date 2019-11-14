@@ -1,0 +1,52 @@
+---
+- name: Rainbond | Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Rainbond | Include overrides specific to RHEL 7.
+  include_vars: RedHat-7.yml
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version == "7"
+
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure nfs is running.
+  service: "name={{ nfs_server_daemon }} state=started enabled=yes"
+
+- name: check grdata for rainbond
+  file: name={{ item }} state=directory
+  with_items:
+    - /grdata/services/ssh
+    - /grdata/services/storage
+    - /grdata/services/offline/images
+    - /grdata/kubernetes
+
+- name: deploy check ssh
+  stat: path="/root/.ssh/id_rsa.pub"
+  register: deploy_check_ssh
+  delegate_to: "{{ groups.manage[0] }}"
+
+- name: Copy ssh pub key as builder pub key
+  copy:
+    src: /root/.ssh/id_rsa.pub
+    dest: /grdata/services/ssh/builder_rsa.pub
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined
+
+- name: Copy ssh key as builder key
+  copy:
+    src: /root/.ssh/id_rsa
+    dest: /grdata/services/ssh/builder_rsa
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined
+
+- name: Copy ssh config 
+  copy:
+    src: "{{ base_dir }}/hack/files/ssh/config"
+    dest: /grdata/services/ssh/config
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined

@@ -1,0 +1,180 @@
+version: '2.1'
+services:
+- name: rbd-api
+  endpoints:
+  - name: API_ENDPOINTS
+    protocol: http
+    port: 8888
+  health:
+    name: rbd-api
+    model: http
+    address: 127.0.0.1:8888/v2/health
+    max_errors_num: 3
+    time_interval: 10
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-api
+  start: >-
+    docker run --name rbd-api
+    --network host
+    -e LicenseSwitch="off"
+    -e EX_DOMAIN={{ app_domain }}
+    -v /grdata:/grdata
+    -v /grdata/downloads/log:/grdata/logs
+    -v {{ rbd_dir }}/etc/rbd-api:/etc/goodrain
+    -v {{ kubecfg_dir }}:/opt/rainbond/etc/kubernetes/kubecfg
+    -v {{ rbd_dir }}/logs/docker_logs:/data/docker_logs
+    -v {{ rbd_dir }}/logs/rbd-api:/logs
+    -i goodrain.me/{{ api }}
+    --etcd=${ETCD_ENDPOINTS}
+    --api-addr-ssl=0.0.0.0:8443
+    --api-addr=127.0.0.1:8888
+    --log-level=info
+    --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region"
+    --api-ssl-enable=true
+    --api-ssl-certfile=/etc/goodrain/region.goodrain.me/ssl/server.pem
+    --api-ssl-keyfile=/etc/goodrain/region.goodrain.me/ssl/server.key.pem
+    --client-ca-file=/etc/goodrain/region.goodrain.me/ssl/ca.pem
+  stop: docker stop rbd-api
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-chaos
+  endpoints:
+  - name: CHAOS_ENDPOINTS
+    protocol: http
+    port: 3228
+  health:
+    name: rbd-chaos
+    model: http
+    address: 127.0.0.1:3228/v2/builder/health
+    max_errors_num: 3
+    time_interval: 10
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-chaos
+  start: >-
+    docker run --name rbd-chaos
+    --network host
+    -e SOURCE_DIR="/cache/source"
+    -e CACHE_DIR="/cache"
+    -v /logs:/logs
+    -v /grdata:/grdata
+    -v /cache:/cache
+    -v /var/run:/var/run
+    -v /grdata/services/ssh:/root/.ssh
+    -i goodrain.me/{{ chaos }}
+    --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }} --log-level=info --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region"
+  stop: docker stop rbd-chaos
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-mq
+  endpoints:
+  - name: MQ_ENDPOINTS
+    protocol: http
+    port: 6301
+  health:
+    name: rbd-mq
+    model: http
+    address: 127.0.0.1:6301/health
+    max_errors_num: 3
+    time_interval: 10
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-mq
+  start: >-
+    docker run --name rbd-mq
+    --network host
+    -i goodrain.me/{{ mq }}
+    --log-level=info --etcd-endpoints=${ETCD_ENDPOINTS} --hostIP={{ nodeip }}
+  stop: docker stop rbd-mq
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-webcli
+  endpoints:
+  - name: WEBCLI_ENDPOINTS
+    protocol: http
+    port: 7171
+  health:
+    name: rbd-webcli
+    model: http
+    address: 127.0.0.1:7171/health
+    max_errors_num: 3
+    time_interval: 10
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-webcli
+  start: >-
+    docker run --name rbd-webcli
+    --network host
+    -v /usr/local/bin/kubectl:/usr/bin/kubectl
+    -v /root/.kube:/root/.kube
+    -i goodrain.me/{{ webcli }}
+    --hostIP={{ nodeip }} --etcd-endpoints=${ETCD_ENDPOINTS}
+  stop: docker stop rbd-webcli
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-worker
+  endpoints:
+  - name: WORKER_ENDPOINTS
+    protocol: http
+    port: 6369
+  health:
+    name: rbd-worker
+    model: http
+    address: 127.0.0.1:6369/worker/health
+    max_errors_num: 3
+    time_interval: 10
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-worker
+  start: >-
+    docker run --name rbd-worker
+    --network host
+    -e K8S_MASTER=http://127.0.0.1:8181
+    -e EX_DOMAIN={{ app_domain }}
+    -e docker_bridge_ip={{ docker_bridge_ip }}
+    -v {{ kubecfg_dir }}:/etc/goodrain/kubernetes
+    -v /grdata:/grdata
+    -i goodrain.me/{{ worker }}
+    --log-level=info
+    --host-ip={{ nodeip }}
+    --etcd-endpoints=${ETCD_ENDPOINTS}
+    --node-name={{ inventory_hostname }}
+    --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
+    --mysql="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region"
+  stop: docker stop rbd-worker
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-eventlog
+  endpoints:
+  - name: EVENTLOG_ENDPOINTS
+    protocol: http
+    port: 6363
+  health:
+    name: rbd-eventlog
+    model: http
+    address: {{ nodeip }}:6363/health
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-eventlog
+  start: >-
+    docker run --name rbd-eventlog
+    --network host
+    -e K8S_MASTER=http://127.0.0.1:8181
+    -e DOCKER_LOG_SAVE_DAY=7
+    -v {{ rbd_dir }}/logs/rbd-eventlog:/var/log
+    -v /grdata/downloads/log:/grdata/logs
+    -v /opt/rainbond/etc/node:/opt/rainbond/etc/node
+    -i goodrain.me/{{ eventlog }}
+    --cluster.bind.ip={{ nodeip }} --cluster.instance.ip={{ nodeip }} --db.type=mysql --db.url="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ nodeip }} --websocket.bind.ip={{ nodeip }}
+  stop: docker stop rbd-eventlog
+  restart_policy: always
+  restart_sec: 10

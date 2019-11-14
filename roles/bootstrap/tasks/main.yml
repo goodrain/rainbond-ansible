@@ -1,0 +1,60 @@
+- name: gather facts
+  setup:
+    gather_timeout: 30
+
+- name: setting absent kernel params
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    ignoreerrors: yes
+    state: absent
+  with_items:
+    - { name: 'net.ipv4.tcp_tw_recycle', value: 0 }
+  when: tuning_kernel_parameters
+
+- name: setting present kernel params
+  sysctl: name="{{ item.name }}" value="{{ item.value }}" ignoreerrors=yes state=present
+  with_items:
+    - { name: 'net.core.somaxconn', value: 32768 }
+    - { name: 'vm.swappiness', value: 0 }
+    - { name: 'net.ipv4.tcp_syncookies', value: 0 }
+    - { name: 'fs.file-max', value: 1000000 }
+  when: tuning_kernel_parameters
+
+- name: disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+# modify irqbalance configuration file
+- name: check centos configuration file exists
+  stat: path=/etc/sysconfig/irqbalance
+  register: centos_irq_config_file
+
+- name: check debian configuration file exists
+  stat: path=/etc/default/irqbalance
+  register: debian_irq_config_file
+
+- name: modify centos irqbalance configuration file
+  lineinfile:
+    dest=/etc/sysconfig/irqbalance
+    regexp='(?<!_)ONESHOT='
+    line='ONESHOT=yes'
+  when:
+    - tuning_irqbalance_value
+    - centos_irq_config_file.stat.exists
+
+- name: modify debian irqbalance configuration file
+  lineinfile:
+    dest=/etc/default/irqbalance
+    regexp='ONESHOT='
+    line='ONESHOT="1"'
+  when:
+    - tuning_irqbalance_value
+    - debian_irq_config_file.stat.exists
+
+# start irqbalance value
+- name: start irqbalance service
+  service: name=irqbalance state=started
+  ignore_errors: true
+  when: tuning_irqbalance_value

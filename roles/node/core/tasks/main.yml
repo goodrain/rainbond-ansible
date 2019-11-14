@@ -1,0 +1,150 @@
+---
+- name: Rainbond | check cni bin
+  stat: path="{{ rbd_dir }}/bin/calico"
+  register: re_cni_is_done
+
+- name: Rainbond | Copy cni bin
+  copy: src={{ item }} dest={{ rbd_dir }}/bin owner=root mode=777
+  with_fileglob:
+    - "{{ rbd_dir }}/etc/tools/cni/bin/*"
+  when: re_cni_is_done.stat.isreg is not defined
+
+- name: Rainbond | Copy tools
+  copy: src={{ item }} dest={{ bin_dir }} owner=root mode=777
+  with_fileglob:
+    - "{{ rbd_dir }}/etc/tools/bin/*"
+  when: re_cni_is_done.stat.isreg is not defined
+
+- name: Rainbond | check kubecfg
+  stat: path="{{ kubecfg_dir }}/token.csv"
+  register: ck_kubecfg_is_done
+
+- name: Rainbond | Copy kubecfg
+  copy: src={{ item }} dest={{ kubecfg_dir }}
+  with_fileglob:
+    - "{{ kubecfg_dir }}/*"
+  when: ck_kubecfg_is_done.stat.isreg is not defined
+
+- name: Rainbond | check ssl
+  stat: path="{{ ca_dir }}/ca.pem"
+  register: ck_ssl_is_done
+
+- name: Rainbond | Copy ssl
+  copy: src={{ item }} dest={{ ca_dir }}
+  with_fileglob:
+    - "{{ ca_dir }}/*"
+  when: ck_ssl_is_done.stat.isreg is not defined
+
+- name: Rainbond | check region ssl
+  stat: path="{{ ssl_ca_cert }}"
+  register: ck_ca_ssl_is_done
+
+- name: Rainbond | Copy region ssl
+  copy: src={{ item }} dest={{ region_ca_dir }}
+  with_fileglob:
+    - "{{ region_ca_dir }}/*"
+  when: ck_ca_ssl_is_done.stat.isreg is not defined
+
+- name: copy private key
+  copy:
+    src: /grdata/services/ssh/builder_rsa
+    dest: /root/.ssh/id_rsa
+    mode: 0600
+    backup: yes
+
+- name: copy public key
+  copy:
+    src: /grdata/services/ssh/builder_rsa.pub
+    dest: /root/.ssh/id_rsa.pub
+    mode: 0644
+    backup: yes
+
+- name: copy kubeconfig from deploy
+  copy:
+    src: "{{  kubecfg_dir }}/admin.kubeconfig"
+    dest: "/root/.kube/config"
+    mode: 0755
+
+- name: copy node binary from deploy
+  copy:
+    src: "{{ local_tools }}/bin/node"
+    dest: "{{ bin_dir }}/node"
+    mode: 0755
+
+- name: prepare check node uuid
+  template:
+    src: node_uuid.sh.j2
+    dest: /tmp/install/node_uuid.sh
+    mode: 0777
+
+- name: config node uuid
+  shell: "bash /tmp/install/node_uuid.sh > /tmp/install/write_node.log"
+
+- name: add manage node master.yaml
+  template:
+    src: master.role.j2
+    dest: "{{ node_role_dir }}/master.yaml"
+  when: inventory_hostname in groups['manage'] + groups['new-manage']
+
+- name: add manage node ui.yaml
+  template:
+    src: ui.role.j2
+    dest: "{{ node_role_dir }}/ui.yaml"
+  when: inventory_hostname in groups['manage'] and install_ui == true
+
+- name: add manage node base.yaml
+  template:
+    src: base.role.j2
+    dest: "{{ node_role_dir }}/base.yaml"
+  when: inventory_hostname in groups['manage'] + groups['new-manage']
+
+#- name: Rainbond | Copy Master Worker Role
+#  template:
+#    src: worker.role.j2
+#    dest: "{{ node_role_dir }}/worker.yaml"
+#  when: inventory_hostname in groups['compute']
+
+- name: Thirdparty | check k8s master
+  stat: path=/etc/kubernetes/manifests/kube-apiserver.yaml
+  register: check_k8s_master
+
+- name: Thirdparty | Add Health Only Health Role
+  template:
+    src: thirdparty-k8s-master.yaml.j2
+    dest: "{{ node_role_dir }}/thirdparty_k8s_master.yaml"
+  when: check_k8s_master.stat.isreg is defined and deploy_type == "thirdparty"
+
+- name: Thirdparty | check kubectl worker
+  stat: path=/etc/kubernetes/kubelet.conf
+  register: check_k8s_worker
+
+- name: Thirdparty | Add Health Only Health Role
+  template:
+    src: thirdparty-k8s-worker.yaml.j2
+    dest: "{{ node_role_dir }}/thirdparty_k8s_worker.yaml"
+  when: check_k8s_worker.stat.isreg is defined and deploy_type == "thirdparty" 
+
+- name: config node script
+  template:
+    src: start-node.sh.j2
+    dest: "{{ script_dir }}/start-node.sh"
+    mode: 0755
+
+- name: config node env
+  template:
+    src: node.sh.j2
+    dest: "{{ env_dir }}/node.sh"
+    mode: 0755
+
+- name: config node service
+  template:
+    src: node.service.j2
+    dest: /etc/systemd/system/node.service
+
+- name: start node service
+  shell: "systemctl daemon-reload && systemctl enable node && systemctl start node"
+
+- name: restart node service
+  service:
+    name: node
+    state: restarted

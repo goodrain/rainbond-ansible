@@ -1,0 +1,79 @@
+---
+- name: Nas | copy check storage
+  template:
+    src: check_storage.sh.j2
+    dest: /tmp/install/check_storage.sh
+    mode: 0777
+
+- name: Nas | run check storage
+  shell: "bash /tmp/install/check_storage.sh > /tmp/install/check_storage.log"
+
+- name: Nas | check grdata
+  stat: path=/tmp/.grdata.init
+  register: check_grdata
+
+- name: install nfs client debian
+  action: apt pkg=nfs-common state=present
+  when: ansible_os_family == 'Debian'
+
+- name: install nfs client centos
+  action: yum pkg=nfs-utils state=present
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure rpcbind is running (CentOS)
+  action: service name=rpcbind state=started enabled=yes
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure rpcbind is running (Debian)
+  action: service name=rpcbind state=started enabled=yes
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure /grdata directory exists
+  action: file path=/grdata state=directory
+
+- name: write /etc/fstab
+  blockinfile:
+    dest: /etc/fstab
+    block: |-
+        {{ storage_cmd }}
+    state: present
+    create: yes
+    backup: yes
+  when: check_grdata.stat.isreg is not defined
+
+- name: mount /grdata
+  shell: mount -a
+
+- name: check grdata for rainbond
+  file: name={{ item }} state=directory
+  with_items:
+    - /grdata/services/ssh
+    - /grdata/services/storage
+    - /grdata/services/offline/images
+    - /grdata/kubernetes
+
+- name: deploy check ssh
+  stat: path="/root/.ssh/id_rsa.pub"
+  register: deploy_check_ssh
+  delegate_to: "{{ groups.manage[0] }}"
+
+- name: Copy ssh pub key as builder pub key
+  copy:
+    src: /root/.ssh/id_rsa.pub
+    dest: /grdata/services/ssh/builder_rsa.pub
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined
+
+- name: Copy ssh key as builder key
+  copy:
+    src: /root/.ssh/id_rsa
+    dest: /grdata/services/ssh/builder_rsa
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined
+
+- name: Copy ssh config 
+  copy:
+    src: "{{ base_dir }}/hack/files/ssh/config"
+    dest: /grdata/services/ssh/config
+    mode: 0600
+  when: deploy_check_ssh.stat.isreg is defined

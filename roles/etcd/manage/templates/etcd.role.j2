@@ -1,0 +1,22 @@
+version: '2.1'
+services:
+- name: etcd
+  endpoints:
+  - name: ETCD_ENDPOINTS
+    protocol: http
+    port: {{ etcd_port_c1 }}
+  health:
+    name: etcd
+    model: tcp
+    address: 127.0.0.1:{{ etcd_port_c1 }}
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm etcd
+  is_init_start: true
+  start: {{ rbd_dir }}/scripts/start-etcd.sh
+  stop: docker stop etcd
+  restart_policy: always
+  restart_sec: 10

@@ -1,0 +1,17 @@
+---
+- hosts: new-manage
+  roles:
+    - { role: rainvar, tags: default }
+    - { role: bootstrap, tags: bootstrap }
+    - { role: prepare, tags: prepare }
+    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
+    - { role: storage/nas, when: "storage_type == 'nas'" }
+    - { role: storage/gfs, when: "storage_type == 'gfs'" }
+    - { role: docker/install, tags: docker }
+    - { role: k8s/manage, tags: kube-master }
+    - { role: etcd/manage, tags: etcd }
+    - { role: monitor, tags: monitor }
+    - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
+    - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
+    - { role: node/exm, tags: master }
+    - { role: node/core, tags: node }

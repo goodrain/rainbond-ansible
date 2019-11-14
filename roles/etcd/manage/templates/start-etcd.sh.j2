@@ -1,0 +1,41 @@
+#!/bin/sh
+
+ETCD_NAME={{ etcd_member_name }}
+ETCD_DATA_DIR="/data/etcd"
+ETCD_LISTEN_CLIENT_URLS="http://{{ etcd_access_address }}:{{ etcd_port_c1 }},http://{{ etcd_access_address }}:{{ etcd_port_c2 }},http://127.0.0.1:{{ etcd_port_c1 }},http://127.0.0.1:{{ etcd_port_c2 }}"
+ETCD_ADVERTISE_CLIENT_URLS="http://{{ etcd_access_address }}:{{ etcd_port_c1 }},http://{{ etcd_access_address }}:{{ etcd_port_c2 }}"
+ETCD_LISTEN_PEER_URLS="http://{{ etcd_access_address }}:{{ etcd_port_s1 }}"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="{{ etcd_peer_url }}"
+ETCD_INITIAL_CLUSTER="{{ etcd_peer_addresses }}"
+ETCD_INITIAL_CLUSTER_TOKEN="rainbond_k8s_etcd"
+
+NODE_NAME=$(echo $ETCD_INITIAL_CLUSTER | tr ',' '\n' | grep "{{ etcd_access_address }}" | awk -F= '{print $1}')
+[ -z "$ETCD_NAME" ] && ETCD_NAME=$NODE_NAME
+
+NODE_NUM=$(echo $ETCD_INITIAL_CLUSTER | tr ',' '\n' | wc -l)
+if [ "$NODE_NUM" -eq 1 ];then
+    ETCD_INITIAL_CLUSTER_STATE="new"
+else 
+    ETCD_INITIAL_CLUSTER_STATE="existing"
+fi
+
+exec docker \
+  run \
+  --privileged \
+  --restart=always \
+  --net=host \
+  --name etcd \
+  --volume={{ rbd_dir }}/data/etcd/:/data/etcd/ \
+  goodrain.me/{{ etcd_image }} \
+  /usr/local/bin/etcd \
+  --name ${ETCD_NAME} \
+  --data-dir ${ETCD_DATA_DIR} \
+  --listen-client-urls ${ETCD_LISTEN_CLIENT_URLS} \
+  --advertise-client-urls ${ETCD_ADVERTISE_CLIENT_URLS} \
+  --listen-peer-urls ${ETCD_LISTEN_PEER_URLS} \
+  --initial-advertise-peer-urls ${ETCD_INITIAL_ADVERTISE_PEER_URLS} \
+  --initial-cluster ${ETCD_INITIAL_CLUSTER} \
+  --initial-cluster-token ${ETCD_INITIAL_CLUSTER_TOKEN} \
+  --initial-cluster-state ${ETCD_INITIAL_CLUSTER_STATE:-existing} \
+  --auto-compaction-retention 1 \
+  --quota-backend-bytes=$((4*1024*1024*1024))
