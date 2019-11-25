@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -f /etc/docker/daemon.json ];then
+    grep goodrain.me /etc/docker/daemon.json || mv /opt/rainbond/scripts/daemon.json /etc/docker/daemon.json
+else
+    mv /opt/rainbond/scripts/daemon.json /etc/docker/daemon.json
+fi

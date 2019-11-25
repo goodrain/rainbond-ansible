@@ -4,9 +4,6 @@
     - { role: rainvar, tags: default }
     - { role: bootstrap, tags: bootstrap }
     - { role: prepare, tags: prepare }
-    - { role: storage/nfs/client, when: "storage_type == 'nfs'" }
-    - { role: storage/nas, when: "storage_type == 'nas'" }
-    - { role: storage/gfs, when: "storage_type == 'gfs'" }
     - { role: docker/install, tags: docker }
     - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
     - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }

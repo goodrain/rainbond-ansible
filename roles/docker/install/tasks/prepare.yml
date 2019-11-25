@@ -25,14 +25,22 @@
 - name: Write docker daemon For CentOS
   template: 
     src: daemon.json.centos.j2 
-    dest: /etc/docker/daemon.json
-  when: ansible_distribution == "CentOS" and docker_daemon_check.stat.isreg is not defined
+    dest: "{{ rbd_dir }}/scripts/daemon.json"
+  when: ansible_distribution == "CentOS" 
 
 - name: Write docker daemon For Debian/Ubuntu
   template: 
     src: daemon.json.j2 
-    dest: /etc/docker/daemon.json
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" and docker_daemon_check.stat.isreg is not defined
+    dest: "{{ rbd_dir }}/scripts/daemon.json"
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" 
+
+- name: Copy docker daemon
+  template: 
+    src: docker-daemon.sh.j2
+    dest: "{{ rbd_dir }}/scripts/docker-daemon.sh"
+
+- name: Check if daemon is existing
+  shell: "bash {{ rbd_dir }}/scripts/docker-daemon.sh"
 
 #- name: Write docker.service systemd file
 #  template:
