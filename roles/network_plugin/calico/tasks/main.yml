@@ -22,13 +22,13 @@
   template:
     src: calico.conf.j2
     dest: /opt/rainbond/etc/cni/10-calico.conf
-  when: inventory_hostname in groups['new-gateway'] and inventory_hostname in groups['new-manage']
+  when: noderule == "manage"  or noderule == "gateway"
 
 - name: Copy calico conf
   template:
     src: cp-calico.conf.j2
     dest: /opt/rainbond/etc/cni/10-calico.conf
-  when: inventory_hostname in groups['new-compute']
+  when: noderule == "compute"
 
 - name: Copy calicoctl binary from deploy
   copy:
