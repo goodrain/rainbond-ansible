@@ -23,11 +23,11 @@
     src: calico.conf.j2
     dest: /opt/rainbond/etc/cni/10-calico.conf
 
-- name: Copy calico conf
+- name: compute |Copy calico conf
   template:
     src: cp-calico.conf.j2
     dest: /opt/rainbond/etc/cni/10-calico.conf
-  when: inventory_hostname in groups['new-compute']
+  when: noderule == "compute"
 
 - name: Copy calicoctl binary from deploy
   copy:
