@@ -32,8 +32,8 @@ EOF
     exit 1
     else
      cat > /etc/resolv.conf <<EOF
+nameserver $LOCAL_DNS
 nameserver $VIP_DNS
-nameserver $MASTER_DNS
 nameserver $DEFALUT_DNS
 EOF
     exit 1
