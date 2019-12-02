@@ -181,6 +181,11 @@
     dest: "{{ rbd_dir }}/health/rbd-dns.sh"
     mode: 0777
 
+- name: Copy Domain.yaml
+  template:
+    src: "{{ rbd_dir }}/.init/domain.yaml"
+    dest: "/opt/rainbond/.init/domain.yaml"
+
 - name: Copy local Dns Health Check
   template:
     src: local-dns.sh.j2
