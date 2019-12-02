@@ -33,7 +33,7 @@ generate_region_sql(){
     cert_file_base=$(echo "${cert_file}" | base64 |xargs echo | sed s/[[:space:]]//g)
     DOMAIN={{ app_domain }}
     cat > /opt/rainbond/.init/region_info.sql <<EOF
-INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`,\`create_time\`) VALUES('{{ region_id }}', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file','0000-00-00 00:00:00.000000');
+INSERT INTO \`region_info\` ( \`region_id\`, \`region_name\`, \`region_alias\`, \`url\`, \`token\`, \`status\`, \`desc\`, \`wsurl\`, \`httpdomain\`, \`tcpdomain\`, \`scope\`, \`ssl_ca_cert\`,\`cert_file\`,\`key_file\`,\`create_time\`) VALUES('{{ region_id }}', '{{ region_name }}', '{{ region_alias }}', '{{ region_url }}', NULL, '1', '{{ region_desc }}', 'ws://$IP:6060', '$DOMAIN', '$IP', 'private','$ssl_ca_cert','$cert_file','$key_file','`date "+%Y-%m-%d %H:%M:%S"`');
 EOF
     cat > /opt/rainbond/.init/token <<EOF
 url: "{{ region_url }}"
