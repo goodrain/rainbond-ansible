@@ -4,7 +4,7 @@
   when: install_type == "online" and  ansible_distribution == "CentOS"
   
 - name: Rainbond | Install ansible Online
-  shell: "pip install ansible"
+  shell: "pip install ansible==2.8.5"
   when: install_type == "online"
 
 - name: Rainbond | Install ansible Offline
