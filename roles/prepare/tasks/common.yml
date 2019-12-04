@@ -205,10 +205,22 @@
     dest: "{{ node_role_dir }}/only_health.yaml"
   when: storage_type != "nfs"
 
+- name: Copy Health Only Health Role For Only gateway
+  template:
+    src: only_health.role.j2
+    dest: "{{ node_role_dir }}/only_health.yaml"
+  when: noderule == "gateway" and storage_type == "nfs"
+
 - name: Copy Health Role
   template:
     src: health.role.j2
     dest: "{{ node_role_dir }}/health.yaml"
+
+- name: Copy Health Role For Only Gateway
+  template:
+    src: health.role.gateway.j2
+    dest: "{{ node_role_dir }}/health.yaml"
+  when: noderule == "gateway"
 
 - name: Copy Storage Health Check
   template:
