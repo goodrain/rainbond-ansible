@@ -1,0 +1,20 @@
+version: '2.1'
+services:
+- name: local-dns
+  health:
+    name: local-dns
+    model: cmd
+    address: {{ rbd_dir }}/health/local-dns.sh
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - network.target
+  requires:
+    - network.target
+  only_health_check: true
+  disable: false
+  is_init_start: true
+  type: notify
+  start: none
+  restart_policy: always
+  restart_sec: 10
