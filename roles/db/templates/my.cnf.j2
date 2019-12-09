@@ -19,7 +19,6 @@
 user=mysql
 datadir=/data/mysql
 socket=/var/lib/mysql/mysql.sock
-sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 
 # Disabling symbolic-links is recommended to prevent assorted security risks
 symbolic-links=0
@@ -27,31 +26,32 @@ symbolic-links=0
 #log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 
-bind-address = 0.0.0.0
-max_connections=3000
-max_connect_errors=2000
-connect_timeout=10
-wait_timeout=7200
-interactive_timeout=7200
 skip-name-resolve
-max_allowed_packet=128M
-thread_cache_size=128
-sort_buffer_size=4M
-bulk_insert_buffer_size=16M
-tmp_table_size=32M
-max_heap_table_size=32M
-query_cache_size=40M
+bind-address = 0.0.0.0
+max_connections=2000
+max_connect_errors=1000
+key_buffer_size= 3840M
+max_allowed_packet = 16M
+sort_buffer_size = 32M
+read_buffer_size = 32M
+read_rnd_buffer_size = 32M
+query_cache_size = 256M
 
 # logbin
 gtid_mode=ON
-enforce_gtid_consistency=true
 server-id=2
-binlog_format=row
+sync-binlog=1
+auto_increment_offset = 1
+auto_increment_increment = 2
+enforce_gtid_consistency = on
+log-slave-updates=ON
+slave-skip-errors=all
 log_bin=/data/mysql/logbin
 log_bin_index=/data/mysql/logbin.index
 log_timestamps = SYSTEM
+
 #sync_binlog=1
-max_binlog_size=500M
+max_binlog_size=1G
 expire_logs_days=30
 
 # * InnoDB
@@ -62,7 +62,6 @@ innodb_file_per_table=1
 innodb_open_files=800
 innodb_io_capacity=400
 innodb_flush_method=O_DIRECT
-binlog_format=row
 innodb_log_file_size=128M
 
 character-set-server = utf8
@@ -76,4 +75,4 @@ default-character-set= utf8
 [mysqldump]
 quick
 quote-names
-max_allowed_packet	= 16M
+max_allowed_packet= 16M
