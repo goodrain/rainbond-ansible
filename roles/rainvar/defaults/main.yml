@@ -24,7 +24,7 @@ env_dir: "{{ rbd_dir }}/envs"
 script_dir: "{{ rbd_dir }}/scripts"
 region_ca_dir: "{{ rbd_dir }}/etc/rbd-api/region.goodrain.me/ssl"
 secretkey: aek0yi7ro5AJaeg5ooRoMie2owu4raeT
-rbd_db_image: rbd-db:latest
+rbd_db_image: rbd-db:v5.1.9
 db_user: write
 db_pass: 1833efe4
 db_port: 3306

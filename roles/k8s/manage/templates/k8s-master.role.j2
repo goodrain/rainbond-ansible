@@ -40,6 +40,7 @@ services:
     --service-account-key-file=/opt/rainbond/etc/kubernetes/ssl/ca-key.pem
     --logtostderr=true
     --service-cluster-ip-range={{ service_cidr }}
+    --enable-aggregator-routing=true
   stop: docker stop kube-apiserver
   restart_policy: always
   restart_sec: 10
