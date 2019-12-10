@@ -90,7 +90,10 @@ services:
   requires: []
   type: simple
   pre_start: docker rm metrics-server
-  start: docker run --name metrics-server --network host
+  start: docker run
+    --privileged
+    --name metrics-server
+    --network host
     -v /opt/rainbond/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -v /opt/rainbond/etc/metrics-server/ssl:/opt/rainbond/etc/metrics-server/ssl
     -i goodrain.me/metrics-server:v0.3.6
@@ -102,4 +105,5 @@ services:
   stop: docker stop rbd-monitor
   restart_policy: always
   restart_sec: "10"
+
 
