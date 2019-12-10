@@ -3,3 +3,8 @@
   template:
     src: monitor.role.j2
     dest: "{{ node_role_dir }}/monitor.yaml"
+
+- name: Monitor | Copy more monitoring
+  template:
+    src: external_monitor.yaml.j2
+    dest: "{{ node_role_dir }}/external_monitor.yaml"
