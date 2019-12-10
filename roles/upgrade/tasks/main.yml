@@ -26,16 +26,10 @@
     state: started
     name: node
 
-- name: Upgrade | Copy  monitor configuration file
+- name: Upgrade | Copy more monitoring
   template:
-    src: 5.1.8-5.1.9.monitor.j2
-    dest: "{{ node_role_dir }}/monitor.yaml"
-    when: inventory_hostname in groups['manage'] + groups['new-manage']
-
-- name: Upgrade | Copy apiserver configuration file
-  template:
-    src: 5.1.8-5.1.9.k8s.j2
-    dest: "{{ node_role_dir }}/k8s-master.yaml"
+    src:  5.1.8-5.1.9.external_monitor.yaml.j2
+    dest: "{{ node_role_dir }}/external_monitor.yaml"
     when: inventory_hostname in groups['manage'] + groups['new-manage']
 
 - name: Upgrade | Copy Image Upgrade Script
