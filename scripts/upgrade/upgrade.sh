@@ -20,6 +20,7 @@ IMAGE_PATH="/grdata/services/offline/upgrade"
 INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.9.tgz"
 
 # check /grdata disk remaining space
+echo -e "\033[35m Check disk space \033[0m"
 check_grdata=$(df -h | grep -c "/grdata$")
 if [ "$check_grdata" == 0 ]; then
     disk=$(df | grep "/$" | awk '{print $4}' | tr 'G' ' ')
@@ -29,7 +30,7 @@ fi
 DISK_LIMIT=6000000
 DISK_STATUS=$(awk -v num1="$disk" -v num2=$DISK_LIMIT 'BEGIN{print(num1>=num2)?"0":"1"}')
 if [ "$DISK_STATUS" -ne '0' ]; then
-    echo "!!! 磁盘(/grdata)至少可用空间大于6GB(now ${disk}GB)"
+    echo -e "\033[31m !!! 磁盘(/grdata)至少可用空间大于6GB(now ${disk}KB) \033[0m"
     exit 1
 fi
 
@@ -42,24 +43,26 @@ PLAN=$(awk -v num1=$DOCKER_DISK -v num2=$USE 'BEGIN{print(num1+num2)}')
 PlANNED=$(awk -v num3=$PLAN -v num4=$TOTAL_DISK 'BEGIN{printf("%.0f\n",num3/num4*100)}')
 # Spatial threshold
 DISK_HALF=80
-DOCKER_DISK=$(awk -v num1="$PLANNED" -v num2=$DISK_HALF 'BEGIN{print(num1<=num2)?"0":"1"}')
+DOCKER_DISK=$(awk -v num1=$PlANNED -v num2=$DISK_HALF 'BEGIN{print(num1<=num2)?"0":"1"}')
 if [ "$DOCKER_DISK" -ne '0' ]; then
-    echo "!!! 磁盘(/var/lib/docker)预估可用空间小于80%"
+    echo -e "\033[31m !!! 磁盘(/var/lib/docker)预估可用空间小于80% \033[0m"
     exit 1
 fi
+echo  -e "\033[32m Check that the remaining disk space passes \033[0m"
 
+echo -e "\033[35m Check current version \033[0m"
 version_check=$(grctl version | grep -c "5.1.")
 if [ "$version_check" -eq 0 ]; then
-    echo "请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803"
+    echo -e "\033[33m 请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803 \033[0m"
     exit 1
 fi
-
+echo  -e "\033[32m Check current version succeeded \033[0m"
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
-echo "tar xf rainbond.images, Please wait for completion."
+echo -e "\033[35m tar xf rainbond.images,Please wait a moment \033[0m"
 if [ -f "$IMAGE_R6D_LOCAL" ]; then
     tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH} && tar xf ${IMAGE_BASE} -C ${IMAGE_PATH}
 else
-    echo "$IMAGE_R6D_LOCAL not exist, please redownload and upgrade."
+    echo -e "\033[33m $IMAGE_R6D_LOCAL not exist, please redownload and upgrade. \033[0m"
     exit 1
 fi
 
@@ -112,51 +115,51 @@ EOF
 else
     echo "$INSTALL_SCRIPT not exist"
     exit 1
-fi    
-
-echo "start load docker image"
-pushd $IMAGE_PATH || exit 1
-ls | grep tgz | xargs -I {} docker load -i ./{}
-popd || exit 1
+fi
 
 for ((i=1;i<=60;i++));do
     sleep 1
     curl -sk --connect-timeout 10 --max-time 30 -I  https://goodrain.me/v2/ | head -1 | grep 200
     [ "$?" -eq 0 ] && export readyok="ok"  && break
 done
-echo "start load new version docker images"
-[ ! -z "$readyok" ] && docker images | grep "goodrain.me" | grep -vE "(2018|2019|kube)" | grep -E  "($version|rbd-mesh-data-panel)" | awk '{print $1":"$2}' | xargs -I {} docker push {}
 
-echo "load new version docker images success"
-echo "start load new version grctl and node"
+echo -e "\033[35m Start load and push new vension images \033[0m"
+while read line
+do
+	docker load -i $IMAGE_PATH/$line |awk -Fimage: '{print $2}' |xargs -I {} docker push {}
+done <<< "$(ls $IMAGE_PATH|grep tgz)"
+echo  -e "\033[32m load new version docker images success \033[0m"
+
+echo -e "\033[35m Start load new version grctl and node \033[0m"
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.$current_version
 mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.$current_version
 
 docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
 if [ $? -ne 0 ]; then
-    echo "load new version grctl and node failure"
+    echo -e "\033[31m load new version grctl and node failure \033[0m"
     exit 1
 else
-    echo "load new version grctl and node success"
+    echo  -e "\033[32m load new version grctl and node success \033[0m"
 fi
 export ANSIBLE_HOST_KEY_CHECKING=False
 # rewrite ansible hosts
 mkdir -p /opt/rainbond/rainbond-ansible/inventory
 /opt/rainbond/etc/tools/bin/grctl ansible hosts
 if [ $? -ne 0 ]; then
-    echo "Generate the ansible host list failure, Verify that the cluster is normal."
+    echo -e "\033[31m Generate the ansible host list failure, Verify that the cluster is normal. \033[0m"
     exit 1
 else
-    echo "Generate the ansible host list successfully"
+    echo  -e "\033[32m Generate the ansible host list successfully \033[0m"
 fi
 
 # ansible upgrade all node
+echo -e "\033[35m Execute ansible upgrade script \033[0m"
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml
 if [ $? -ne 0 ]; then
-    echo "ansible upgrade all node failure"
+    echo -e "\033[31m ansible upgrade all node failure \033[0m"
     exit 1
 else
-    echo "success upgrade by ansible"
+    echo  -e "\033[32m Success upgrade by ansible \033[0m"
 fi
 # clear data
 rm -rf ${IMAGE_PATH}
