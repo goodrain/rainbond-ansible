@@ -1,5 +1,5 @@
 r6d_version: V5.1-dev
-rainbond_version: 5.1.5
+rainbond_version: 5.1.9
 kubernetes_version: v1.10.13
 docker_version: 18.06
 docker_selinux_version: '17.03'

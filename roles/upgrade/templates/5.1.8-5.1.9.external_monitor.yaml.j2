@@ -1,0 +1,79 @@
+version: "2.1"
+services:
+- name: kube-state-metrics
+  endpoints:
+  - name: METRICS_ENDPOINTS
+    protocol: http
+    port: "9105"
+  health:
+    name: kube-state-metrics
+    model: http
+    address: 127.0.0.1:9105/healthz
+    time_interval: 5
+    max_errors_num: 3
+  only_health_check: false
+  is_init_start: false
+  disable: false
+  after:
+  - docker
+  requires: []
+  type: simple
+  pre_start: docker rm kube-state-metrics
+  start: docker run --name kube-state-metrics --network host -v /opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig:/admin.kubeconfig
+    -i goodrain.me/kube-state-metrics /kube-state-metrics --kubeconfig /admin.kubeconfig
+    --port 9105 --telemetry-port 9981
+  stop: docker stop kube-state-metrics
+  restart_policy: always
+  restart_sec: "10"
+
+- name: metrics-server
+  endpoints:
+  - name: METRICS_SERVER_ENDPOINTS
+    protocol: https
+    port: "4443"
+  health:
+    name: metrics-server
+    model: http
+    address: 127.0.0.1:4443/healthz
+    time_interval: 5
+    max_errors_num: 3
+  only_health_check: false
+  is_init_start: false
+  disable: false
+  after:
+  - docker
+  requires: []
+  type: simple
+  pre_start: docker rm metrics-server
+  start: docker run --privileged --name metrics-server --network host -v /opt/rainbond/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
+    -v /opt/rainbond/etc/metrics-server/ssl:/opt/rainbond/etc/metrics-server/ssl -i
+    goodrain.me/metrics-server:v0.3.6 --kubeconfig=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
+    --cert-dir=/opt/rainbond/etc/metrics-server/ssl --secure-port=4443 --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
+    --kubelet-insecure-tls
+  stop: docker stop metrics-server
+  restart_policy: always
+  restart_sec: "10"
+
+- name: mysqld-exporter
+  endpoints:
+  - name: MYSQLD_METRICS_ENDPOINTS
+    protocol: http
+    port: 9104
+  health:
+    name: mysqld-exporter
+    model: tcp
+    address: 127.0.0.1:9104
+    max_errors_num: 3
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm mysqld-exporter
+  start: >-
+    docker run --name mysqld-exporter
+    --network host
+    -e DATA_SOURCE_NAME="{{ db_user }}:{{ db_pass }}@tcp({{ db_host }}:{{ db_port }})/"
+    -i goodrain.me/mysqld-exporter
+  stop: docker stop mysqld-exporter
+  restart_policy: always
+  restart_sec: 10

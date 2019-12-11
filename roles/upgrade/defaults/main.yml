@@ -1,0 +1,2 @@
+---
+nodeip: "{{hostvars[inventory_hostname]['ip']}}"

@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.8.tgz"
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.9.tgz"
+IMAGE_BASE="/grdata/services/offline/base.images.2019-11-03-5.1.9.tgz"
 IMAGE_PATH="/grdata/services/offline/upgrade"
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.8.tgz"
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.9.tgz"
 
 # check /grdata disk remaining space
 check_grdata=$(df -h | grep -c "/grdata$")
@@ -41,7 +42,7 @@ fi
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
 echo "tar xf rainbond.images, Please wait for completion."
 if [ -f "$IMAGE_R6D_LOCAL" ]; then
-    tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH}
+    tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH} && tar xf ${IMAGE_BASE} -C ${IMAGE_PATH}
 else
     echo "$IMAGE_R6D_LOCAL not exist, please redownload and upgrade."
     exit 1
