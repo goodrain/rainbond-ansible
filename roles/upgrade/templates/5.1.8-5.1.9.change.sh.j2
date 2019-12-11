@@ -1,13 +1,11 @@
 #!/bin/bash
 
 if [ -f "/opt/rainbond/conf/monitor.yaml" ];then
-
-  sed -i -e '/rbd-monitor:/a\    --kube-state-metrics={{ nodeip }}:9105 --mysqld-exporter={{ nodeip }}:9104' /opt/rainbond/conf/monitor.yaml
-
+   cat /opt/rainbond/conf/monitor.yaml |grep kube-state-metrics || sed -i -e '/rbd-monitor:/a\    --kube-state-metrics={{ nodeip }}:9105 --mysqld-exporter={{ nodeip }}:9104' /opt/rainbond/conf/monitor.yaml
+   cat /opt/rainbond/conf/monitor.yaml |grep mysqld-exporter || sed -i -e '/rbd-monitor:/a\    --mysqld-exporter={{ nodeip }}:9104' /opt/rainbond/conf/monitor.yaml
 fi
 
 if [ -f "/opt/rainbond/conf/k8s-master.yaml" ];then
-
-  sed -i -e  '/kube-apiserver:/a\    --enable-aggregator-routing=true'  /opt/rainbond/conf/k8s-master.yaml
+    cat /opt/rainbond/conf/k8s-master.yaml |grep enable-aggregator-routing=true  || sed -i -e  '/kube-apiserver:/a\    --enable-aggregator-routing=true'  /opt/rainbond/conf/k8s-master.yaml
 
 fi
