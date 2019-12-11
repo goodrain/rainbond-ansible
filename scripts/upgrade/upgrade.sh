@@ -33,6 +33,21 @@ if [ "$DISK_STATUS" -ne '0' ]; then
     exit 1
 fi
 
+# Check the docker directory using half score
+TOTAL_DISK=$(df -Th| grep "/var/lib/docker" | awk '{print $3}' | tr 'G' ' '|head -1)
+DOCKER_DISK=$(df -Th| grep "/var/lib/docker" | awk '{print $4}' | tr 'G' ' '|head -1)
+# Occupancy space
+USE=6
+PLAN=$(awk -v num1=$DOCKER_DISK -v num2=$USE 'BEGIN{print(num1+num2)}')
+PlANNED=$(awk -v num3=$PLAN -v num4=$TOTAL_DISK 'BEGIN{printf("%.0f\n",num3/num4*100)}')
+# Spatial threshold
+DISK_HALF=80
+DOCKER_DISK=$(awk -v num1="$PLANNED" -v num2=$DISK_HALF 'BEGIN{print(num1<=num2)?"0":"1"}')
+if [ "$DOCKER_DISK" -ne '0' ]; then
+    echo "!!! 磁盘(/var/lib/docker)预估可用空间小于80%"
+    exit 1
+fi
+
 version_check=$(grctl version | grep -c "5.1.")
 if [ "$version_check" -eq 0 ]; then
     echo "请升级至5.1.0版本后在升级至5.1.x版本 https://t.goodrain.com/t/rainbond-v5-1-1/803"
