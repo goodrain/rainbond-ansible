@@ -45,7 +45,7 @@ PlANNED=$(awk -v num3=$PLAN -v num4=$TOTAL_DISK 'BEGIN{printf("%.0f\n",num3/num4
 DISK_HALF=80
 DOCKER_DISK=$(awk -v num1=$PlANNED -v num2=$DISK_HALF 'BEGIN{print(num1<=num2)?"0":"1"}')
 if [ "$DOCKER_DISK" -ne '0' ]; then
-    echo -e "\033[31m !!! 磁盘(/var/lib/docker)预估可用空间小于80% \033[0m"
+    echo -e "\033[31m !!! 预估磁盘(/var/lib/docker)使用率将超过80% \033[0m"
     exit 1
 fi
 echo  -e "\033[32m Check that the remaining disk space passes \033[0m"
