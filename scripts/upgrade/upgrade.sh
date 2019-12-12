@@ -15,7 +15,7 @@
 # limitations under the License.
 
 IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.9.tgz"
-IMAGE_BASE="/grdata/services/offline/base.images.2019-12-12-5.1.9.tgz"
+IMAGE_BASE="/grdata/services/offline/base.images.upgrade.5.1.9.tgz"
 IMAGE_PATH="/grdata/services/offline/upgrade"
 INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.9.tgz"
 
