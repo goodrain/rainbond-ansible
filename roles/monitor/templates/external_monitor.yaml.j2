@@ -6,7 +6,7 @@ services:
     protocol: http
     port: "9105"
   health:
-    name: ksm-health
+    name: kube-state-metrics
     model: http
     address: 127.0.0.1:9105/healthz
     time_interval: 5
@@ -32,7 +32,7 @@ services:
     protocol: https
     port: "4443"
   health:
-    name: ksm-health
+    name: metrics-server
     model: http
     address: 127.0.0.1:4443/healthz
     time_interval: 5
