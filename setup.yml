@@ -20,7 +20,7 @@
 - hosts: manage:new-compute:new-gateway
   roles:
     - { role: rainvar, tags: default }
-    - { role: docker/install, tags: docker }
+#    - { role: docker/install, tags: docker }
 
 - hosts: manage
   roles:
@@ -32,14 +32,14 @@
 - hosts: new-compute
   roles:
     - { role: rainvar, tags: default }
-    - { role: k8s/compute, tags: kube-worker }
-    - { role: etcd/compute, tags: etcd-proxy }
+#    - { role: k8s/compute, tags: kube-worker }
+#    - { role: etcd/compute, tags: etcd-proxy }
 
 - hosts: manage:new-compute:new-gateway
   roles:
   - { role: rainvar, tags: default }
-  - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
-  - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
+#  - { role: network_plugin/calico, when: "CLUSTER_NETWORK == 'calico'" }
+#  - { role: network_plugin/flannel, when: "CLUSTER_NETWORK == 'flannel'" }
 
 - hosts: manage[0]
   roles:

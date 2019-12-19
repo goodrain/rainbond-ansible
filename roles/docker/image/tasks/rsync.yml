@@ -39,7 +39,21 @@
   shell: "bash {{ script_dir }}/clean.ssl.sh"
 
 - name: Generate certificate
-  shell: docker run --rm -v {{ ca_dir }}:{{ ca_dir }} -v {{ region_ca_dir }}:{{ region_ca_dir }} -v {{ kubecfg_dir }}:{{ kubecfg_dir }} -v /grdata/kubernetes:/grdata/kubernetes rainbond/r6dctl:docker-cfg-certs kip {{ master_external_ip }}
+  shell: docker run --rm -v {{ region_ca_dir }}:{{ region_ca_dir }} rainbond/r6dctl:docker-cfg-certs kip {{ master_external_ip }}
   register: generate_certificate_task_result
   until: generate_certificate_task_result is succeeded
   retries: 5
+
+- name: copy kubeconfig
+  copy: src={{ item }} dest=/opt/rainbond/etc/kubernetes/kubecfg/
+  with_items:
+    - {{ k8s_config_dir }}/kubelet.kubeconfig
+    - {{ k8s_config_dir }}/kube-proxy.kubeconfig
+  mode: 0755
+
+- name: copy k8s admin.kubeconfig
+  copy: src=/root/.kube/config dest=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig mode=0755
+
+- name: copy k8s certificate
+  copy: src={{ k8s_certificate_dir }} dest=/opt/rainbond/etc/kubernetes/ssl/ mode=0755
+

@@ -59,11 +59,11 @@
     mode: 0644
     backup: yes
 
-- name: copy kubeconfig from deploy
-  copy:
-    src: "{{  kubecfg_dir }}/admin.kubeconfig"
-    dest: "/root/.kube/config"
-    mode: 0755
+#- name: copy kubeconfig from deploy
+#  copy:
+#    src: "{{  kubecfg_dir }}/admin.kubeconfig"
+#    dest: "/root/.kube/config"
+#    mode: 0755
 
 - name: copy node binary from deploy
   copy:

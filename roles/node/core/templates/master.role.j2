@@ -135,7 +135,7 @@ services:
   start: >-
     docker run --name rbd-worker
     --network host
-    -e K8S_MASTER=http://127.0.0.1:8181
+    -e K8S_MASTER={{ k8s_apiserver }}
     -e EX_DOMAIN={{ app_domain }}
     -e docker_bridge_ip={{ docker_bridge_ip }}
     -v {{ kubecfg_dir }}:/etc/goodrain/kubernetes
@@ -168,7 +168,7 @@ services:
   start: >-
     docker run --name rbd-eventlog
     --network host
-    -e K8S_MASTER=http://127.0.0.1:8181
+    -e K8S_MASTER={{ k8s_apiserver }}
     -e DOCKER_LOG_SAVE_DAY=7
     -v {{ rbd_dir }}/logs/rbd-eventlog:/var/log
     -v /grdata/downloads/log:/grdata/logs

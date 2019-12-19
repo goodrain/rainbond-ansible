@@ -1,5 +1,5 @@
 #!/bin/bash
 
-NODE_OPTS="--log-level=info --auto-scheduler=true --kube-conf={{ kubecfg_dir }}/admin.kubeconfig --etcd=http://127.0.0.1:{{ etcd_port_c1 }}   --hostIP={{ nodeip }} --run-mode {{ run_mode }} --noderule {{ noderule }}"
+NODE_OPTS="--log-level=info --auto-scheduler=true --kube-conf={{ kubecfg_dir }}/admin.kubeconfig --etcd={{ etcd_server }}:{{ etcd_port_c1 }}   --hostIP={{ nodeip }} --run-mode {{ run_mode }} --noderule {{ noderule }}"
 
 exec {{ bin_dir }}/node $NODE_OPTS

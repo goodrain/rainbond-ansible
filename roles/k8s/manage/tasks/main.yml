@@ -1,53 +1,8 @@
 ---
-- name: K8S | run if image is pulled
-  command: /usr/local/bin/check_img k8s
-
-- name: K8S | check if image is pulled
-  stat: path="/tmp/install/check_k8s_img"
-  register: check_k8s_img
-
-- name: K8S | pull kubernetes apiserver from goodrain.me
-  shell: "docker pull goodrain.me/{{ kube_apiserver_image }}"
-  when: check_k8s_img.stat.isreg is not defined
-
-- name: K8S | pull kubernetes controller_manager from goodrain.me
-  shell: "docker pull goodrain.me/{{ kube_controller_manager_image}}"
-  when: check_k8s_img.stat.isreg is not defined
-
-- name: K8S | pull kubernetes scheduler from goodrain.me
-  shell: "docker pull  goodrain.me/{{ kube_scheduler_image }}"
-  when: check_k8s_img.stat.isreg is not defined
-
 - name: Rainbond | Copy K8S Master Role
   template:
     src: k8s-master.role.j2
     dest: "{{ node_role_dir }}/k8s-master.yaml"
 
-- name: Rainbond | Copy Kube apiserver Script
-  template:
-    src: kube-apiserver.sh.j2
-    dest: "{{ script_dir }}/kube-apiserver.sh"
-    mode: 0777
-
-- name: Rainbond | Copy Kube controller-manager Script
-  template:
-    src: kube-controller-manager.sh.j2
-    dest: "{{ script_dir }}/kube-controller-manager.sh"
-    mode: 0777
-
-- name: Rainbond | Copy Kube scheduler Script
-  template:
-    src: kube-scheduler.sh.j2
-    dest: "{{ script_dir }}/kube-scheduler.sh"
-    mode: 0777
-
-- name: Rainbond | Copy Kube audit policy 
-  template:
-    src: audit-policy.yaml.j2
-    dest: "{{ kubecfg_dir }}/audit-policy.yaml"
-
-- name: Rainbond | Copy kubectl binary from deploy
-  copy:
-    src: "{{ local_tools }}/bin/hyperkube"
-    dest: "{{ bin_dir }}/kubectl"
-    mode: 0755
+- name: Copy kubectl
+  copy: src={{ kubectl_bin }} dest=/usr/local/bin/kubectl mode=0755

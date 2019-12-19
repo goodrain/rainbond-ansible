@@ -23,6 +23,12 @@
     dest: /tmp/install/check_registries.sh
     mode: 0777
 
+- name: check certs dir
+  file: name=/etc/docker/certs.d/goodrain.me/ state=directory
+
+- name: Copy goodrain.me crt
+  shell: "docker cp rbd-gateway:/var/run/nginx/conf/rainbond/ssl/server.crt /etc/docker/certs.d/goodrain.me/ca.crt"
+
 - name: Rainbond | Check local image registry
   shell: "bash /tmp/install/check_registries.sh > /tmp/install/check_registries.log"
 

@@ -562,6 +562,20 @@ EOF
     done
 }
 
+#下载easzup安装包
+download::kubeasz(){
+    [ -z KUBEASZ_RELEASE ] && KUBEASZ_RELEASE="2.1.0"
+    curl -C- -fLO --retry 3 https://github.com/easzlab/kubeasz/releases/download/${release}/easzup
+    mv ./easzup ~/easzup
+    chmod +x ~/easzup
+    ~/easzup -D
+}
+
+install::k8s(){
+    ~/easzup -S
+    docker exec -it kubeasz easzctl start-aio
+}
+
 # General preparation before installation
 prepare::general(){
     progress "Preparation before installation..."
@@ -603,6 +617,7 @@ prepare::general(){
     [ ! -z "$EIP" ] && config::region_url $EIP
     [ ! -z "$VIP" ] && config::region_url $VIP
     config::region_id
+    download::kubeasz
 }
 
 # 域名解析生效
@@ -629,23 +644,16 @@ prepare::r6d(){
         network="calico"
     fi
     info "Pod Network Provider" "${network}"
-    if [ -z "$POD_NETWORK_CIDR" ]; then
-	INET_IP=${IIP%%.*}
-        if [ "$NETWORK_TYPE" == "flannel" ]; then
-            pod_network_cidr="${flannel_pod_network_cidr}"
-        else
-            if [ "$INET_IP" != "192" ]; then
-                pod_network_cidr="${calico_pod_network_cidr}"
-            else
-                pod_network_cidr="${pod_network_cidr_10}"
-            fi
-        fi
+    if [ "network" ==  "calico" ];then
+        sed -i -r 's/(CLUSTER_NETWORK=).*/\1"calico"/' /etc/ansible/example/hosts.allinone
     else
-        pod_network_cidr="${POD_NETWORK_CIDR}"
+        sed -i -r 's/(CLUSTER_NETWORK=).*/\1"flannel"/' /etc/ansible/example/hosts.allinone
     fi
     info "Pod Network Cidr" "${pod_network_cidr}"
     sed -i -r "s/(^CLUSTER_NETWORK: ).*/\1$network/" roles/rainvar/defaults/main.yml
     sed -i -r "s#(^pod_cidr: ).*#\1$pod_network_cidr#" roles/rainvar/defaults/main.yml
+    sed -i -r 's/(metricsserver_install: ).*/\1"no"/' /etc/ansible/roles/cluster-addon/defaults/main.yml 
+    sed -i -r 's/(dashboard_install: ).*/\1"no"/' /etc/ansible/roles/cluster-addon/defaults/main.yml
 }
 
 # 3rd K8s preparation before installation
@@ -672,6 +680,7 @@ do_install::ok(){
 
 # Install the rainbond cluster
 do_install::r6d(){
+    install::k8s
     progress "Initialize the data center"
     if [ -z "$DRY_RUN" ]; then
         run ansible-playbook -i inventory/hosts -e noderule=$ROLE setup.yml

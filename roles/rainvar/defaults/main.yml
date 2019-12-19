@@ -101,9 +101,17 @@ docker_bridge_ip: 172.30.42.1
 #flannel_backend: "vxlan"
 flannel_backend: host-gw
 
+k8s_apiserver: http://{{ master_ip }}:8080
+k8s_config_dir: /etc/kubernetes/
+k8s_certificate_dir: {{ k8s_config_dir }}/ssl/
+kubectl_bin: /opt/kube/bin/kubectl
+
+
+etcd_server: http://127.0.0.1
 etcd_port_c1: 2379
 etcd_port_c2: 4001
 etcd_port_s1: 2380
+etcd_certificate_dir: /etc/etcd/ssl/
 
 install_logs_dir: "/tmp/install"
 
