@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.9.tgz"
-IMAGE_BASE="/grdata/services/offline/base.images.upgrade.5.1.9.tgz"
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.10.tgz"
+IMAGE_BASE="/grdata/services/offline/base.images.upgrade.5.1.10.tgz"
 IMAGE_PATH="/grdata/services/offline/upgrade"
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.9.tgz"
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.10.tgz"
 
 # check /grdata disk remaining space
 echo -e "\033[35m Check disk space \033[0m"
@@ -45,7 +45,7 @@ PlANNED=$(awk -v num3=$PLAN -v num4=$TOTAL_DISK 'BEGIN{printf("%.0f\n",num3/num4
 DISK_HALF=80
 DOCKER_DISK=$(awk -v num1=$PlANNED -v num2=$DISK_HALF 'BEGIN{print(num1<=num2)?"0":"1"}')
 if [ "$DOCKER_DISK" -ne '0' ]; then
-    echo -e "\033[31m !!! 预估磁盘(/var/lib/docker)使用率将超过80% \033[0m"
+    echo -e "\033[31m !!! 预估磁盘(/var/lib/docker)使用率将超过80%,请参照官方文档清理磁盘空间（https://t.goodrain.com/t/topic/1317/2） \033[0m"
     exit 1
 fi
 echo  -e "\033[32m Check that the remaining disk space passes \033[0m"
@@ -58,7 +58,7 @@ if [ "$version_check" -eq 0 ]; then
 fi
 echo  -e "\033[32m Check current version succeeded \033[0m"
 [ -d "${IMAGE_PATH}" ] || mkdir -pv ${IMAGE_PATH}
-echo -e "\033[35m tar xf rainbond.images,Please wait a moment \033[0m"
+echo -e "\033[35m Tar xf rainbond.images,Please wait a moment \033[0m"
 if [ -f "$IMAGE_R6D_LOCAL" ]; then
     tar xf ${IMAGE_R6D_LOCAL} -C ${IMAGE_PATH} && tar xf ${IMAGE_BASE} -C ${IMAGE_PATH}
 else
@@ -126,9 +126,9 @@ done
 echo -e "\033[35m Start load and push new vension images \033[0m"
 while read line
 do
-	docker load -i $IMAGE_PATH/$line |awk -Fimage: '{print $2}' |xargs -I {} docker push {}
+        docker load -i $IMAGE_PATH/$line |awk -Fimage: '{print $2}' |xargs -I {} docker push {}
 done <<< "$(ls $IMAGE_PATH|grep tgz)"
-echo  -e "\033[32m load new version docker images success \033[0m"
+echo  -e "\033[32m Load new version docker images success \033[0m"
 
 echo -e "\033[35m Start load new version grctl and node \033[0m"
 mv /opt/rainbond/etc/tools/bin/node /opt/rainbond/etc/tools/bin/node.$current_version
@@ -136,10 +136,10 @@ mv /opt/rainbond/etc/tools/bin/grctl /opt/rainbond/etc/tools/bin/grctl.$current_
 
 docker run --rm -v /opt/rainbond/etc/tools:/sysdir rainbond/cni:rbd_${version} tar zxf /pkg.tgz -C /sysdir
 if [ $? -ne 0 ]; then
-    echo -e "\033[31m load new version grctl and node failure \033[0m"
+    echo -e "\033[31m Load new version grctl and node failure \033[0m"
     exit 1
 else
-    echo  -e "\033[32m load new version grctl and node success \033[0m"
+    echo  -e "\033[32m Load new version grctl and node success \033[0m"
 fi
 export ANSIBLE_HOST_KEY_CHECKING=False
 # rewrite ansible hosts
@@ -156,7 +156,7 @@ fi
 echo -e "\033[35m Execute ansible upgrade script \033[0m"
 ansible-playbook -i /opt/rainbond/rainbond-ansible/inventory/hosts /opt/rainbond/rainbond-ansible/upgrade.yml
 if [ $? -ne 0 ]; then
-    echo -e "\033[31m ansible upgrade all node failure \033[0m"
+    echo -e "\033[31m Ansible upgrade all node failure \033[0m"
     exit 1
 else
     echo  -e "\033[32m Success upgrade by ansible \033[0m"
