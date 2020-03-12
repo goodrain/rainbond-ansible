@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.10.tgz"
-IMAGE_BASE="/grdata/services/offline/base.images.upgrade.5.1.10.tgz"
+IMAGE_R6D_LOCAL="/grdata/services/offline/rainbond.images.upgrade.5.1.11.tgz"
+IMAGE_BASE="/grdata/services/offline/base.images.upgrade.5.1.11.tgz"
 IMAGE_PATH="/grdata/services/offline/upgrade"
-INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.10.tgz"
+INSTALL_SCRIPT="/grdata/services/offline/rainbond-ansible.upgrade.5.1.11.tgz"
 
 # check /grdata disk remaining space
 echo -e "\033[35m Check disk space \033[0m"
