@@ -123,7 +123,7 @@ client_key_file: "{{ region_ca_dir }}/client.pem"
 
 base_images_url: "https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2020-03-11-5.1.11.tgz"
 base_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/base.images.2020-03-11-5.1.11.sha256sum.txt"
-rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/rainbond.images.2020-03-11-5.1.11.tgz"
+rainbond_images_url: "http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2020-03-11-5.1.11.tgz"
 rainbond_images_sha256: "sha256:http://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.1/rainbond.images.2020-03-11-5.1.11.sha256sum.txt"
 
 install_ui: true
