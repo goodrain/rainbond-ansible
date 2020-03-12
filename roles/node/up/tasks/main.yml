@@ -10,6 +10,7 @@
   register: nodeup_task_result
   until: nodeup_task_result is succeeded
   retries: 5
+  delay: 5
 
 - name: Copy image push script
   template:
