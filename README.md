@@ -5,13 +5,13 @@
 
 ## Overview
 
-> Deploy a Production Ready Rainbond Cluster
+Install Rainbond 5.2.X, Please click https://github.com/goodrain/rainbond-operator
 
 ## Tutorial
 
 #### Stable version installation
 
-current version: 5.1.4
+current version: 5.1.11
 
 ```bash
 wget https://pkg.rainbond.com/releases/common/v5.1/grctl
